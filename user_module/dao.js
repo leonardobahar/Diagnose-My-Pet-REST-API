@@ -8,7 +8,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, VALID, WRONG_BODY_FORMAT
 } from "./strings";
-import {Customer} from "./model";
+import {AnimalCategory, Customer} from "./model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -160,6 +160,45 @@ export class Dao{
 					resolve(customers)
 				}
 			})
+		})
+	}
+
+	registerCustomer(user){
+		return new Promise((resolve, reject) => {
+			if (user instanceof Customer){
+				const query = "INSERT INTO `customer`(`fullname`, `mobile`, `email`, `birthdate`) VALUES (?, ?, ?, ?)"
+				this.mysqlConn.query(query, [user.fullname, user.mobile, user.email, user.birthdate], (err, res)=>{
+					if (err){
+						reject(err)
+					}
+
+					user.id = res.insertId
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	registerAnimalType(){
+
+	}
+
+	registerAnimalCategory(animalCategory){
+		return new Promise((resolve, reject) => {
+			if (animalCategory instanceof AnimalCategory){
+				const query = "INSERT INTO `animal_category`(`category_name`) VALUES (?)"
+				this.mysqlConn.query(query, [animalCategory.category_name], (err, res)=>{
+					if (err){
+						reject(err)
+					}else{
+						animalCategory.id = res.insertId
+						resolve(animalCategory)
+					}
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 
