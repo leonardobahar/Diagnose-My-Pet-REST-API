@@ -7,8 +7,6 @@ export const ERROR_FOREIGN_KEY = "There was a foreign key error. Please check th
 export const NO_SUCH_CONTENT = "No Such Content"
 export const MISMATCH_OBJ_TYPE = "Mismatch Object Type Passed"
 
-export const NO_VENDORS_AVAILABLE = "Sorry, there is no vendors available for this particular order"
-
 // CONSTANTS
 export const ALL = "ALL"
 export const ONLY_WITH_VENDORS = "ONLY WITH VENDORS"
