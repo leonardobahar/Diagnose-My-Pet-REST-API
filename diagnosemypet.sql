@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `animal_type`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	animal_name VARCHAR(255) UNIQUE NOT NULL,
 	animal_category_id INT(11),
-	FOREIGN KEY (animal_category_id) REFERENCES animal_category(id)
+	FOREIGN KEY (animal_category_id) REFERENCES animal_category(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `disease`(
@@ -34,35 +34,38 @@ CREATE TABLE IF NOT EXISTS `disease_symptoms_animal`(
 	disease_id INT(11),
 	animal_id INT(11),
 	symptoms_id INT(11),
-	FOREIGN KEY (disease_id) REFERENCES disease(id),
-	FOREIGN KEY (animal_id) REFERENCES animal_type(id),
-	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id)
+	FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (animal_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medicine_for_disease_symptoms`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	disease_symptoms_animal_id INT(11),
 	medicine_id INT(11),
-	FOREIGN KEY (disease_symptoms_animal_id) REFERENCES disease_symptoms_animal(id),
-	FOREIGN KEY (medicine_id) REFERENCES medicine(id)
+	FOREIGN KEY (disease_symptoms_animal_id) REFERENCES disease_symptoms_animal(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS `customer`(
+CREATE TABLE IF NOT EXISTS `users`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	fullname VARCHAR(255) NOT NULL,
 	mobile VARCHAR(255) UNIQUE DEFAULT NULL,
 	email VARCHAR(255) UNIQUE DEFAULT NULL,
-	birthdate DATE DEFAULT NULL
+	birthdate DATE DEFAULT NULL,
+	password VARCHAR(255),
+	salt VARCHAR(255),
+	role VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS `patients`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	fullname VARCHAR(255) NOT NULL,
-	animal_type_id INT(11) NOT NULL,
+	animal_type_id INT(11),
 	birthdate DATE DEFAULT NULL,
-	pet_owner_id INT(11) NOT NULL,
-	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id),
-	FOREIGN KEY (pet_owner_id) REFERENCES customer(id)
+	pet_owner_id INT(11),
+	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE SET NULL ON UPDATE CASCADE,
+	FOREIGN KEY (pet_owner_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_records`(
@@ -70,13 +73,13 @@ CREATE TABLE IF NOT EXISTS `medical_records`(
 	patient_id INT(11) NOT NULL,
 	case_open_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	status TEXT,
-	FOREIGN KEY (patient_id) REFERENCES patients(id)
+	FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_records_symptoms`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	medical_records_id INT(11) NOT NULL,
 	symptoms_id INT(11) NOT NULL,
-	FOREIGN KEY (medical_records_id) REFERENCES medical_records(id),
-	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id)
+	FOREIGN KEY (medical_records_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

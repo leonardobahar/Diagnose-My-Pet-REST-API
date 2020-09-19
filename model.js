@@ -38,13 +38,15 @@ export class Disease{
 	}
 }
 
-export class Customer{
-	constructor(id, fullname, mobile, email, birthdate){
-		this.id = id;
-		this.fullname = fullname;
-		this.mobile = mobile;
-		this.email = email;
-		this.birthdate = birthdate;
+export class User{
+	constructor(id, fullname, mobile, email, birthdate, password, role){
+		this.id = id
+		this.fullname = fullname
+		this.mobile = mobile
+		this.email = email
+		this.birthdate = birthdate
+		this.password = password
+		this.role = role
 	}
 
 }

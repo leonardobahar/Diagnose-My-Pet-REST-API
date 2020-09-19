@@ -1,4 +1,4 @@
-import mysqlConn from './util/mysql-conn.js'
+import mysqlConn from '../util/mysql-conn.js'
 import {
     ADMIN_VALIDATED,
     ALL, CANCELLED, INVALID, INVALID_FINAL,
@@ -7,8 +7,8 @@ import {
     NO_SUCH_CONTENT,
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, VALID, WRONG_BODY_FORMAT
-} from "./strings";
-import {AnimalCategory, Customer} from "./model";
+} from "../strings";
+import {AnimalCategory, AnimalType, User} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -70,7 +70,8 @@ export class Dao{
 		fullname VARCHAR(255) NOT NULL,
 		mobile VARCHAR(255) UNIQUE DEFAULT NULL,
 		email VARCHAR(255) UNIQUE DEFAULT NULL,
-		birthdate DATE DEFAULT NULL
+		birthdate DATE DEFAULT NULL,
+		password VARCHAR(255) NOT NULL
 		);
 		
 		CREATE TABLE IF NOT EXISTS patients(
@@ -141,19 +142,21 @@ export class Dao{
 
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM customer"
+			const query = "SELECT * FROM users"
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
 				}else{
 					let customers = []
 					for (let i=0; i<result.length; i++){
-						customers.push(new Customer(
+						customers.push(new User(
 							result[i].id,
 							result[i].fullname,
 							result[i].mobile,
 							result[i].email,
-							result[i].birthdate
+							result[i].birthdate,
+							result[i].password,
+							result[i].role
 						))
 					}
 
@@ -165,23 +168,63 @@ export class Dao{
 
 	registerCustomer(user){
 		return new Promise((resolve, reject) => {
-			if (user instanceof Customer){
-				const query = "INSERT INTO `customer`(`fullname`, `mobile`, `email`, `birthdate`) VALUES (?, ?, ?, ?)"
-				this.mysqlConn.query(query, [user.fullname, user.mobile, user.email, user.birthdate], (err, res)=>{
-					if (err){
-						reject(err)
-					}
-
-					user.id = res.insertId
-				})
-			}else{
+			if (!user instanceof User) {
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
+
+			const query = "INSERT INTO `users`(`fullname`, `mobile`, `email`, `birthdate`, `password`, `role`) VALUES (?, ?, ?, ?, ?, ?)"
+			this.mysqlConn.query(query, [user.fullname, user.mobile, user.email, user.birthdate, user.password, user.role], (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				user.id = res.insertId
+				resolve(user)
+			})
 		})
 	}
 
-	registerAnimalType(){
+	registerAnimalType(animalType){
+		return new Promise((resolve, reject) => {
+			if (!animalType instanceof AnimalType) {
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
 
+			const query = "INSERT INTO `animal_type`(`animal_name`, `animal_category_id`) VALUES (?, ?)"
+			this.mysqlConn.query(query, [animalType.animal_name, animalType.animal_category.idl], (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				animalType.id = res.insertId
+				resolve(animalType)
+			})
+		})
+	}
+
+	retrieveAnimalCategory(){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM animal_category"
+			this.mysqlConn.query(query, (error, result)=>{
+				if (error){
+					reject(error)
+				}else{
+					let categories = []
+					for (let i=0; i<result.length; i++){
+						categories.push(new User(
+							result[i].id,
+							result[i].category_name
+						))
+					}
+
+					resolve(categories)
+				}
+			})
+		})
 	}
 
 	registerAnimalCategory(animalCategory){
@@ -191,10 +234,11 @@ export class Dao{
 				this.mysqlConn.query(query, [animalCategory.category_name], (err, res)=>{
 					if (err){
 						reject(err)
-					}else{
-						animalCategory.id = res.insertId
-						resolve(animalCategory)
+						return
 					}
+
+					animalCategory.id = res.insertId
+					resolve(animalCategory)
 				})
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
