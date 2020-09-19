@@ -69,15 +69,17 @@ export class Dao{
 				}else{
 					let customers = []
 					for (let i=0; i<result.length; i++){
-						customers.push(new User(
+						const user = new User(
 							result[i].id,
 							result[i].fullname,
 							result[i].mobile,
 							result[i].email,
 							result[i].birthdate,
-							result[i].password,
+							null,
 							result[i].role
-						))
+						)
+						delete user.password
+						customers.push(user)
 					}
 
 					resolve(customers)
