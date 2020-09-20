@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, User} from "../model";
+import {AnimalCategory, AnimalType, Disease, Symptoms, User} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -57,53 +57,6 @@ export class Dao{
 		}
 
 		handleConnection()
-	}
-
-
-	retrieveUsers(){
-		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM users"
-			this.mysqlConn.query(query, (error, result)=>{
-				if (error){
-					reject(error)
-				}else{
-					let customers = []
-					for (let i=0; i<result.length; i++){
-						customers.push(new User(
-							result[i].id,
-							result[i].fullname,
-							result[i].mobile,
-							result[i].email,
-							result[i].birthdate,
-							result[i].password,
-							result[i].role
-						))
-					}
-
-					resolve(customers)
-				}
-			})
-		})
-	}
-
-	registerCustomer(user){
-		return new Promise((resolve, reject) => {
-			if (!user instanceof User) {
-				reject(MISMATCH_OBJ_TYPE)
-				return
-			}
-
-			const query = "INSERT INTO `users`(`fullname`, `mobile`, `email`, `birthdate`, `password`, `role`) VALUES (?, ?, ?, ?, ?, ?)"
-			this.mysqlConn.query(query, [user.fullname, user.mobile, user.email, user.birthdate, user.password, user.role], (err, res)=>{
-				if (err){
-					reject(err)
-					return
-				}
-
-				user.id = res.insertId
-				resolve(user)
-			})
-		})
 	}
 
 	retrieveAnimalType(){
@@ -189,9 +142,83 @@ export class Dao{
 		})
 	}
 
-	retrieveUserPets(user_id){
+	retrieveDisease(){
 		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM disease"
+			this.mysqlConn.query(query, (error, result)=>{
+				if (error){
+					reject(error)
+				}else{
+					let diseases = []
+					for (let i=0; i<result.length; i++){
+						diseases.push(new User(
+							result[i].id,
+							result[i].disease_name
+						))
+					}
 
+					resolve(diseases)
+				}
+			})
+		})
+	}
+
+	registerDisease(disease){
+		return new Promise((resolve, reject) => {
+			if (disease instanceof Disease){
+				const query = "INSERT INTO `disease`(`disease_name`) VALUES (?)"
+				this.mysqlConn.query(query, [disease.disease_name], (err, res)=>{
+					if (err){
+						reject(err)
+						return
+					}
+
+					disease.id = res.insertId
+					resolve(disease)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveSymptom(){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM symptoms"
+			this.mysqlConn.query(query, (error, result)=>{
+				if (error){
+					reject(error)
+				}else{
+					let symptoms = []
+					for (let i=0; i<result.length; i++){
+						symptoms.push(new User(
+							result[i].id,
+							result[i].symptom_name
+						))
+					}
+
+					resolve(symptoms)
+				}
+			})
+		})
+	}
+
+	registerSymptom(symptom){
+		return new Promise((resolve, reject) => {
+			if (symptom instanceof Symptoms){
+				const query = "INSERT INTO `symptoms`(`symptom_name`) VALUES (?)"
+				this.mysqlConn.query(query, [symptom.symptom_name], (err, res)=>{
+					if (err){
+						reject(err)
+						return
+					}
+
+					symptom.id = res.insertId
+					resolve(symptom)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 }

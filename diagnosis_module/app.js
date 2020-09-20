@@ -8,7 +8,7 @@ import {
     SOMETHING_WENT_WRONG,
     WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, User} from "../model";
+import {AnimalCategory, AnimalType, Disease, User} from "../model";
 
 dotenv.config();
 
@@ -125,6 +125,55 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
             new AnimalCategory(req.body.category_id, null))
 
         dao.registerAnimalType(animal).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(200).send({
+                    success: false,
+                    message: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.log(err)
+                res.status(500).send({
+                    success: false,
+                    result: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
+app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
+    dao.retrieveDisease().then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/diagnosis/add-disease", (req, res)=>{
+    if (typeof req.body.disease_name === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }else{
+        const disease = new Disease(null,
+            req.body.disease_name)
+
+        dao.registerDisease(disease).then(result=>{
             res.status(200).send({
                 success: true,
                 result: result
