@@ -308,7 +308,7 @@ app.get("/api/diagnosis/retrieve-symptoms-of-disease", (req, res)=>{
     })
 })
 
-app.get("/api/diagnosis/diagnose-this", (req, res)=>{
+app.post("/api/diagnosis/diagnose-this", (req, res)=>{
     if (typeof req.body.symptoms === 'undefined'){
         res.status(400).send({
             success: false,
