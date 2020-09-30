@@ -1,13 +1,13 @@
 import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
 import {
-    ADMIN_VALIDATED,
-    ALL, CANCELLED, INVALID, INVALID_FINAL,
-    MISMATCH_OBJ_TYPE,
-    NO_AFFECTED_ROWS,
-    NO_SUCH_CONTENT,
-    ONLY_WITH_VENDORS, ORDER_PROCESSING,
-    SOMETHING_WENT_WRONG, VALID, WRONG_BODY_FORMAT
+	ADMIN_VALIDATED,
+	ALL, CANCELLED, DUPLICATE_ENTRY, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
+	MISMATCH_OBJ_TYPE,
+	NO_AFFECTED_ROWS,
+	NO_SUCH_CONTENT,
+	ONLY_WITH_VENDORS, ORDER_PROCESSING,
+	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
 import {AnimalCategory, AnimalType, Disease, Symptoms, User} from "../model";
 
@@ -49,7 +49,7 @@ export class Dao{
 					console.log('db error', err)
 					if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
 						handleConnection()                         // lost due to either server restart, or a
-					} else {                                      // connnection idle timeout (the wait_timeout
+					} else {                                      // connection idle timeout (the wait_timeout
 						throw err                                  // server variable configures this)
 					}
 				})
@@ -219,6 +219,117 @@ export class Dao{
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	bindSymptomToDisease(symptom, disease, animal){
+		return new Promise((resolve, reject)=>{
+			if (symptom instanceof Symptoms &&
+				disease instanceof Disease &&
+				animal instanceof AnimalType){
+				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ?"
+				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id], (err, res)=>{
+					if (res.length > 1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					const query = "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`) VALUES (?, ?, ?)";
+					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id], (err, res)=>{
+						if (err){
+							reject(err)
+							return
+						}
+
+						resolve(SUCCESS)
+					})
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	diagnoseSymptoms(symptoms){
+		return new Promise((resolve, reject) => {
+			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, " +
+				"dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name " +
+				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
+				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
+				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
+				"WHERE dsa.symptoms_id IN (?)";
+
+			this.mysqlConn.query(query, [symptoms], async(err, res)=>{
+				//resolve(res)
+				let diagnoseResult = []
+				// Narrows down res to categorised set
+				res.forEach(diseaseResult=>{
+					if (diagnoseResult === 0){
+						diagnoseResult.push({
+							disease_id: diseaseResult.disease_id,
+							key: diseaseResult.disease_name,
+							symptoms: [diseaseResult]
+						})
+					}else{
+						// Check if disease has already exist in array
+						const index = diagnoseResult.findIndex(t=> t.key === diseaseResult.disease_name)
+
+						if (index === -1){
+							// Does not exist therefore push here
+							diagnoseResult.push({
+								disease_id: diseaseResult.disease_id,
+								key: diseaseResult.disease_name,
+								symptoms: [diseaseResult]
+							})
+						}else{
+							// Exist therefore add to that index
+							diagnoseResult[index].symptoms.push(diseaseResult)
+						}
+					}
+				})
+
+				// await diagnoseResult.map(async resultSet => {
+				// 	resultSet.symptoms_met = Object(resultSet.symptoms).length
+				// 	const diseaseSymptoms = await this.retrieveSymptomsForDisease(resultSet.disease_id).catch(err=>{console.error(err)})
+				// 	resultSet.total_disease_symptoms = diseaseSymptoms.length
+				// 	return resultSet
+				// })
+
+				for (let i=0; i<diagnoseResult.length; i++){
+					const resultSet = diagnoseResult[i]
+					resultSet.symptoms_met = Object(resultSet.symptoms).length
+					const diseaseSymptoms = await this.retrieveSymptomsForDisease(new Disease(resultSet.disease_id)).catch(err=>{console.error(err)})
+					resultSet.total_disease_symptoms = diseaseSymptoms.length
+				}
+
+				resolve(diagnoseResult)
+			})
+		})
+	}
+
+	retrieveSymptomsForDisease(disease){
+		return new Promise((resolve, reject) => {
+			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, " +
+				"dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name " +
+				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
+				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
+				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
+				"WHERE dsa.disease_id = ?"
+
+			this.mysqlConn.query(query, [disease.id], (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				const symptoms = res.map(rowDataPacket => {
+					return new Symptoms(
+						rowDataPacket.id,
+						rowDataPacket.symptom_name
+					)
+				})
+				resolve(symptoms)
+			})
 		})
 	}
 }
