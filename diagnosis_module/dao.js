@@ -260,6 +260,10 @@ export class Dao{
 				"WHERE dsa.symptoms_id IN (?)";
 
 			this.mysqlConn.query(query, [symptoms], async(err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
 				//resolve(res)
 				let diagnoseResult = []
 				// Narrows down res to categorised set
@@ -287,13 +291,6 @@ export class Dao{
 						}
 					}
 				})
-
-				// await diagnoseResult.map(async resultSet => {
-				// 	resultSet.symptoms_met = Object(resultSet.symptoms).length
-				// 	const diseaseSymptoms = await this.retrieveSymptomsForDisease(resultSet.disease_id).catch(err=>{console.error(err)})
-				// 	resultSet.total_disease_symptoms = diseaseSymptoms.length
-				// 	return resultSet
-				// })
 
 				for (let i=0; i<diagnoseResult.length; i++){
 					const resultSet = diagnoseResult[i]
