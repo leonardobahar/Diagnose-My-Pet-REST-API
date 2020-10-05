@@ -89,7 +89,7 @@ app.post("/api/user/register-user", (req, res)=>{
             })
         }).catch(err=>{
             if (err.code === 'ER_DUP_ENTRY') {
-                res.status(200).send({
+                res.status(500).send({
                     success: false,
                     message: 'DUPLICATE-ENTRY'
                 })
