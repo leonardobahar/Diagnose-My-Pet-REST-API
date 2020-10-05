@@ -313,7 +313,7 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
 
 app.post("/api/diagnosis/update-disease",(req,res)=>{
     if(typeof req.body.id==='undefined' ||
-        typeof req.body.disease_name){
+        typeof req.body.disease_name === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -325,8 +325,7 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
 
     dao.updateDisease(disease).then(result=>{
         res.status(200).send({
-            success:true,
-            result:result
+            success:true
         })
     }).catch(err=>{
         if(err.code==='ER_DUP_ENTRY'){
@@ -504,6 +503,28 @@ app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
                 result: SOMETHING_WENT_WRONG
             })
         }
+    })
+})
+
+app.delete("/api/diagnosis/delete-bind-symptom-to-disease", (req, res)=>{
+    if (typeof req.query.bind_id === 'undefined' ){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.unbindDiseaseSymptoms(req.query.bind_id).then(result=>{
+        res.status(200).send({
+            success: true
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            result: SOMETHING_WENT_WRONG
+        })
     })
 })
 

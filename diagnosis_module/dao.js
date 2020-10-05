@@ -471,12 +471,32 @@ export class Dao{
 				}
 
 				const symptoms = res.map(rowDataPacket => {
-					return new Symptoms(
-						rowDataPacket.id,
-						rowDataPacket.symptom_name
-					)
+					// return new Symptoms(
+					// 	rowDataPacket.id,
+					// 	rowDataPacket.symptom_name
+					// )
+
+					return {
+						bind_id : rowDataPacket.id,
+						symptom_id: rowDataPacket.symptoms_id,
+						symptom_name : rowDataPacket.symptom_name
+					}
 				})
 				resolve(symptoms)
+			})
+		})
+	}
+
+	unbindDiseaseSymptoms(bind_id){
+		return new Promise((resolve, reject) => {
+			const query = "DELETE FROM disease_symptoms_animal WHERE id = ?"
+			this.mysqlConn.query(query, [bind_id], (err, res)=> {
+				if (err) {
+					reject(err)
+					return
+				}
+
+				resolve(SUCCESS)
 			})
 		})
 	}
