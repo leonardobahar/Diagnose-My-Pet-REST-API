@@ -283,15 +283,15 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query="DELETE FROM disease WHERE id=?"
-			this.mysqlConn.query(query,disease.id, (err,res)=>{
+			const query= "DELETE FROM disease WHERE id = ? "
+			this.mysqlConn.query(query,[disease.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
 				}
 
 				disease.id=res.insertId
-				resolve(disease)
+				resolve(SUCCESS)
 			})
 		})
 	}

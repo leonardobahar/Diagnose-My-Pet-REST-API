@@ -345,20 +345,19 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
     }
 })
 
-app.post("/api/diagnosis/delete-disease", (req,res)=>{
-    if(typeof req.body.id==='undefined'){
+app.delete("/api/diagnosis/delete-disease", (req,res)=>{
+    if(typeof req.query.disease_id==='undefined'){
         res.status(404).send({
             success:false,
-            error:SOMETHING_WENT_WRONG
+            error: WRONG_BODY_FORMAT
         })
     }
 
     else{
-        const disease=new Disease(req.body.id,null,null,null)
+        const disease=new Disease(req.query.disease_id,null,null,null)
         dao.deleteDisease(disease).then(result=>{
             res.status(200).send({
-                success:true,
-                result:result
+                success:true
             })
         }).catch(err=>{
             console.log(err)
