@@ -215,7 +215,7 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     }
 
     else{
-        const animal=new AnimalType(null,req.body.category_name.toUpperCase())
+        const animal=new AnimalType(req.body.id,req.body.category_name.toUpperCase())
 
         dao.updateAnimalType(animal).then(result=>{
             res.status(200).send({
@@ -320,7 +320,7 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
     }
 
     else{
-        const disease=new Disease(null,req.body.disease_name.toUpperCase())
+        const disease=new Disease(req.body.id,req.body.disease_name.toUpperCase())
 
         dao.updateDisease(disease).then(result=>{
             res.status(200).send({
@@ -427,7 +427,7 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
     }
 
     else{
-        const symptom=new Symptoms(null,req.body.symptom_name.toUpperCase())
+        const symptom=new Symptoms(req.body.id,req.body.symptom_name.toUpperCase())
 
         dao.updateSymptom(symptom).then(result=>{
             res.status(200).send({
