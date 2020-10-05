@@ -420,10 +420,11 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
 })
 
 app.post("/api/diagnosis/update-symptom",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.id ==='undefined' ||
+        typeof req.body.symptom_name === "undefined"){
         res.status(404).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
+            success: false,
+            error: WRONG_BODY_FORMAT
         })
     }
 
@@ -432,8 +433,7 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
 
         dao.updateSymptom(symptom).then(result=>{
             res.status(200).send({
-                success:true,
-                result:result
+                success:true
             })
         }).catch(err=>{
             console.log(err)

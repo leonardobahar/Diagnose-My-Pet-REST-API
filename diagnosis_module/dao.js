@@ -342,15 +342,14 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query = "UPDATE symptom SET symptom_name=? WHERE id=?"
+			const query = "UPDATE symptoms SET symptom_name=? WHERE id=?"
 			this.mysqlConn.query(query, [symptom.symptom_name,symptom.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
 				}
 
-				symptom.id=res.insertId
-				resolve(animalCategory)
+				resolve(SUCCESS)
 			})
 		})
 	}
