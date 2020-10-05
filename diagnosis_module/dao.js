@@ -360,7 +360,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query="DELETE FROM symptom WHERE id=?"
+			const query="DELETE FROM symptoms WHERE id=?"
 			this.mysqlConn.query(query,symptom.id,(err,res)=>{
 				if(err){
 					reject(err)
