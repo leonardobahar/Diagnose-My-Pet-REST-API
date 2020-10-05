@@ -336,6 +336,10 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
                 res.end()
             }else{
                 console.log(err)
+                res.status(500).send({
+                    success: false,
+                    message: SOMETHING_WENT_WRONG
+                })
             }
         })
     }
@@ -357,14 +361,12 @@ app.post("/api/diagnosis/delete-disease", (req,res)=>{
                 result:result
             })
         }).catch(err=>{
-            if(err.code==="SOMETHING_WENT_WRONG"){
-                console.log(err)
-                res.status(500).send({
-                    success:false,
-                    result:SOMETHING_WENT_WRONG
-                    }
-                )
-            }
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                result:SOMETHING_WENT_WRONG
+                }
+            )
         })
     }
 })
@@ -435,15 +437,11 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
                 result:result
             })
         }).catch(err=>{
-            if(err.code==='ER_DUP_ENTRY'){
-                res.status(200).send({
-                    success:false,
-                    message:'DUPLICATE-ENTRY'
-                })
-                res.end()
-            }else{
-                console.log(err)
-            }
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
         })
     }
 })
@@ -463,13 +461,11 @@ app.post("/api/diagnosis/delete-symptom",(req,res)=>{
                 result:result
             })
         }).catch(err=>{
-            if(err.code==='SOMETHING_WENT_WRONG'){
-                console.log(err)
-                res.status(500).send({
-                    success:false,
-                    result:SOMETHING_WENT_WRONG
-                })
-            }
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
         })
     }
 })

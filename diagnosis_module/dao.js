@@ -227,7 +227,7 @@ export class Dao{
 				}else{
 					let diseases = []
 					for (let i=0; i<result.length; i++){
-						diseases.push(new User(
+						diseases.push(new Disease(
 							result[i].id,
 							result[i].disease_name
 						))
