@@ -102,6 +102,44 @@ export class Dao{
 		})
 	}
 
+	updateAnimalType(animal){
+		return new Promise((resolve,reject)=>{
+			if(!animal instanceof AnimalCategory){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE animal_type SET animal_name=?, animal_category_id=? WHERE id=?"
+			this.mysqlConn.query(query, [animal.animal_name,animal.animal_category,animal.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				animal.id=res.insertId
+				resolve(animal)
+			})
+		})
+	}
+
+	deleteAnimalType(animalType){
+		return new Promise((resolve,reject)=>{
+			if(!animalType instanceof AnimalType){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "DELETE FROM animal_type WHERE id = ?"
+			this.mysqlConn.query(query, [animalType.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				animalType.id=res.insertId
+				resolve(animalType)
+			})
+		})
+	}
+
 	retrieveAnimalCategory(){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT * FROM animal_category"
@@ -139,6 +177,44 @@ export class Dao{
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	updateAnimalCategory(animalCategory){
+		return new Promise((resolve,reject)=>{
+			if(!animalCategory instanceof AnimalCategory){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE animal_category SET category_name=? WHERE id=?"
+			this.mysqlConn.query(query, [animalCategory.category_name,animalCategory.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				animalCategory.id=res.insertId
+				resolve(animalCategory)
+			})
+		})
+	}
+
+	deleteAnimalCategory(animalCategory){
+		return new Promise((resolve,reject)=>{
+			if(!animalCategory instanceof AnimalCategory){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "DELETE FROM animal_category WHERE id = ?"
+			this.mysqlConn.query(query, animalCategory.id, (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				animalCategory.id=res.insertId
+				resolve(animalCategory)
+			})
 		})
 	}
 
@@ -182,6 +258,44 @@ export class Dao{
 		})
 	}
 
+	updateDisease(disease){
+		return new Promise((resolve,reject)=>{
+			if(!disease instanceof Disease){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE disease SET disease_name=? WHERE id=?"
+			this.mysqlConn.query(query, [disease.disease_name,disease.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				disease.id=res.insertId
+				resolve(disease)
+			})
+		})
+	}
+
+	deleteDisease(disease){
+		return new Promise((resolve, reject)=>{
+			if(!disease instanceof Disease){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query="DELETE FROM disease WHERE id=?"
+			this.mysqlConn.query(query,disease.id, (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				disease.id=res.insertId
+				resolve(disease)
+			})
+		})
+	}
+
 	retrieveSymptom(){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT * FROM symptoms"
@@ -219,6 +333,44 @@ export class Dao{
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	updateSymptom(symptom){
+		return new Promise((resolve,reject)=>{
+			if(!symptom instanceof Symptoms){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE symptom SET symptom_name=? WHERE id=?"
+			this.mysqlConn.query(query, [symptom.symptom_name,symptom.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				symptom.id=res.insertId
+				resolve(animalCategory)
+			})
+		})
+	}
+
+	deleteSymptom(symptom){
+		return new Promise((resolve,reject)=>{
+			if(!symptom instanceof Symptoms){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query="DELETE FROM symptom WHERE id=?"
+			this.mysqlConn.query(query,symptom.id,(err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				symptom.id=res.insertId
+				resolve(symptom)
+			})
 		})
 	}
 

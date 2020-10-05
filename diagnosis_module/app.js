@@ -98,6 +98,63 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
     }
 })
 
+app.post("/api/diagnosis/update-animal-category",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else{
+        const category=new AnimalCategory(req.body.id,req.body.category_name.toUpperCase())
+
+        dao.updateAnimalCategory(category).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(200).send({
+                    success:false,
+                    message:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.log(err)
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/delete-animal-category", (req,res)=>{
+    if(typeof req.body.id === 'undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        const category=new AnimalCategory(req.body.id,null)
+
+        dao.deleteAnimalCategory(category).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='SOMETHING_WENT_WRONG'){
+                console.log(err)
+                res.status(500).send({
+                    success: false,
+                    result: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
 app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
     dao.retrieveAnimalType().then(result=>{
         res.status(200).send({
@@ -139,6 +196,62 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
                 })
                 res.end()
             }else{
+                console.log(err)
+                res.status(500).send({
+                    success: false,
+                    result: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/update-animal-type",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else{
+        const animal=new AnimalType(null,req.body.category_name.toUpperCase())
+
+        dao.updateAnimalType(animal).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(200).send({
+                    success:false,
+                    message:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.log(err)
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/delete-animal-type", (req,res)=>{
+    if(typeof req.body.id === 'undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        const animalType=new AnimalType(req.body.id,null,null)
+        dao.deleteAnimalType(animalType).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='SOMETHING_WENT_WRONG'){
                 console.log(err)
                 res.status(500).send({
                     success: false,
@@ -198,6 +311,64 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
     }
 })
 
+app.post("/api/diagnosis/update-disease",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else{
+        const disease=new Disease(null,req.body.disease_name.toUpperCase())
+
+        dao.updateDisease(disease).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(200).send({
+                    success:false,
+                    message:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.log(err)
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/delete-disease", (req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else{
+        const disease=new Disease(req.body.id,null,null,null)
+        dao.deleteDisease(disease).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==="SOMETHING_WENT_WRONG"){
+                console.log(err)
+                res.status(500).send({
+                    success:false,
+                    result:SOMETHING_WENT_WRONG
+                    }
+                )
+            }
+        })
+    }
+})
+
 app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
     dao.retrieveSymptom().then(result=>{
         res.status(200).send({
@@ -241,6 +412,62 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
                 res.status(500).send({
                     success: false,
                     result: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/update-symptom",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else{
+        const symptom=new Symptoms(null,req.body.symptom_name.toUpperCase())
+
+        dao.updateSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(200).send({
+                    success:false,
+                    message:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.log(err)
+            }
+        })
+    }
+})
+
+app.post("/api/diagnosis/delete-symptom",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            result:SOMETHING_WENT_WRONG
+        })
+    }
+    else{
+        const symptom=new Symptoms(req.body.id,null)
+        dao.deleteSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='SOMETHING_WENT_WRONG'){
+                console.log(err)
+                res.status(500).send({
+                    success:false,
+                    result:SOMETHING_WENT_WRONG
                 })
             }
         })
