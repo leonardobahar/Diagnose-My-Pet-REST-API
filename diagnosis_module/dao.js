@@ -9,7 +9,7 @@ import {
 	ONLY_WITH_VENDORS, ORDER_PROCESSING,
 	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, Disease, Symptoms, User} from "../model";
+import {AnimalCategory, AnimalType, Disease, Patient, Symptoms, User} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -320,8 +320,8 @@ export class Dao{
 	registerSymptom(symptom){
 		return new Promise((resolve, reject) => {
 			if (symptom instanceof Symptoms){
-				const query = "INSERT INTO `symptoms`(`symptom_name`) VALUES (?)"
-				this.mysqlConn.query(query, [symptom.symptom_name], (err, res)=>{
+				const query = "INSERT INTO symptoms(symptom_name) VALUES (?)"
+				this.mysqlConn.query(query, symptom.symptom_name, (err, res)=>{
 					if (err){
 						reject(err)
 						return
@@ -373,6 +373,176 @@ export class Dao{
 		})
 	}
 
+	retrieveUser(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM users"
+			this.mysqlConn.query(query,(error,result)=>{
+				if (error){
+					reject(error)
+				}
+
+				else{
+					let users=[]
+					for(let i=0; i<users.length; i++){
+						users.push(new User(
+							result[i].id,
+							result[i].fullname,
+							result[i].mobile,
+							result[i].email,
+							result[i].birthdate,
+							result[i].password,
+							result[i].salt,
+							result[i].role
+						))
+					}
+
+					resolve(users)
+				}
+			})
+		})
+	}
+
+	registerUser(user){
+		return new Promise((resolve,reject)=>{
+			if(user instanceof User){
+				const query="INSERT INTO `users`(`fullname`,`mobile`,`email`, `birthdate, `password`, `salt`, `role`) VALUES(?, ?, ?, ?, ?, ?)"
+				this.mysqlConn.query(query,[user.fullname, user.mobile, user.email, user.birthdate, user.password, user.salt, user.role],(err,res)=>{
+					if(err){
+						reject(err)
+						return
+					}
+
+					user.id=res.insertId
+					resolve(user)
+				})
+			}
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	updateUser(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE user SET fullname=?, mobile=?, birthdate=?, password=?, salt=?, role=? WHERE id=?"
+			this.mysqlConn.query(query, [user.fullname,user.mobile,user.birthdate,user.salt,user.role,user.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	deleteUser(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query="DELETE FROM users WHERE id=?"
+			this.mysqlConn.query(query,user.id,(err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				user.id=res.insertId
+				resolve(user)
+			})
+		})
+	}
+
+	retrievePatient(){
+		return new Promise((resolve, reject)=>{
+			const query="SELECT * FROM patients"
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+				}
+
+				else{
+					let patients=[]
+					for(let i=0; i<patients.length; i++){
+						patients.push(new User(
+							result[i].id,
+							result[i].fullname,
+							result[i].animal_type,
+							result[i].birthdate,
+							result[i].pet_owner
+						))
+					}
+					resolve(users)
+				}
+			})
+		})
+	}
+
+	registerPatient(patient){
+		return new Promise((resolve,reject)=>{
+			if(patient instanceof Patient){
+				const query="INSERT INTO `patients`(`fullname`,`animal_type_id`,`birthdate`, `pet_owner_id`) VALUES(?, ?, ?, ?)"
+				this.mysqlConn.query(query,[patient.fullname, patient.animal_type, patient.birthdate, patient.pet_owner],(err,res)=>{
+					if(err){
+						reject(err)
+						return
+					}
+
+					patient.id=res.insertId
+					resolve(patient)
+				})
+			}
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	updatePatient(patient){
+		return new Promise((resolve, reject)=>{
+			if(!patient instanceof Patient){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			else{
+				const query="UPDATE patients SET fullname=?, animal_type_id=?, birthdate=?, pet_owner_id=? WHERE id=?"
+				this.mysqlConn.query(query, [patient.fullname, patient.animal_type, patient.birthdate, patient.pet_owner, patient.id], (err, res)=>{
+					if(err){
+						reject(err)
+						return
+					}
+
+					resolve(SUCCESS)
+				})
+			}
+		})
+	}
+
+	deletePatient(patient){
+		return new Promise((resolve, reject)=>{
+			if(!patient instanceof Patient){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query="DELETE FROM patients WHERE id=?"
+			this.mysqlConn.query(query,patient.id,(err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				patient.id=res.insertId
+				resolve(patient)
+			})
+		})
+	}
+
 	bindSymptomToDisease(symptom, disease, animal){
 		return new Promise((resolve, reject)=>{
 			if (symptom instanceof Symptoms &&
@@ -396,6 +566,33 @@ export class Dao{
 					})
 				})
 			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	bindUserToPet(user,patient){
+		return new Promise((resolve,reject)=>{
+			if(user instanceof User &&
+				patient instanceof Patient){
+				const checkQuery="SELECT id FROM users_patients WHERE user_id=? AND patient_id=?"
+				this.mysqlConn.query(checkQuery, [user.id,patient.id], (err, res)=>{
+					if(res.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					const query="INSERT INTO `users_patients` (`user_id`, `patient_id`) VALUES(?, ?)";
+					this.mysqlConn.query(query, [user.id, patient.id], (err,res)=>{
+						if(err){
+							reject(err)
+							return
+						}
+
+						resolve(SUCCESS)
+					})
+				})
+			}else {
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
