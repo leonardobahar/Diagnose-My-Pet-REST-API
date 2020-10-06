@@ -227,7 +227,7 @@ export class Dao{
 				}else{
 					let diseases = []
 					for (let i=0; i<result.length; i++){
-						diseases.push(new User(
+						diseases.push(new Disease(
 							result[i].id,
 							result[i].disease_name
 						))
@@ -283,15 +283,15 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query="DELETE FROM disease WHERE id=?"
-			this.mysqlConn.query(query,disease.id, (err,res)=>{
+			const query= "DELETE FROM disease WHERE id = ? "
+			this.mysqlConn.query(query,[disease.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
 				}
 
 				disease.id=res.insertId
-				resolve(disease)
+				resolve(SUCCESS)
 			})
 		})
 	}
@@ -342,15 +342,14 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query = "UPDATE symptom SET symptom_name=? WHERE id=?"
+			const query = "UPDATE symptoms SET symptom_name=? WHERE id=?"
 			this.mysqlConn.query(query, [symptom.symptom_name,symptom.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
 				}
 
-				symptom.id=res.insertId
-				resolve(animalCategory)
+				resolve(SUCCESS)
 			})
 		})
 	}
@@ -361,7 +360,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query="DELETE FROM symptom WHERE id=?"
+			const query="DELETE FROM symptoms WHERE id=?"
 			this.mysqlConn.query(query,symptom.id,(err,res)=>{
 				if(err){
 					reject(err)
@@ -472,12 +471,32 @@ export class Dao{
 				}
 
 				const symptoms = res.map(rowDataPacket => {
-					return new Symptoms(
-						rowDataPacket.id,
-						rowDataPacket.symptom_name
-					)
+					// return new Symptoms(
+					// 	rowDataPacket.id,
+					// 	rowDataPacket.symptom_name
+					// )
+
+					return {
+						bind_id : rowDataPacket.id,
+						symptom_id: rowDataPacket.symptoms_id,
+						symptom_name : rowDataPacket.symptom_name
+					}
 				})
 				resolve(symptoms)
+			})
+		})
+	}
+
+	unbindDiseaseSymptoms(bind_id){
+		return new Promise((resolve, reject) => {
+			const query = "DELETE FROM disease_symptoms_animal WHERE id = ?"
+			this.mysqlConn.query(query, [bind_id], (err, res)=> {
+				if (err) {
+					reject(err)
+					return
+				}
+
+				resolve(SUCCESS)
 			})
 		})
 	}
