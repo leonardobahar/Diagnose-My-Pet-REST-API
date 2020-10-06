@@ -100,7 +100,7 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
 
 app.post("/api/diagnosis/update-animal-category",(req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -130,7 +130,7 @@ app.post("/api/diagnosis/update-animal-category",(req,res)=>{
 
 app.post("/api/diagnosis/delete-animal-category", (req,res)=>{
     if(typeof req.body.id === 'undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -208,7 +208,7 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
 
 app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -238,7 +238,7 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
 
 app.post("/api/diagnosis/delete-animal-type", (req,res)=>{
     if(typeof req.body.id === 'undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -313,7 +313,7 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
 
 app.post("/api/diagnosis/update-disease",(req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -343,7 +343,7 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
 
 app.post("/api/diagnosis/delete-disease", (req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -420,7 +420,7 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
 
 app.post("/api/diagnosis/update-symptom",(req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
@@ -450,7 +450,7 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
 
 app.post("/api/diagnosis/delete-symptom",(req,res)=>{
     if(typeof req.body.id==='undefined'){
-        res.status(404).send({
+        res.status(500).send({
             success:false,
             result:SOMETHING_WENT_WRONG
         })
