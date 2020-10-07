@@ -38,15 +38,25 @@ export class Disease{
 	}
 }
 
+export class Patient{
+	constructor(id, fullname, animal_type, birthdate, pet_owner) {
+		this.id=id
+		this.fullname=fullname
+		this.animal_type=animal_type
+		this.birthdate=birthdate
+		this.pet_owner=pet_owner
+	}
+}
+
 export class User{
-	constructor(id, fullname, mobile, email, birthdate, password, role){
+	constructor(id, fullname, mobile, email, birthdate, password, salt, role){
 		this.id = id
 		this.fullname = fullname
 		this.mobile = mobile
 		this.email = email
 		this.birthdate = birthdate
 		this.password = password
+		this.salt=salt
 		this.role = role
 	}
-
 }
