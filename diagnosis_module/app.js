@@ -11,6 +11,7 @@ import {
     WRONG_BODY_FORMAT
 } from "../strings";
 import {AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import * as swaggerUi from "swagger-ui-express";
 
 dotenv.config();
 
@@ -43,6 +44,37 @@ const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
+const swaggerJsDoc=require('swagger-jsdoc')
+const swaggerUI=require('swagger-ui-express')
+
+//Extended: https://swagger.io/specification/#infoObject
+const swaggerOptions={
+    swaggerDefinition: {
+        info:{
+            title:'Diagnosis Module',
+            description:"Diagnosis API Information",
+            contact:{
+              Team: "BaharTech CodeDoc"
+            },
+            servers:["http://localhost:8086"]
+        }
+    },
+    //[`.routes/*.js`]
+    apis:["/diagnosis_module/app.js"]
+};
+
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs/',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+
+/**
+ * @swagger
+ * /diagnosis:
+ * get:
+ *   description: Use to get all animal categories
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
@@ -64,31 +96,17 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
     }
 })
 
-app.get("/api/diagnosis/retrieve-one-animal-category", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
 
-    else {
-        const category=new AnimalCategory(req.body.id,null)
 
-        dao.retrieveOneAnimalCategory(category).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * / Diagnosis:
+ * post:
+ *   description: Use to add animal categories
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-animal-category", (req, res)=>{
     if (typeof req.body.category_name === 'undefined'){
@@ -123,6 +141,16 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update animal category by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/diagnosis/update-animal-category",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(500).send({
@@ -153,6 +181,16 @@ app.post("/api/diagnosis/update-animal-category",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete animal category by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-animal-category", (req,res)=>{
     if(typeof req.body.id === 'undefined'){
         res.status(500).send({
@@ -177,6 +215,16 @@ app.delete("/api/diagnosis/delete-animal-category", (req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get all animal types
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
     dao.retrieveAnimalType().then(result=>{
         res.status(200).send({
@@ -192,31 +240,15 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
     })
 })
 
-app.get("/api/diagnosis/retrieve-one-animal-type", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
-
-    else {
-        const type=new AnimalType(req.body.id,null,null)
-
-        dao.retrieveOneAnimalType(type).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to add animal types
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-animal-type", (req, res)=>{
     if (typeof req.body.category_id === 'undefined' ||
@@ -254,6 +286,16 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update animal type by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(400).send({
@@ -284,6 +326,16 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete animal type by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
     if(typeof req.body.id === 'undefined'){
         res.status(400).send({
@@ -310,6 +362,16 @@ app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get all disease
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
     dao.retrieveDisease().then(result=>{
         res.status(200).send({
@@ -325,31 +387,15 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
     })
 })
 
-app.get("/api/diagnosis/retrieve-one-animal-disease", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
-
-    else {
-        const disease=new Disease(req.body.id,null)
-
-        dao.retrieveOneDisease(disease).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to add disease
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-disease", (req, res)=>{
     if (typeof req.body.disease_name === 'undefined'){
@@ -384,6 +430,16 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
         })
     }
 })
+
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update disease by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/update-disease",(req,res)=>{
 
@@ -422,6 +478,16 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete disease by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-disease", (req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(500).send({
@@ -449,6 +515,16 @@ app.delete("/api/diagnosis/delete-disease", (req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get all symptom
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
     dao.retrieveSymptom().then(result=>{
         res.status(200).send({
@@ -464,31 +540,15 @@ app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
     })
 })
 
-app.get("/api/diagnosis/retrieve-one-animal-symptom", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
-
-    else {
-        const symptom=new Symptoms(req.body.id,null)
-
-        dao.retrieveOneSymptom(symptom).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to add symptom
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-symptom", (req, res)=>{
     if (typeof req.body.symptom_name === 'undefined'){
@@ -524,6 +584,16 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update symptom by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/diagnosis/update-symptom",(req,res)=>{
     if(typeof req.body.id==='undefined') {
         res.status(500).send({
@@ -558,6 +628,16 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete symptom by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(500).send({
@@ -582,6 +662,16 @@ app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get all medicine
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
     dao.retrieveMedicine().then(result=>{
         res.status(200).send({
@@ -597,31 +687,15 @@ app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
     })
 })
 
-app.get("/api/diagnosis/retrieve-one-medicine", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
-
-    else {
-        const medicine=new Medicine(req.body.id,null)
-
-        dao.retrieveOneMedicine(medicine).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to add medicine
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-medicine",(req,res)=>{
     if(typeof req.body.medicine_name === 'undefined' ||
@@ -659,6 +733,16 @@ app.post("/api/diagnosis/add-medicine",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update medicine by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/diagnosis/update-medicine",(req,res)=>{
     if(typeof req.body.id==='undefined' ||
         typeof req.body.medicine_name==='undefined' ||
@@ -686,6 +770,16 @@ app.post("/api/diagnosis/update-medicine",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete medicine by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-medicine",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(500).send({
@@ -711,6 +805,16 @@ app.delete("/api/diagnosis/delete-medicine",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get all patient
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
     dao.retrievePatient().then(result=>{
         res.status(200).send({
@@ -726,31 +830,15 @@ app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
     })
 })
 
-app.get("/api/diagnosis/retrieve-one-patient", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }
-
-    else {
-        const patient=new Patient(req.body.id,null,null,null,null)
-
-        dao.retrieveOnePatient(patient).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
-})
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to add patient
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/add-patient",(req,res)=>{
     if (typeof req.body.fullname === 'undefined' ||
@@ -787,6 +875,16 @@ app.post("/api/diagnosis/add-patient",(req,res)=>{
         })
     }
 })
+
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to update patient by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/update-patient",(req,res)=>{
     if(typeof req.body.id==='undefined') {
@@ -825,6 +923,16 @@ app.post("/api/diagnosis/update-patient",(req,res)=>{
     }
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * delete:
+ *   description: Use to delete patient by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-patient",(req,res)=>{
     if(typeof req.query.id==='undefined'){
         res.status(500).send({
@@ -848,6 +956,16 @@ app.delete("/api/diagnosis/delete-patient",(req,res)=>{
         })
     }
 })
+
+/**
+ * @swagger
+ * /Diagnosis:
+ * post:
+ *   description: Use to bind symptom to disease
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
     if (typeof req.body.symptom_id === 'undefined' ||
@@ -887,6 +1005,16 @@ app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
     })
 })
 
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to delete bind symptom to disease
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/diagnosis/delete-bind-symptom-to-disease", (req, res)=>{
     if (typeof req.query.bind_id === 'undefined' ){
         res.status(400).send({
@@ -908,6 +1036,17 @@ app.delete("/api/diagnosis/delete-bind-symptom-to-disease", (req, res)=>{
         })
     })
 })
+
+//Routes
+/**
+ * @swagger
+ * /Diagnosis:
+ * get:
+ *   description: Use to get symptoms of disease
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.get("/api/diagnosis/retrieve-symptoms-of-disease", (req, res)=>{
     if (typeof req.query.disease_id === 'undefined'){
