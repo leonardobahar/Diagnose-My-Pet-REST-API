@@ -59,7 +59,6 @@ export class Dao{
 		handleConnection()
 	}
 
-
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT * FROM users"
@@ -107,7 +106,6 @@ export class Dao{
 			})
 		})
 	}
-
 
 	updateCustomer(user){
 		return new Promise((resolve,reject)=>{
