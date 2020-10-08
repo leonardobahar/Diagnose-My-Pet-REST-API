@@ -59,7 +59,6 @@ export class Dao{
 		handleConnection()
 	}
 
-
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT * FROM users"
@@ -75,10 +74,37 @@ export class Dao{
 							result[i].mobile,
 							result[i].email,
 							result[i].birthdate,
-							null,
+							result[i].password,
 							result[i].role
 						)
-						delete user.password
+						//delete user.password
+						customers.push(user)
+					}
+
+					resolve(customers)
+				}
+			})
+		})
+	}
+
+	retrieveOneUser(user){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM users WHERE id=?"
+			this.mysqlConn.query(query,user.id, (error,result)=>{
+				if(error){
+					reject(error)
+				}else{
+					let customers=[]
+					for(let i=0;i<result.length;i++){
+						const user=new User(
+							result[i].id,
+							result[i].fullname,
+							result[i].mobile,
+							result[i].email,
+							result[i].birthdate,
+							result[i].password,
+							result[i].role
+						)
 						customers.push(user)
 					}
 
@@ -107,7 +133,6 @@ export class Dao{
 			})
 		})
 	}
-
 
 	updateCustomer(user){
 		return new Promise((resolve,reject)=>{

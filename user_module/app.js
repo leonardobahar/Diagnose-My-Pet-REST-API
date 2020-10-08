@@ -63,6 +63,32 @@ app.get("/api/user/retrieve-users", (req, res)=>{
     }
 })
 
+app.get("/api/diagnosis/retrieve-one-user", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const customer=new User(req.body.id,null,null,null,null,null,null,null)
+
+        dao.retrieveOneUser(customer).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
 app.post("/api/user/register-user", (req, res)=>{
     if (typeof req.body.fullname === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
