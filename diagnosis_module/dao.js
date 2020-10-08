@@ -82,23 +82,25 @@ export class Dao{
 		})
 	}
 
-	retrieveOneAnimalType(){
+	retrieveOneAnimalType(animalType){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE a.id=?"
-			this.mysqlConn.query(query, (err,res)=>{
-				if(err){
+			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
+			this.mysqlConn.query(query, animalType.id, (err, res)=>{
+				if (err){
 					reject(err)
 					return
 				}
 
-				let animals=[]
-				for(let i=0; i<res.length; i++){
+				let animals = []
+				for	(let i=0; i<res.length; i++){
 					animals.push(new AnimalType(
 						res[i].id,
-						res[i].animal_category,
-						new AnimalType(res[i].animal_category_id, res[i].category_name)
+						res[i].animal_name,
+						new AnimalCategory(res[i].animal_category_id, res[i].category_name)
 					))
 				}
+
+				resolve(animals)
 			})
 		})
 	}
@@ -170,7 +172,7 @@ export class Dao{
 				}else{
 					let categories = []
 					for (let i=0; i<result.length; i++){
-						categories.push(new AnimalCategory(
+						categories.push(new User(
 							result[i].id,
 							result[i].category_name
 						))
@@ -183,22 +185,23 @@ export class Dao{
 	}
 
 	retrieveOneAnimalCategory(animalCategory){
-		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM animal_category WHERE id=?"
-			this.mysqlConn.query(query, animalCategory.id, (error, result)=>{
-				if (error){
-					reject(error)
-				}else{
-					let categories = []
-					for (let i=0; i<result.length; i++){
-						categories.push(new AnimalCategory(
-							result[i].id,
-							result[i].category_name
-						))
-					}
-
-					resolve(categories)
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM animal_category WHERE id=?"
+			this.mysqlConn.query(query, animalCategory.id, (err, res)=>{
+				if (err){
+					reject(err)
+					return
 				}
+
+				let categories = []
+				for	(let i=0; i<res.length; i++){
+					categories.push(new AnimalCategory(
+						res[i].id,
+						res[i].category_name,
+					))
+				}
+
+				resolve(categories)
 			})
 		})
 	}
@@ -282,22 +285,23 @@ export class Dao{
 	}
 
 	retrieveOneDisease(disease){
-		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM disease WHERE id=?"
-			this.mysqlConn.query(query, disease.id, (error, result)=>{
-				if (error){
-					reject(error)
-				}else{
-					let diseases = []
-					for (let i=0; i<result.length; i++){
-						diseases.push(new Disease(
-							result[i].id,
-							result[i].disease_name
-						))
-					}
-
-					resolve(diseases)
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM disease WHERE id=?"
+			this.mysqlConn.query(query, disease.id, (err, res)=>{
+				if (err){
+					reject(err)
+					return
 				}
+
+				let diseases = []
+				for	(let i=0; i<res.length; i++){
+					diseases.push(new Disease(
+						res[i].id,
+						res[i].disease_name,
+					))
+				}
+
+				resolve(diseases)
 			})
 		})
 	}
@@ -363,29 +367,6 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM medicine"
 			this.mysqlConn.query(query, (error,result)=>{
-				if(error){
-					reject(error)
-				}else{
-					let medicines=[]
-					for(let i=0; i<result.length; i++){
-						medicines.push(new Medicine(
-							result[i].id,
-							result[i].medicine_name,
-							result[i].side_effect,
-							result[i].dosage_info
-						))
-					}
-
-					resolve(medicines)
-				}
-			})
-		})
-	}
-
-	retrieveOneMedicine(medicine){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM medicine WHERE id=?"
-			this.mysqlConn.query(query, medicine.id, (error,result)=>{
 				if(error){
 					reject(error)
 				}else{
@@ -484,27 +465,6 @@ export class Dao{
 		})
 	}
 
-	retrieveOneSymptom(symptom){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM symptom WHERE id=?"
-			this.mysqlConn.query(query,symptom.id,(error,result)=>{
-				if (error){
-					reject(error)
-				}else{
-					let symptoms = []
-					for (let i=0; i<result.length; i++){
-						symptoms.push(new Symptoms(
-							result[i].id,
-							result[i].symptom_name
-						))
-					}
-
-					resolve(symptoms)
-				}
-			})
-		})
-	}
-
 	registerSymptom(symptom){
 		return new Promise((resolve, reject) => {
 			if (symptom instanceof Symptoms){
@@ -573,7 +533,7 @@ export class Dao{
 				else{
 					let patients=[]
 					for(let i=0; i<patients.length; i++){
-						patients.push(new Patient(
+						patients.push(new User(
 							result[i].id,
 							result[i].fullname,
 							result[i].animal_type,
@@ -581,28 +541,7 @@ export class Dao{
 							result[i].pet_owner
 						))
 					}
-					resolve(patients)
-				}
-			})
-		})
-	}
-
-	retrieveOnePatient(patient){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM patients WHERE id=?"
-			this.mysqlConn.query(query,patient.id,(error,result)=>{
-				if(error){
-					reject(error)
-				}
-
-				else{
-					let patients=[]
-					for(let i=0; i<patients.length;i++){
-						patients.push(new Patient(
-							result[i].id,
-
-						))
-					}
+					resolve(users)
 				}
 			})
 		})
