@@ -44,7 +44,6 @@ const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : proce
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 
-
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
@@ -62,6 +61,32 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
         })
     }else{
         // RETRIEVE WITH ID
+    }
+})
+
+app.get("/api/diagnosis/retrieve-one-animal-category", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const category=new AnimalCategory(req.body.id,null)
+
+        dao.retrieveOneAnimalCategory(category).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
     }
 })
 
@@ -170,6 +195,32 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
     })
 })
 
+app.get("/api/diagnosis/retrieve-one-animal-type", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const type=new AnimalType(req.body.id,null,null)
+
+        dao.retrieveOneAnimalType(type).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
 app.post("/api/diagnosis/add-animal-type", (req, res)=>{
     if (typeof req.body.category_id === 'undefined' ||
         typeof req.body.animal_name === 'undefined'){
@@ -273,6 +324,32 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
             error: SOMETHING_WENT_WRONG
         })
     })
+})
+
+app.get("/api/diagnosis/retrieve-one-animal-disease", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const disease=new Disease(req.body.id,null)
+
+        dao.retrieveOneDisease(disease).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
 })
 
 app.post("/api/diagnosis/add-disease", (req, res)=>{
@@ -386,6 +463,32 @@ app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
     })
 })
 
+app.get("/api/diagnosis/retrieve-one-animal-symptom", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const symptom=new Symptoms(req.body.id,null)
+
+        dao.retrieveOneSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
 app.post("/api/diagnosis/add-symptom", (req, res)=>{
     if (typeof req.body.symptom_name === 'undefined') {
         res.status(400).send({
@@ -486,6 +589,32 @@ app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
+})
+
+app.get("/api/diagnosis/retrieve-one-medicine", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const medicine=new Medicine(req.body.id,null)
+
+        dao.retrieveOneMedicine(medicine).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
 })
 
 app.post("/api/diagnosis/add-medicine",(req,res)=>{
@@ -591,6 +720,32 @@ app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
             error: SOMETHING_WENT_WRONG
         })
     })
+})
+
+app.get("/api/diagnosis/retrieve-one-patient", (req, res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }
+
+    else {
+        const patient=new Patient(req.body.id,null,null,null,null)
+
+        dao.retrieveOnePatient(patient).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
+        })
+    }
 })
 
 app.post("/api/diagnosis/add-patient",(req,res)=>{
