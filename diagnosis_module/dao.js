@@ -82,6 +82,29 @@ export class Dao{
 		})
 	}
 
+	retrieveOneAnimalType(animalType){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
+			this.mysqlConn.query(query, animalType.id, (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				let animals = []
+				for	(let i=0; i<res.length; i++){
+					animals.push(new AnimalType(
+						res[i].id,
+						res[i].animal_name,
+						new AnimalCategory(res[i].animal_category_id, res[i].category_name)
+					))
+				}
+
+				resolve(animals)
+			})
+		})
+	}
+
 	registerAnimalType(animalType){
 		return new Promise((resolve, reject) => {
 			if (!animalType instanceof AnimalType) {
@@ -161,6 +184,28 @@ export class Dao{
 		})
 	}
 
+	retrieveOneAnimalCategory(animalCategory){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM animal_category WHERE id=?"
+			this.mysqlConn.query(query, animalCategory.id, (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				let categories = []
+				for	(let i=0; i<res.length; i++){
+					categories.push(new AnimalCategory(
+						res[i].id,
+						res[i].category_name,
+					))
+				}
+
+				resolve(categories)
+			})
+		})
+	}
+
 	registerAnimalCategory(animalCategory){
 		return new Promise((resolve, reject) => {
 			if (animalCategory instanceof AnimalCategory){
@@ -235,6 +280,28 @@ export class Dao{
 
 					resolve(diseases)
 				}
+			})
+		})
+	}
+
+	retrieveOneDisease(disease){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM disease WHERE id=?"
+			this.mysqlConn.query(query, disease.id, (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				let diseases = []
+				for	(let i=0; i<res.length; i++){
+					diseases.push(new Disease(
+						res[i].id,
+						res[i].disease_name,
+					))
+				}
+
+				resolve(diseases)
 			})
 		})
 	}

@@ -43,6 +43,38 @@ const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : proce
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 
+const swaggerJsDoc=require('swagger-jsdoc')
+const swaggerUI=require('swagger-ui-express')
+
+//Extended: https://swagger.io/specification/#infoObject
+const swaggerOptions={
+    swaggerDefinition: {
+        info:{
+            title:'User Module',
+            description:"User API Information",
+            contact:{
+              team:"BaharTech CodeDoc"
+            },
+            servers:["http://localhost:8085"]
+        }
+    },
+    apis:["app.js"]
+};
+
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs/',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * get:
+ *   description: Use to get all users
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/user/retrieve-users", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
@@ -62,6 +94,17 @@ app.get("/api/user/retrieve-users", (req, res)=>{
         // RETRIEVE WITH ID
     }
 })
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to register user
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/user/register-user", (req, res)=>{
     if (typeof req.body.fullname === 'undefined' ||
@@ -105,6 +148,17 @@ app.post("/api/user/register-user", (req, res)=>{
         })
     }
 })
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to update user by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/user/update-user",(req,res)=>{
     if(typeof req.body.id==='undefined') {
@@ -152,6 +206,17 @@ app.post("/api/user/update-user",(req,res)=>{
     }
 })
 
+//Routes
+/**
+ * @swagger
+ * /User:
+ * delete:
+ *   description: Use to delete user by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/user/delete-user",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(400).send({
@@ -174,6 +239,17 @@ app.delete("/api/user/delete-user",(req,res)=>{
         })
     }
 })
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to bind user to pet
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
     if(typeof req.body.user_id === 'undefined' ||
