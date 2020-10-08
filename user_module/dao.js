@@ -1,15 +1,15 @@
 import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
 import {
-    ADMIN_VALIDATED,
-    ALL, CANCELLED, INVALID, INVALID_FINAL,
-    MISMATCH_OBJ_TYPE,
-    NO_AFFECTED_ROWS,
-    NO_SUCH_CONTENT,
-    ONLY_WITH_VENDORS, ORDER_PROCESSING,
-    SOMETHING_WENT_WRONG, VALID, WRONG_BODY_FORMAT
+	ADMIN_VALIDATED,
+	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
+	MISMATCH_OBJ_TYPE,
+	NO_AFFECTED_ROWS,
+	NO_SUCH_CONTENT,
+	ONLY_WITH_VENDORS, ORDER_PROCESSING,
+	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, User} from "../model";
+import {AnimalCategory, AnimalType, Patient, User} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -109,9 +109,73 @@ export class Dao{
 	}
 
 
+	updateCustomer(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query = "UPDATE users SET fullname=?, mobile=?, email=?, birthdate=?, password=?, salt=?, role=? WHERE id=?"
+			this.mysqlConn.query(query, [user.fullname,user.mobile, user.email,user.birthdate, user.password,user.salt,user.role,user.id], (err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				resolve(user)
+			})
+		})
+	}
+
+	deleteCustomer(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			const query="DELETE FROM users WHERE id=?"
+			this.mysqlConn.query(query,user.id,(err,res)=>{
+				if(err){
+					reject(err)
+					return
+				}
+
+				user.id=res.insertId
+				resolve(user)
+			})
+		})
+	}
+
 	retrieveUserPets(user_id){
 		return new Promise((resolve, reject)=>{
 
+		})
+	}
+
+	bindUserToPet(user,patient){
+		return new Promise((resolve,reject)=>{
+			if(user instanceof User &&
+				patient instanceof Patient){
+				const checkQuery="SELECT id FROM users_patients WHERE user_id=? AND patient_id=?"
+				this.mysqlConn.query(checkQuery, [user.id,patient.id], (err, res)=>{
+					if(res.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					const query="INSERT INTO `users_patients` (`user_id`, `patient_id`) VALUES(?, ?)";
+					this.mysqlConn.query(query, [user.id, patient.id], (err,res)=>{
+						if(err){
+							reject(err)
+							return
+						}
+
+						resolve(SUCCESS)
+					})
+				})
+			}else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 }
