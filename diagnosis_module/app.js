@@ -425,7 +425,7 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
                 console.log(err)
                 res.status(500).send({
                     success: false,
-                    result: SOMETHING_WENT_WRONG
+                    error: SOMETHING_WENT_WRONG
                 })
                 res.end()
             }
@@ -465,7 +465,7 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
         if(err.code==='ER_DUP_ENTRY'){
             res.status(200).send({
                 success:false,
-                message:'DUPLICATE-ENTRY'
+                error:'DUPLICATE-ENTRY'
             })
             res.end()
         }else{
