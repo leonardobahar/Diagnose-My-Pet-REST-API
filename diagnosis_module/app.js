@@ -88,7 +88,7 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
             console.log(err)
             res.status(500).send({
                 success: false,
-                erro: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         })
     }else{
@@ -472,7 +472,7 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
             console.log(err)
             res.status(500).send({
                 success: false,
-                message: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         }
     })
@@ -508,9 +508,8 @@ app.delete("/api/diagnosis/delete-disease", (req,res)=>{
         console.log(err)
         res.status(500).send({
             success:false,
-            result:SOMETHING_WENT_WRONG
-            }
-        )
+            error:SOMETHING_WENT_WRONG
+        })
     })
 })
 
@@ -579,6 +578,7 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
                 success: false,
                 error: SOMETHING_WENT_WRONG
             })
+            res.end()
         }
     })
 
@@ -712,14 +712,14 @@ app.post("/api/diagnosis/add-medicine",(req,res)=>{
             if(err.code==='ER_DUP_ENTRY'){
                 res.status(500).send({
                     success:false,
-                    message:'DUPLICATE_ENTRY'
+                    error:'DUPLICATE_ENTRY'
                 })
                 res.end()
             }else{
                 console.error(err)
                 res.status(500).send({
                     success: false,
-                    result: SOMETHING_WENT_WRONG
+                    error: SOMETHING_WENT_WRONG
                 })
             }
         })
@@ -759,7 +759,7 @@ app.post("/api/diagnosis/update-medicine",(req,res)=>{
         console.error(err)
         res.status(500).send({
             success:false,
-            result:SOMETHING_WENT_WRONG
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
@@ -857,14 +857,14 @@ app.post("/api/diagnosis/add-patient",(req,res)=>{
             if (err.code === 'ER_DUP_ENTRY') {
                 res.status(500).send({
                     success: false,
-                    message: 'DUPLICATE-ENTRY'
+                    error: 'DUPLICATE-ENTRY'
                 })
                 res.end()
             }else{
                 console.error(err)
                 res.status(500).send({
                     success: false,
-                    result: SOMETHING_WENT_WRONG
+                    error: SOMETHING_WENT_WRONG
                 })
             }
         })
