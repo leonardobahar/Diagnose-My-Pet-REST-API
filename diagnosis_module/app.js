@@ -649,7 +649,7 @@ app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
         console.error(err)
         res.status(500).send({
             success: false,
-            result: SOMETHING_WENT_WRONG
+            error: SOMETHING_WENT_WRONG
         })
     })
 
