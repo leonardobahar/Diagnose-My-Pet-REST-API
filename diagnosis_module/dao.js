@@ -248,7 +248,7 @@ export class Dao{
 			}
 
 			const query = "DELETE FROM animal_category WHERE id = ?"
-			this.mysqlConn.query(query, animalCategory.id, (err,res)=>{
+			this.mysqlConn.query(query, [animalCategory.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
