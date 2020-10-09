@@ -140,17 +140,14 @@ app.delete("/api/diagnosis/delete-animal-category", (req,res)=>{
 
         dao.deleteAnimalCategory(category).then(result=>{
             res.status(200).send({
-                success:true,
-                result:result
+                success:true
             })
         }).catch(err=>{
-            if(err.code==='SOMETHING_WENT_WRONG'){
-                console.log(err)
-                res.status(500).send({
-                    success: false,
-                    result: SOMETHING_WENT_WRONG
-                })
-            }
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
         })
     }
 })
