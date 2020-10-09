@@ -24,12 +24,12 @@ app.use((err, req, res, next)=>{
         if (err.type === 'entity.parse.failed') {
             res.status(406).send({
                 success: false,
-                message: 'WRONG-JSON-FORMAT'
+                error: 'WRONG-JSON-FORMAT'
             })
         }else{
             res.status(400).send({
                 success: false,
-                message: 'CHECK-SERVER-LOG'
+                error: 'CHECK-SERVER-LOG'
             })
             console.error(err)
         }
@@ -55,7 +55,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
             console.log(err)
             res.status(500).send({
                 success: false,
-                result: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         })
     }else{
@@ -118,14 +118,14 @@ app.post("/api/user/register-user", (req, res)=>{
             if (err.code === 'ER_DUP_ENTRY') {
                 res.status(500).send({
                     success: false,
-                    message: 'DUPLICATE-ENTRY'
+                    error: 'DUPLICATE-ENTRY'
                 })
                 res.end()
             }else{
                 console.log(err)
                 res.status(500).send({
                     success: false,
-                    result: SOMETHING_WENT_WRONG
+                    error: SOMETHING_WENT_WRONG
                 })
             }
         })
@@ -133,20 +133,12 @@ app.post("/api/user/register-user", (req, res)=>{
 })
 
 app.post("/api/user/update-user",(req,res)=>{
-    if(typeof req.body.id==='undefined') {
-        res.status(400).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
-        })
-    }
-
     if(typeof req.body.id ==='undefined' ||
         typeof req.body.fullname === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.password === 'undefined' ||
-        typeof req.body.salt === 'undefined' ||
         typeof req.body.role === 'undefined'){
         res.status(400).send({
             success: false,
@@ -155,13 +147,14 @@ app.post("/api/user/update-user",(req,res)=>{
     }
 
     else{
+        const salt = "GAREM"
         const user=new User(req.body.id,
             req.body.fullname,
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
             req.body.password,
-            req.body.salt,
+            salt,
             req.body.role)
 
         dao.updateCustomer(user).then(result=>{
@@ -170,7 +163,7 @@ app.post("/api/user/update-user",(req,res)=>{
             })
         }).catch(err=>{
             console.log(err)
-            res.status(400).send({
+            res.status(500).send({
                 success: false,
                 result: SOMETHING_WENT_WRONG
             })
