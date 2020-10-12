@@ -13,9 +13,9 @@ import {
 import {AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
 import * as swaggerUi from "swagger-ui-express";
 
-dotenv.config();
+require('dotenv').config()
 
-const app = express()
+const app=express()
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json())
 
@@ -95,8 +95,6 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
         // RETRIEVE WITH ID
     }
 })
-
-
 
 /**
  * @swagger
@@ -254,7 +252,7 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
  */
 
 app.post("/api/diagnosis/add-animal-type", (req, res)=>{
-    if (typeof req.body.category_id === 'undefined' ||
+    if (typeof req.body.animal_category_id === 'undefined' ||
         typeof req.body.animal_name === 'undefined'){
         res.status(400).send({
             success: false,
@@ -263,8 +261,8 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
         return
     }else{
         const animal = new AnimalType(null,
-            req.body.animal_name,
-            new AnimalCategory(req.body.category_id, null))
+            req.body.animal_name.toUpperCase(),
+            req.body.animal_category)
 
         dao.registerAnimalType(animal).then(result=>{
             res.status(200).send({
@@ -308,7 +306,7 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
         return
     }
 
-    const animal=new AnimalType(req.body.id,req.body.category_name.toUpperCase())
+    const animal=new AnimalType(req.body.id,req.body.animal_name.toUpperCase(),req.body.animal_category())
 
     dao.updateAnimalType(animal).then(result=>{
         res.status(200).send({
@@ -405,7 +403,8 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
             error: WRONG_BODY_FORMAT
         })
         return
-    }else{
+    }
+
         const disease = new Disease(null,
             req.body.disease_name.toUpperCase())
 
@@ -430,7 +429,6 @@ app.post("/api/diagnosis/add-disease", (req, res)=>{
                 res.end()
             }
         })
-    }
 })
 
 /**
@@ -566,17 +564,17 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
             result: result
         })
     }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY') {
+        
+        if(err.code==='WR_DUPLICATE_ENTRY'){
             res.status(500).send({
-                success: false,
-                error: 'DUPLICATE-ENTRY'
+                success:false,
+                error:'DUPLICATE-ENTRY'
             })
-            res.end()
-        }else{
+        }else {
             console.log(err)
             res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
+                success:false,
+                error:SOMETHING_WENT_WRONG
             })
             res.end()
         }
@@ -956,7 +954,7 @@ app.delete("/api/diagnosis/delete-patient",(req,res)=>{
  *     description: A successful response
  */
 
-app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
+app.post("/api/diagnosis/bind-symptom-to-disease-and-medicine", (req, res)=>{
     if (typeof req.body.symptom_id === 'undefined' ||
         typeof req.body.disease_id === 'undefined' ||
         typeof req.body.animal_id === 'undefined'){
@@ -967,28 +965,28 @@ app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
         return
     }
 
-    dao.bindSymptomToDisease(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id)).then(result=>{
+    dao.bindSymptomToDiseaseAndMedicine(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id), new Medicine(req.body.medicine_id)).then(result=>{
         res.status(200).send({
             success: true,
             result: result
         })
     }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
+        if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY){
             res.status(500).send({
-                success: false,
+                success:false,
                 error: 'DUPLICATE-ENTRY'
             })
             res.end()
-        }else if(err.code === 'ER_NO_REFERENCED_ROW_2') {
+        }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
             res.status(500).send({
-                success: false,
-                error: ERROR_FOREIGN_KEY
+                success:false,
+                error:ERROR_FOREIGN_KEY
             })
         }else{
             console.log(err)
             res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
+                success:false,
+                error:SOMETHING_WENT_WRONG
             })
         }
     })
@@ -1046,7 +1044,7 @@ app.get("/api/diagnosis/retrieve-symptoms-of-disease", (req, res)=>{
         return
     }
 
-    dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
+    dao.retrieveSymptomsAndMedicineForDisease(new Disease(req.query.disease_id)).then(result=>{
         res.status(200).send({
             success: true,
             result: result
@@ -1075,7 +1073,7 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
             result: result
         })
     }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
+        if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
             res.status(500).send({
                 success: false,
                 error: 'DUPLICATE-ENTRY'

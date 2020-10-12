@@ -263,19 +263,19 @@ app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
         if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
             res.status(500).send({
                 success: false,
-                message: 'DUPLICATE-ENTRY'
+                error: 'DUPLICATE-ENTRY'
             })
             res.end()
         }else if(err.code === 'ER_NO_REFERENCED_ROW_2') {
             res.status(500).send({
                 success: false,
-                result: ERROR_FOREIGN_KEY
+                error: ERROR_FOREIGN_KEY
             })
         }else{
             console.log(err)
             res.status(500).send({
                 success: false,
-                result: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         }
     })
