@@ -95,6 +95,31 @@ app.get("/api/user/retrieve-users", (req, res)=>{
     }
 })
 
+app.get("/api/user-retrieve-one-user", (req,res)=>{
+    if(typeof req.query.id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user=new User(req.body.id,null,null,null,null,null,null,null)
+
+    dao.retrieveOneUser(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.log(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 //Routes
 /**
  * @swagger
