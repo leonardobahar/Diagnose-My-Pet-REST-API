@@ -84,8 +84,8 @@ export class Dao{
 
 	retrieveOneAnimalType(animalType){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
-			this.mysqlConn.query(query, animalType.id, (err,res)=>{
+			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE a.id=?"
+			this.mysqlConn.query(query, [animalType.id], (err,res)=>{
 				if (err){
 					reject(err)
 					return
@@ -270,17 +270,17 @@ export class Dao{
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
-				}else{
-					let diseases = []
-					for (let i=0; i<result.length; i++){
-						diseases.push(new Disease(
-							result[i].id,
-							result[i].disease_name
-						))
-					}
-
-					resolve(diseases)
+					return
 				}
+				let diseases = []
+				for (let i=0; i<result.length; i++){
+					diseases.push(new Disease(
+						result[i].id,
+						result[i].disease_name
+					))
+				}
+
+				resolve(diseases)
 			})
 		})
 	}
@@ -288,7 +288,7 @@ export class Dao{
 	retrieveOneDisease(disease){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM disease WHERE id=?"
-			this.mysqlConn.query(query, disease.id, (err, res)=>{
+			this.mysqlConn.query(query, [disease.id], (err, res)=>{
 				if (err){
 					reject(err)
 					return
@@ -493,8 +493,8 @@ export class Dao{
 
 	retrieveOneSymptom(symptom){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM symptom WHERE id=?"
-			this.mysqlConn.query(query,symptom.id,(error,result)=>{
+			const query="SELECT * FROM symptoms WHERE id=?"
+			this.mysqlConn.query(query,[symptom.id],(error,result)=>{
 				if (error){
 					reject(error)
 				}else{
@@ -787,7 +787,7 @@ export class Dao{
 						symptom_id: rowDataPacket.symptom_id,
 						symptom_name : rowDataPacket.symptom_name,
 						medicine_id : rowDataPacket.medicine_id,
-						medicne_name: rowDataPacket.medicine_name
+						medicine_name: rowDataPacket.medicine_name
 					}
 				})
 				resolve(symptoms)
