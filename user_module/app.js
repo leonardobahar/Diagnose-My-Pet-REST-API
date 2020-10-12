@@ -43,6 +43,38 @@ const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : proce
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 
+const swaggerJsDoc=require('swagger-jsdoc')
+const swaggerUI=require('swagger-ui-express')
+
+//Extended: https://swagger.io/specification/#infoObject
+const swaggerOptions={
+    swaggerDefinition: {
+        info:{
+            title:'User Module',
+            description:"User API Information",
+            contact:{
+              team:"BaharTech CodeDoc"
+            },
+            servers:["http://localhost:8085"]
+        }
+    },
+    apis:["app.js"]
+};
+
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs/',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * get:
+ *   description: Use to get all users
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.get("/api/user/retrieve-users", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
@@ -63,31 +95,41 @@ app.get("/api/user/retrieve-users", (req, res)=>{
     }
 })
 
-app.get("/api/diagnosis/retrieve-one-user", (req, res)=>{
-    if(typeof req.body.id==='undefined'){
+app.get("/api/user-retrieve-one-user", (req,res)=>{
+    if(typeof req.query.id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user=new User(req.body.id,null,null,null,null,null,null,null)
+
+    dao.retrieveOneUser(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.log(err)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
-    }
-
-    else {
-        const customer=new User(req.body.id,null,null,null,null,null,null,null)
-
-        dao.retrieveOneUser(customer).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
-    }
+    })
 })
+
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to register user
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
 
 app.post("/api/user/register-user", (req, res)=>{
     if (typeof req.body.fullname === 'undefined' ||
@@ -132,6 +174,17 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to update user by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/user/update-user",(req,res)=>{
     if(typeof req.body.id ==='undefined' ||
         typeof req.body.fullname === 'undefined' ||
@@ -171,6 +224,17 @@ app.post("/api/user/update-user",(req,res)=>{
     }
 })
 
+//Routes
+/**
+ * @swagger
+ * /User:
+ * delete:
+ *   description: Use to delete user by ID
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.delete("/api/user/delete-user",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(400).send({
@@ -194,6 +258,17 @@ app.delete("/api/user/delete-user",(req,res)=>{
     }
 })
 
+//Routes
+/**
+ * @swagger
+ * /User:
+ * post:
+ *   description: Use to bind user to pet
+ *   responses:
+ *   '200':
+ *     description: A successful response
+ */
+
 app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
     if(typeof req.body.user_id === 'undefined' ||
         typeof req.body.patient_id === 'undefined'){
@@ -213,19 +288,19 @@ app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
         if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
             res.status(500).send({
                 success: false,
-                message: 'DUPLICATE-ENTRY'
+                error: 'DUPLICATE-ENTRY'
             })
             res.end()
         }else if(err.code === 'ER_NO_REFERENCED_ROW_2') {
             res.status(500).send({
                 success: false,
-                result: ERROR_FOREIGN_KEY
+                error: ERROR_FOREIGN_KEY
             })
         }else{
             console.log(err)
             res.status(500).send({
                 success: false,
-                result: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         }
     })
