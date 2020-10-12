@@ -95,6 +95,31 @@ app.get("/api/user/retrieve-users", (req, res)=>{
     }
 })
 
+app.get("/api/user-retrieve-one-user", (req,res)=>{
+    if(typeof req.query.id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user=new User(req.body.id,null,null,null,null,null,null,null)
+
+    dao.retrieveOneUser(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.log(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 //Routes
 /**
  * @swagger
@@ -263,19 +288,19 @@ app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
         if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
             res.status(500).send({
                 success: false,
-                message: 'DUPLICATE-ENTRY'
+                error: 'DUPLICATE-ENTRY'
             })
             res.end()
         }else if(err.code === 'ER_NO_REFERENCED_ROW_2') {
             res.status(500).send({
                 success: false,
-                result: ERROR_FOREIGN_KEY
+                error: ERROR_FOREIGN_KEY
             })
         }else{
             console.log(err)
             res.status(500).send({
                 success: false,
-                result: SOMETHING_WENT_WRONG
+                error: SOMETHING_WENT_WRONG
             })
         }
     })
