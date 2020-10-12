@@ -440,54 +440,71 @@ app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
-    dao.retrieveDisease().then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
-        })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
-        })
-    })
-})
-
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one disease by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
-
-app.get("/api/diagnosis/retrieve-one-disease", (req,res)=>{
-    if(typeof req.query.id==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    const disease=new Disease(req.body.id,null,null,null)
-
-    dao.retrieveOneDisease(disease).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    if (typeof req.body.id==='undefined'){
+        dao.retrieveDisease().then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
         }).catch(err=>{
             console.error(err)
             res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
+                success: false,
+                error: SOMETHING_WENT_WRONG
             })
         })
-    })
+    }else{
+        const disease=new Disease(req.body.id,null,null,null)
+
+        dao.retrieveOneDisease(disease).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        })
+    }
 })
+
+// /**
+//  * @swagger
+//  * /Diagnosis:
+//  * get:
+//  *   description: Use to get one disease by ID
+//  *   responses:
+//  *   '200':
+//  *     description: A successful response
+//  */
+//
+// app.get("/api/diagnosis/retrieve-one-disease", (req,res)=>{
+//     if(typeof req.query.id==='undefined'){
+//         res.status(400).send({
+//             success:false,
+//             error:WRONG_BODY_FORMAT
+//         })
+//         return
+//     }
+//
+//     const disease=new Disease(req.body.id,null,null,null)
+//
+//     dao.retrieveOneDisease(disease).then(result=>{
+//         res.status(200).send({
+//             success:true,
+//             result:result
+//         }).catch(err=>{
+//             console.error(err)
+//             res.status(500).send({
+//                 success:false,
+//                 error:SOMETHING_WENT_WRONG
+//             })
+//         })
+//     })
+// })
 
 /**
  * @swagger
