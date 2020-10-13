@@ -92,10 +92,24 @@ app.get("/api/user/retrieve-users", (req, res)=>{
         })
     }else{
         // RETRIEVE WITH ID
+        const user=new User(req.body.id,null,null,null,null,null,null,null)
+
+        dao.retrieveOneUser(user).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }
 })
 
-app.get("/api/user-retrieve-one-user", (req,res)=>{
+/*app.get("/api/user-retrieve-one-user", (req,res)=>{
     if(typeof req.query.id === 'undefined'){
         res.status(400).send({
             success:false,
@@ -118,7 +132,7 @@ app.get("/api/user-retrieve-one-user", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-})
+})*/
 
 //Routes
 /**
