@@ -93,20 +93,34 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
         })
     }else{
         // RETRIEVE WITH ID
+        const animal=new AnimalCategory(req.body.id,null)
+
+        dao.retrieveOneAnimalCategory(animal).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            }).catch(err=>{
+                console.log(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        })
     }
 })
 
-/**
- * @swagger
- * /diagnosis:
- * get:
- *   description: Use to get one animal category by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
+///**
+// * @swagger
+// * /diagnosis:
+// * get:
+// *   description: Use to get one animal category by ID
+// *   responses:
+// *   '200':
+// *     description: A successful response
+// */
 
-app.get("/api/diagnosis/retrieve-one-animal-category", (req,res)=>{
+/*app.get("/api/diagnosis/retrieve-one-animal-category", (req,res)=>{
     if(typeof req.query.id === 'undefined'){
         res.status(400).send({
             success:false,
@@ -129,7 +143,7 @@ app.get("/api/diagnosis/retrieve-one-animal-category", (req,res)=>{
             })
         })
     })
-})
+})*/
 
 /**
  * @swagger
@@ -261,31 +275,48 @@ app.delete("/api/diagnosis/delete-animal-category", (req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
-    dao.retrieveAnimalType().then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
+    if(typeof req.body.id==='undefined'){
+        dao.retrieveAnimalType().then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+    }else{
+        const animal=new AnimalType(req.body.id,null,null)
+
+        dao.retrieveOneAnimalType(animal).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    })
+    }
 })
 
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one animal type by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
+///**
+// * @swagger
+// * /Diagnosis:
+// * get:
+// *   description: Use to get one animal type by ID
+// *   responses:
+// *   '200':
+// *     description: A successful response
+// */
 
-app.get("/api/diagnosis/retrieve-one-animal-type", (req,res)=>{
+/*app.get("/api/diagnosis/retrieve-one-animal-type", (req,res)=>{
     if(typeof req.body.id === 'undefined'){
         res.status(400).send({
             success:false,
@@ -308,7 +339,7 @@ app.get("/api/diagnosis/retrieve-one-animal-type", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-})
+})*/
 
 /**
  * @swagger
@@ -677,31 +708,48 @@ app.delete("/api/diagnosis/delete-disease", (req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
-    dao.retrieveSymptom().then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
+    if(typeof req.body.id==='undefined'){
+        dao.retrieveSymptom().then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+    }else{
+        const symptom=new Symptoms(req.body.id,null)
+
+        dao.retrieveOneSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    })
+    }
 })
 
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one symptom by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
+///**
+// * @swagger
+// * /Diagnosis:
+// * get:
+// *   description: Use to get one symptom by ID
+// *   responses:
+//*   '200':
+// *     description: A successful response
+// */
 
-app.get("/api/diagnosis/retrieve-one-symptom", (req,res)=>{
+/*app.get("/api/diagnosis/retrieve-one-symptom", (req,res)=>{
     if(typeof req.query.id==='undefined'){
         res.status(400).send({
             success:false,
@@ -724,7 +772,7 @@ app.get("/api/diagnosis/retrieve-one-symptom", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-})
+})*/
 
 /**
  * @swagger
@@ -854,31 +902,48 @@ app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
-    dao.retrieveMedicine().then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    if(typeof req.body.id==='undefined'){
+        dao.retrieveMedicine().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
+    }else{
+        const medicine=new Medicine(req.body.id,null,null,null)
+
+        dao.retrieveOneMedicine(medicine).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    })
+    }
 })
 
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one medicine by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
+///**
+// * @swagger
+// * /Diagnosis:
+// * get:
+// *   description: Use to get one medicine by ID
+// *   responses:
+// *   '200':
+//*     description: A successful response
+// */
 
-app.get("/api/diagnosis/retrieve-one-medicine", (req,res)=>{
+/*app.get("/api/diagnosis/retrieve-one-medicine", (req,res)=>{
     if(typeof req.query.id==="undefined"){
         res.status(400).send({
             success:false,
@@ -901,7 +966,7 @@ app.get("/api/diagnosis/retrieve-one-medicine", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-})
+})*/
 
 /**
  * @swagger
@@ -1034,31 +1099,48 @@ app.delete("/api/diagnosis/delete-medicine",(req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
-    dao.retrievePatient().then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
+    if(typeof req.body.id==='undefined'){
+        dao.retrievePatient().then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+    }else{
+        const patient=new Patient(req.body.id,null,null,null)
+
+        dao.retrieveOnePatient(patient).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    })
+    }
 })
 
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one patient by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
+///**
+// * @swagger
+// * /Diagnosis:
+// * get:
+// *   description: Use to get one patient by ID
+// *   responses:
+// *   '200':
+// *     description: A successful response
+// */
 
-app.get("/api/diagnosis/retrieve-one-patient", (req,res)=>{
+/*app.get("/api/diagnosis/retrieve-one-patient", (req,res)=>{
     if(typeof req.query.id==='undefined'){
         res.status(400).send({
             success:false,
@@ -1081,7 +1163,7 @@ app.get("/api/diagnosis/retrieve-one-patient", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-})
+})*/
 
 /**
  * @swagger
