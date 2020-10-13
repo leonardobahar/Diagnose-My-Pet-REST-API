@@ -352,7 +352,7 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
  */
 
 app.post("/api/diagnosis/add-animal-type", (req, res)=>{
-    if (typeof req.body.animal_category_id === 'undefined' ||
+    if (typeof req.body.category_id === 'undefined' ||
         typeof req.body.animal_name === 'undefined') {
         res.status(400).send({
             success: false,
@@ -362,7 +362,7 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
     }
     const animal = new AnimalType(null,
         req.body.animal_name.toUpperCase(),
-        req.body.animal_category)
+        req.body.category_id)
 
     dao.registerAnimalType(animal).then(result=>{
         res.status(200).send({
