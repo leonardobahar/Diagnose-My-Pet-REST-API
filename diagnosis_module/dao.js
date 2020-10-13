@@ -61,7 +61,7 @@ export class Dao{
 
 	retrieveAnimalType(){
 		return new Promise((resolve, reject) => {
-			const query = "SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a LEFT OUTER JOIN animal_category c ON a.animal_category_id = c.id"
+			const query = "SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id"
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
@@ -84,8 +84,9 @@ export class Dao{
 
 	retrieveOneAnimalType(animalType){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE a.id=?"
-			this.mysqlConn.query(query, [animalType.id], (err,res)=>{
+			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
+			this.mysqlConn.query(query, animalType.id, (err,res)=>{
+
 				if (err){
 					reject(err)
 					return
@@ -113,7 +114,10 @@ export class Dao{
 			}
 
 			const query = "INSERT INTO `animal_type`(`animal_name`, `animal_category_id`) VALUES (?, ?)"
+<<<<<<< HEAD
 			console.log(query)
+=======
+>>>>>>> Added Get One Disease with it's Symptom and Medicne
 			this.mysqlConn.query(query, [animalType.animal_name, animalType.animal_category], (err, res)=>{
 				if (err){
 					reject(err)
@@ -788,7 +792,7 @@ export class Dao{
 						symptom_id: rowDataPacket.symptom_id,
 						symptom_name : rowDataPacket.symptom_name,
 						medicine_id : rowDataPacket.medicine_id,
-						medicine_name: rowDataPacket.medicine_name
+						medicne_name: rowDataPacket.medicine_name
 					}
 				})
 				resolve(symptoms)
