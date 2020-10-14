@@ -121,7 +121,7 @@ export class Dao{
 					return
 				}
 
-				animalType.id = res.insertId
+				animalType.animal_name = res.animal_name
 				resolve(animalType)
 			})
 		})
@@ -190,7 +190,7 @@ export class Dao{
 	retrieveOneAnimalCategory(animalCategory){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM animal_category WHERE id=?"
-			this.mysqlConn.query(query, animalCategory.id, (err, res)=>{
+			this.mysqlConn.query(query, [animalCategory.id], (err, res)=>{
 				if (err){
 					reject(err)
 					return
@@ -219,7 +219,7 @@ export class Dao{
 						return
 					}
 
-					animalCategory.id = res.insertId
+					animalCategory.category_name = res.category_name
 					resolve(animalCategory)
 				})
 			}else{

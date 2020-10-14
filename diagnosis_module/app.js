@@ -77,7 +77,7 @@ app.use('/api-docs/',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
  */
 
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
-    if (typeof req.query.id === 'undefined'){
+    if (typeof req.body.id === 'undefined'){
         // RETRIEVE ALL
         dao.retrieveAnimalCategory().then(result=>{
             res.status(200).send({
@@ -162,30 +162,30 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
             error: WRONG_BODY_FORMAT
         })
         return
-    }else{
-        const category = new AnimalCategory(null, req.body.category_name.toUpperCase())
-
-        dao.registerAnimalCategory(category).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    success: false,
-                    error: 'DUPLICATE-ENTRY'
-                })
-                res.end()
-            }else{
-                console.log(err)
-                res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
-                })
-            }
-        })
     }
+
+    const category = new AnimalCategory(null, req.body.category_name.toUpperCase())
+
+    dao.registerAnimalCategory(category).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
 })
 
 /**
@@ -352,7 +352,7 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
  */
 
 app.post("/api/diagnosis/add-animal-type", (req, res)=>{
-    if (typeof req.body.category_id === 'undefined' ||
+    if (typeof req.body.animal_category_id === 'undefined' ||
         typeof req.body.animal_name === 'undefined') {
         res.status(400).send({
             success: false,
@@ -362,7 +362,7 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
     }
     const animal = new AnimalType(null,
         req.body.animal_name.toUpperCase(),
-        req.body.category_id)
+        req.body.animal_category)
 
     dao.registerAnimalType(animal).then(result=>{
         res.status(200).send({
@@ -536,76 +536,6 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
 //         })
 //     })
 // })
-
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one disease by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
-
-app.get("/api/diagnosis/retrieve-one-disease", (req,res)=>{
-    if(typeof req.query.id==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    const disease=new Disease(req.body.id,null,null,null)
-
-    dao.retrieveOneDisease(disease).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        }).catch(err=>{
-            console.error(err)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
-    })
-})
-
-/**
- * @swagger
- * /Diagnosis:
- * get:
- *   description: Use to get one disease by ID
- *   responses:
- *   '200':
- *     description: A successful response
- */
-
-app.get("/api/diagnosis/retrieve-one-disease", (req,res)=>{
-    if(typeof req.query.id==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    const disease=new Disease(req.body.id,null,null,null)
-
-    dao.retrieveOneDisease(disease).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        }).catch(err=>{
-            console.error(err)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
-    })
-})
 
 /**
  * @swagger
