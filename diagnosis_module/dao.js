@@ -84,7 +84,7 @@ export class Dao{
 
 	retrieveOneAnimalType(animalType){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a LEFT OUTER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
+			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a LEFT OUTER JOIN animal_category c ON a.animal_category_id = c.id WHERE a.id=?"
 			this.mysqlConn.query(query, animalType.id, (err,res)=>{
 
 				if (err){
