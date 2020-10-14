@@ -690,6 +690,7 @@ app.get("/api/diagnosis/retrieve-one-disease", (req,res)=>{
 /**
  * @swagger
  * /Diagnosis:
+
  * post:
  *   description: Use to update disease by ID
  *   responses:
