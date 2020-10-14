@@ -197,6 +197,7 @@ export class Dao{
 				}
 
 				let animals = []
+				let category_name = res[0].category_name
 				for	(let i=0; i<res.length; i++){
 					animals.push(new AnimalType(
 						res[i].id,
@@ -205,7 +206,10 @@ export class Dao{
 					))
 				}
 
-				resolve(animals)
+				resolve({
+					category_name: category_name,
+					animal_types: animals
+				})
 			})
 		})
 	}
