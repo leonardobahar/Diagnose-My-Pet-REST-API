@@ -77,7 +77,7 @@ app.use('/api-docs/',swaggerUI.serve, swaggerUI.setup(swaggerDocs));
  */
 
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
-    if (typeof req.body.id === 'undefined'){
+    if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
         dao.retrieveAnimalCategory().then(result=>{
             res.status(200).send({
@@ -93,7 +93,7 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
         })
     }else{
         // RETRIEVE WITH ID
-        const animal=new AnimalCategory(req.body.id,null)
+        const animal=new AnimalCategory(req.query.id,null)
 
         dao.retrieveOneAnimalCategory(animal).then(result=>{
             res.status(200).send({
