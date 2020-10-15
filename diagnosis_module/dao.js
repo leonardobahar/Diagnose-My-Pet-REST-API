@@ -190,6 +190,7 @@ export class Dao{
 	retrieveOneAnimalCategory(animalCategory){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT at.id, at.animal_name, at.animal_category_id, ac.category_name FROM animal_type at INNER JOIN animal_category ac ON at.animal_category_id = ac.id WHERE at.animal_category_id=?"
+			//const query="SELECT * FROM animal_category WHERE id=?"
 			this.mysqlConn.query(query, [animalCategory.id], (err, res)=>{
 				if (err){
 					reject(err)
