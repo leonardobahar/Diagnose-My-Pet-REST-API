@@ -73,7 +73,8 @@ export class Dao{
 					animals.push(new AnimalType(
 						result[i].id,
 						result[i].animal_name,
-						new AnimalType(result[i].id, result[i].category_name, result[i].animal_category)
+						new AnimalCategory(result[i].animal_category_id,result[i].category_name)
+						//new AnimalType(result[i].id, result[i].category_name, result[i].animal_category)
 					))
 				}
 

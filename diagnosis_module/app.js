@@ -834,9 +834,9 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
 
 app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
     if(typeof req.query.id==='undefined'){
-        res.status(500).send({
+        res.status(400).send({
             success:false,
-            error: SOMETHING_WENT_WRONG
+            error: WRONG_BODY_FORMAT
         })
         return
     }
