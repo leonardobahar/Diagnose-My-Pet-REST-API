@@ -24,12 +24,12 @@ app.use((err, req, res, next)=>{
         if (err.type === 'entity.parse.failed') {
             res.status(406).send({
                 success: false,
-                error: 'WRONG-JSON-FORMAT'
+                message: 'WRONG-JSON-FORMAT'
             })
         }else{
             res.status(400).send({
                 success: false,
-                error: 'CHECK-SERVER-LOG'
+                message: 'CHECK-SERVER-LOG'
             })
             console.error(err)
         }
@@ -87,52 +87,13 @@ app.get("/api/user/retrieve-users", (req, res)=>{
             console.log(err)
             res.status(500).send({
                 success: false,
-                error: SOMETHING_WENT_WRONG
+                result: SOMETHING_WENT_WRONG
             })
         })
     }else{
         // RETRIEVE WITH ID
-        const user=new User(req.body.id,null,null,null,null,null,null,null)
-
-        dao.retrieveOneUser(user).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
     }
 })
-
-/*app.get("/api/user-retrieve-one-user", (req,res)=>{
-    if(typeof req.query.id === 'undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    const user=new User(req.body.id,null,null,null,null,null,null,null)
-
-    dao.retrieveOneUser(user).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        console.log(err)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
-})*/
 
 //Routes
 /**
@@ -174,14 +135,14 @@ app.post("/api/user/register-user", (req, res)=>{
             if (err.code === 'ER_DUP_ENTRY') {
                 res.status(500).send({
                     success: false,
-                    error: 'DUPLICATE-ENTRY'
+                    message: 'DUPLICATE-ENTRY'
                 })
                 res.end()
             }else{
                 console.log(err)
                 res.status(500).send({
                     success: false,
-                    error: SOMETHING_WENT_WRONG
+                    result: SOMETHING_WENT_WRONG
                 })
             }
         })
@@ -200,12 +161,20 @@ app.post("/api/user/register-user", (req, res)=>{
  */
 
 app.post("/api/user/update-user",(req,res)=>{
+    if(typeof req.body.id==='undefined') {
+        res.status(400).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    }
+
     if(typeof req.body.id ==='undefined' ||
         typeof req.body.fullname === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.password === 'undefined' ||
+        typeof req.body.salt === 'undefined' ||
         typeof req.body.role === 'undefined'){
         res.status(400).send({
             success: false,
@@ -214,14 +183,13 @@ app.post("/api/user/update-user",(req,res)=>{
     }
 
     else{
-        const salt = "GAREM"
         const user=new User(req.body.id,
             req.body.fullname,
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
             req.body.password,
-            salt,
+            req.body.salt,
             req.body.role)
 
         dao.updateCustomer(user).then(result=>{
@@ -230,7 +198,7 @@ app.post("/api/user/update-user",(req,res)=>{
             })
         }).catch(err=>{
             console.log(err)
-            res.status(500).send({
+            res.status(400).send({
                 success: false,
                 result: SOMETHING_WENT_WRONG
             })
@@ -302,19 +270,19 @@ app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
         if (err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY) {
             res.status(500).send({
                 success: false,
-                error: 'DUPLICATE-ENTRY'
+                message: 'DUPLICATE-ENTRY'
             })
             res.end()
         }else if(err.code === 'ER_NO_REFERENCED_ROW_2') {
             res.status(500).send({
                 success: false,
-                error: ERROR_FOREIGN_KEY
+                result: ERROR_FOREIGN_KEY
             })
         }else{
             console.log(err)
             res.status(500).send({
                 success: false,
-                error: SOMETHING_WENT_WRONG
+                result: SOMETHING_WENT_WRONG
             })
         }
     })
