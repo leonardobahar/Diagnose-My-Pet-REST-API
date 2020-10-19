@@ -129,7 +129,7 @@ export class Dao{
 
 	updateAnimalType(animal){
 		return new Promise((resolve,reject)=>{
-			if(!animal instanceof AnimalCategory){
+			if(!animal instanceof AnimalType){
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
