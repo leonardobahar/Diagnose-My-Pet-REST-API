@@ -723,7 +723,7 @@ export class Dao{
 	diagnoseSymptoms(symptoms){
 		return new Promise((resolve, reject) => {
 			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, " +
-				"dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name, dsa.medicine_id, m.medicine_name " +
+				"dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name, m.medicine_name " +
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
 				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
 				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
