@@ -798,7 +798,7 @@ export class Dao{
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
 				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
 				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
-				"INNER JOIN medicine m ON dsa.medicine_id=m.id" +
+				"INNER JOIN medicine m ON dsa.medicine_id=m.id " +
 				"WHERE dsa.symptoms_id IN (?)";
 
 			this.mysqlConn.query(query, [symptoms], async(err, res)=>{
