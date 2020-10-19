@@ -142,7 +142,6 @@ export class Dao{
 			}
 
 			const query = "INSERT INTO `animal_type`(`animal_name`, `animal_category_id`) VALUES (?, ?)"
-			console.log(query)
 			this.mysqlConn.query(query, [animalType.animal_name, animalType.animal_category], (err, res)=>{
 				if (err){
 					reject(err)
@@ -445,7 +444,7 @@ export class Dao{
 				}
 
 				disease.id=res.insertId
-				resolve(SUCCESS)
+				resolve(disease)
 			})
 		})
 	}
