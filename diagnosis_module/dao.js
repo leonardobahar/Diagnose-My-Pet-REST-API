@@ -107,33 +107,6 @@ export class Dao{
 		})
 	}
 
-	retrieveOneAnimalType(animalType){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.animal_name, a.animal_category_id, c.category_name FROM animal_type a INNER JOIN animal_category c ON a.animal_category_id = c.id WHERE id=?"
-			this.mysqlConn.query(query, animalType.id, (err, res)=>{
-				if (err){
-					reject(err)
-					return
-				}
-
-				let animals = []
-				let category_name = res[0].category_name
-				for	(let i=0; i<res.length; i++){
-					animals.push(new AnimalType(
-						res[i].id,
-						res[i].animal_name,
-						new AnimalCategory(res[i].animal_category_id, res[i].category_name)
-					))
-				}
-
-				resolve({
-					category_name: category_name,
-					animal_types: animals
-				})
-			})
-		})
-	}
-
 	registerAnimalType(animalType){
 		return new Promise((resolve, reject) => {
 			if (!animalType instanceof AnimalType) {
@@ -248,28 +221,6 @@ export class Dao{
 		})
 	}
 
-	retrieveOneAnimalCategory(animalCategory){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM animal_category WHERE id=?"
-			this.mysqlConn.query(query, animalCategory.id, (err, res)=>{
-				if (err){
-					reject(err)
-					return
-				}
-
-				let categories = []
-				for	(let i=0; i<res.length; i++){
-					categories.push(new AnimalCategory(
-						res[i].id,
-						res[i].category_name,
-					))
-				}
-
-				resolve(categories)
-			})
-		})
-	}
-
 	registerAnimalCategory(animalCategory){
 		return new Promise((resolve, reject) => {
 			if (animalCategory instanceof AnimalCategory){
@@ -362,28 +313,6 @@ export class Dao{
 					diseases.push(new Disease(
 						res[i].id,
 						res[i].disease_name
-					))
-				}
-
-				resolve(diseases)
-			})
-		})
-	}
-
-	retrieveOneDisease(disease){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM disease WHERE id=?"
-			this.mysqlConn.query(query, disease.id, (err, res)=>{
-				if (err){
-					reject(err)
-					return
-				}
-
-				let diseases = []
-				for	(let i=0; i<res.length; i++){
-					diseases.push(new Disease(
-						res[i].id,
-						res[i].disease_name,
 					))
 				}
 
@@ -798,7 +727,6 @@ export class Dao{
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
 				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
 				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
-				"INNER JOIN medicine m ON dsa.medicine_id=m.id " +
 				"WHERE dsa.symptoms_id IN (?)";
 
 			this.mysqlConn.query(query, [symptoms], async(err, res)=>{
