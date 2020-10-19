@@ -95,16 +95,16 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
         // RETRIEVE WITH ID
         const animal=new AnimalCategory(req.query.id,null)
 
-        dao.retrieveOneAnimalCategory(animal).then(result=>{
+        dao.retrieveOneAnimalCategory(animal).then(result=> {
             res.status(200).send({
-                success:true,
-                result:result
-            }).catch(err=>{
-                console.log(err)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
             })
         })
     }
