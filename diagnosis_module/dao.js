@@ -98,7 +98,7 @@ export class Dao{
 					animals.push(new AnimalType(
 						res[i].id,
 						res[i].animal_name,
-						new AnimalType(res[i].id, res[i].category_name, res[i].animal_category)
+						new AnimalCategory(res[i].animal_category_id,res[i].category_name)
 					))
 				}
 
@@ -129,7 +129,7 @@ export class Dao{
 
 	updateAnimalType(animal){
 		return new Promise((resolve,reject)=>{
-			if(!animal instanceof AnimalCategory){
+			if(!animal instanceof AnimalType){
 				reject(MISMATCH_OBJ_TYPE)
 			}
 

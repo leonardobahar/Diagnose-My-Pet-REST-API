@@ -199,7 +199,8 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
  */
 
 app.post("/api/diagnosis/update-animal-category",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.id==='undefined' ||
+       typeof req.body.category_name==='undefined'){
         res.status(400).send({
             success:false,
             error: WRONG_BODY_FORMAT
@@ -397,15 +398,17 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
  */
 
 app.post("/api/diagnosis/update-animal-type",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.id==='undefined' ||
+       typeof req.body.animal_name==='undefined' ||
+       typeof req.body.animal_category==='undefined'){
         res.status(400).send({
             success:false,
-            error:SOMETHING_WENT_WRONG
+            error:WRONG_BODY_FORMAT
         })
         return
     }
 
-    const animal=new AnimalType(req.body.id,req.body.animal_name.toUpperCase(),req.body.animal_category())
+    const animal=new AnimalType(req.body.id,req.body.animal_name.toUpperCase(),req.body.animal_category)
 
     dao.updateAnimalType(animal).then(result=>{
         res.status(200).send({
@@ -416,11 +419,15 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
         if(err.code==='ER_DUP_ENTRY'){
             res.status(200).send({
                 success:false,
-                message:'DUPLICATE-ENTRY'
+                error:'DUPLICATE-ENTRY'
             })
             res.end()
         }else{
             console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         }
     })
 })
