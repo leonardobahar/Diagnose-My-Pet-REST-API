@@ -92,7 +92,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
         })
     }else{
         // RETRIEVE WITH ID
-        const user=new User(req.body.id,null,null,null,null,null,null,null)
+        const user=new User(req.query.id,null,null,null,null,null,null,null)
 
         dao.retrieveOneUser(user).then(result=>{
             res.status(200).send({
