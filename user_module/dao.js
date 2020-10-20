@@ -140,8 +140,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 
-			const query = "UPDATE users SET fullname=?, mobile=?, email=?, birthdate=?, password=?, salt=?, role=? WHERE id=?"
-			this.mysqlConn.query(query, [user.fullname,user.mobile, user.email,user.birthdate, user.password,user.salt,user.role,user.id], (err,res)=>{
+			const query = "UPDATE users SET fullname=?, mobile=?, email=?, birthdate=?, password=?, role=? WHERE id=?"
+			this.mysqlConn.query(query, [user.fullname,user.mobile, user.email,user.birthdate, user.password,user.role,user.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return

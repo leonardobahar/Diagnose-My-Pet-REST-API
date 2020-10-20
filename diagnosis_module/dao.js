@@ -9,7 +9,7 @@ import {
 	ONLY_WITH_VENDORS, ORDER_PROCESSING,
 	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import {Anatomy, AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -460,7 +460,7 @@ export class Dao{
 				}
 
 				medicine.id=res.insertId
-				resolve(SUCCESS)
+				resolve(medicine)
 			})
 		})
 	}
@@ -559,7 +559,7 @@ export class Dao{
 				}
 
 				symptom.id=res.insertId
-				resolve(SUCCESS)
+				resolve(symptom)
 			})
 		})
 	}
@@ -627,6 +627,7 @@ export class Dao{
 							result[i].pet_owner
 						))
 					}
+					resolve(patients)
 				}
 			})
 		})
@@ -666,7 +667,8 @@ export class Dao{
 						return
 					}
 
-					resolve(SUCCESS)
+					patient.id=res.insertId
+					resolve(patient)
 				})
 			}
 		})
@@ -691,21 +693,260 @@ export class Dao{
 		})
 	}
 
-	bindSymptomToDiseaseAndMedicine(symptom, disease, animal, medicine){
+	retrieveAnatomy(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.part_name, a.animal_type_id FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id"
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let parts=[]
+				for(let i=0; i<parts.length; i++){
+					parts.push(new Anatomy(
+						result[i].id,
+						result[i].part_name,
+						new AnimalType(result[i].id,result[i].animal_name,result[i].animal_category)
+					))
+				}
+				resolve(parts)
+			})
+		})
+	}
+
+	retrieveOneAnatomy(anatomy){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.part_name, a.animal_type_id FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ?"
+			this.mysqlConn.query(query, anatomy.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let parts=[]
+				for(let i=0; i<parts.length; i++){
+					parts.push(new Anatomy(
+						result[i].id,
+						result[i].part_name,
+						new AnimalType(result[i].id,result[i].animal_name,result[i].animal_category)
+					))
+				}
+				resolve(parts)
+			})
+		})
+	}
+
+	registerAnatomy(anatomy){
+		return new Promise((resolve,reject)=>{
+			if(anatomy instanceof Anatomy){
+				const query="INSERT INTO `anatomy` (`part_name`, `animal_type_id`) VALUES (?, ?)"
+				this.mysqlConn.query(query,[anatomy.part_name,anatomy.animal_type_id],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					anatomy.id=result.insertId
+					resolve(anatomy)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	updateAnatomy(anatomy){
+		return new Promise((resolve,reject)=>{
+			if(!anatomy instanceof Anatomy){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			else{
+				const query="UPDATE anatomy SET part_name = ?, animal_type_id = ? WHERE id = ?"
+				this.mysqlConn.query(query,[anatomy.part_name, anatomy.animal_type_id, anatomy.id],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					anatomy.id=result.insertId
+					resolve(anatomy)
+				})
+			}
+		})
+	}
+
+	deleteAnatomy(anatomy){
+		return new Promise((resolve,reject)=>{
+			if(!anatomy instanceof Anatomy){
+				reject(MISMATCH_OBJ_TYPE)
+			}
+
+			else{
+				const query="DELETE FROM anatomy WHERE id = ?"
+				this.mysqlConn.query(query, anatomy.id, (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					anatomy.id=result.insertId
+					resolve(anatomy)
+				})
+			}
+		})
+	}
+
+	bindMedicineToSymptom(medicine, symptom){
+		return new Promise((resolve,reject)=>{
+			if(symptom instanceof Symptoms &&
+			   medicine instanceof Medicine){
+				const checkQuery="SELECT id FROM medicine_cure_symptoms WHERE medicine_id = ? AND symptoms_id = ?"
+				this.mysqlConn.query(checkQuery, [medicine.id, symptom.id], (error,result)=>{
+					if(result.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					const query="INSERT INTO `medicine_cure_symptoms`(`medicine_id`, `symptoms_id`) VALUES(?, ?)"
+					this.mysqlConn.query(query,[medicine.id, symptom.id], (error,result)=>{
+						if(error){
+							reject(error)
+							return
+						}
+
+						resolve(SUCCESS)
+					})
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveMedicineForSymptom(symptom){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mcs.id, mcs.medicine_id, m.medicine_name, mcs.symptoms_id, s.symptom_name " +
+				"FROM medicine_cure_symptoms mcs INNER JOIN medicine m ON mcs.medicine_id=m.id " +
+				"INNER JOIN symptoms s ON mcs.symptoms_id=s.id " +
+				"WHERE mcs.symptoms_id = ?"
+			this.mysqlConn.query(query, symptom.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const medicine = result.map(rowDataPacket =>{
+					return{
+						bind_id:rowDataPacket.id,
+						medicine_id:rowDataPacket.medicine_id,
+						medicine_name:rowDataPacket.medicine_name
+					}
+				})
+
+				resolve(medicine)
+			})
+		})
+	}
+
+	unbindMedicineSymptoms(bind_id){
+		return new Promise((resolve, reject) => {
+			const query = "DELETE FROM medicine_cure_symptoms WHERE id = ?"
+			this.mysqlConn.query(query, [bind_id], (err, res)=> {
+				if (err) {
+					reject(err)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	bindMedicineToDisease(medicine, disease){
+		return new Promise((resolve,reject)=>{
+			if(medicine instanceof Medicine &&
+			   disease instanceof Disease){
+				const checkQuery="SELECT id FROM treatment_plan WHERE medicine_id = ? AND disease_id = ?"
+				this.mysqlConn.query(checkQuery, [medicine.id,disease.id], (error,result)=>{
+					if(result.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					const query="INSERT INTO `treatment_plan`(`medicine_id`, `disease_id`) VALUES(?, ?)"
+					this.mysqlConn.query(query,[medicine.id, disease.id], (error,result)=>{
+						if(error){
+							reject(error)
+							return
+						}
+
+						resolve(SUCCESS)
+					})
+				})
+			}else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveMedicineForDisease(disease){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT tp.id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name " +
+				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine.id=m.id " +
+				"INNER JOIN disease d ON tp.disease_id=d.id " +
+				"WHERE tp.disease_id = ?"
+			this.mysqlConn.query(query, disease.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const medicine = result.map(rowDataPacket =>{
+					return{
+						bind_id:rowDataPacket.id,
+						medicine_id:rowDataPacket.medicine_id,
+						medicine_name:rowDataPacket.medicine_name
+					}
+				})
+
+				resolve(medicine)
+			})
+		})
+	}
+
+	unbindMedicineDisease(bind_id){
+		return new Promise((resolve, reject) => {
+			const query = "DELETE FROM treatment_plan WHERE id = ?"
+			this.mysqlConn.query(query, [bind_id], (err, res)=> {
+				if (err) {
+					reject(err)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	bindSymptomToDisease(symptom, disease, animal, anatomy){
 		return new Promise((resolve, reject)=>{
 			if (symptom instanceof Symptoms &&
 				disease instanceof Disease &&
 				animal instanceof AnimalType &&
-			    medicine instanceof Medicine){
-				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ? AND medicine_id = ?"
-				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id, medicine.id], (err, res)=>{
+			    anatomy instanceof Anatomy){
+				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ? AND anatomy_id = ?"
+				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
 					if (res.length > 1){
 						reject(ERROR_DUPLICATE_ENTRY)
 						return
 					}
 
-					const query = "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `medicine_id`) VALUES (?, ?, ?, ?)";
-					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id, medicine.id], (err, res)=>{
+					const query = "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)";
+					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
 						if (err){
 							reject(err)
 							return
@@ -774,13 +1015,12 @@ export class Dao{
 		})
 	}
 
-	retrieveSymptomsAndMedicineForDisease(disease){
+	retrieveSymptomsForDisease(disease){
 		return new Promise((resolve, reject) => {
-			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name, dsa.medicine_id, m.medicine_name " +
+			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name " +
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
 				"INNER JOIN symptoms s ON dsa.symptoms_id = s.id " +
 				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
-				"INNER JOIN medicine m ON dsa.medicine_id=m.id " +
 				"WHERE dsa.disease_id = ?"
 
 			this.mysqlConn.query(query, disease.id, (err, res)=>{
@@ -798,9 +1038,7 @@ export class Dao{
 					return {
 						bind_id : rowDataPacket.id,
 						symptom_id: rowDataPacket.symptom_id,
-						symptom_name : rowDataPacket.symptom_name,
-						medicine_id : rowDataPacket.medicine_id,
-						medicne_name: rowDataPacket.medicine_name
+						symptom_name : rowDataPacket.symptom_name
 					}
 				})
 				resolve(symptoms)
