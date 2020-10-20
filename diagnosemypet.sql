@@ -83,3 +83,31 @@ CREATE TABLE IF NOT EXISTS `medical_records_symptoms`(
 	FOREIGN KEY (medical_records_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS `anatomy`(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+	part_name VARCHAR(20) NOT NULL,
+        animal_type_id INT(11) NOT NULL,
+	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+ALTER TABLE disease_symptoms_animal ADD COLUMN IF NOT EXISTS medicine_id INT(11) AFTER symptoms_id;
+ALTER TABLE disease_symptoms_animal ADD COLUMN IF NOT EXISTS anatomy_id INT(11) AFTER medicine_id;
+
+CREATE TABLE IF NOT EXISTS `medicine_cure_symptoms`(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    medicine_id INT(11) NOT NULL,
+    symptoms_id INT(11) NOT NULL,
+    FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `treatment_plan`(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    medicine_id INT(11) NOT NULL,
+    disease_id INT(11) NOT NULL,
+    FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+ALTER TABLE disease_symptoms_animal DROP COLUMN medicine_id;
