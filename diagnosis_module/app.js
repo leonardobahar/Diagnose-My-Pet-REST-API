@@ -10,7 +10,7 @@ import {
     SOMETHING_WENT_WRONG,
     WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import {Anatomy, AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
 import * as swaggerUi from "swagger-ui-express";
 
 require('dotenv').config()
@@ -1094,7 +1094,7 @@ app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
                 result:result
             })
         }).catch(err=>{
-            console.log(err)
+            console.error(err)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
@@ -1221,7 +1221,6 @@ app.post("/api/diagnosis/update-patient",(req,res)=>{
             error: SOMETHING_WENT_WRONG
         })
     })
-
 })
 
 /**
@@ -1256,7 +1255,287 @@ app.delete("/api/diagnosis/delete-patient",(req,res)=>{
             error: SOMETHING_WENT_WRONG
         })
     })
+})
 
+app.get("/api/diagnosis/retrieve-anatomy",(req,res)=>{
+    if(typeof req.query.id === 'undefined'){
+        dao.retrieveAnatomy().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    } else{
+        const anatomy=new Anatomy(req.query.id,null,null)
+        dao.retrieveOneAnatomy(anatomy).then(result=>[
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        ]).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/diagnosis/register-anatomy",(req,res)=>{
+    if(typeof req.body.part_name ==='undefined' ||
+       typeof req.body.animal_type_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const anatomy=new Anatomy(null,req.body.part_name.toUpperCase(),req.body.animal_type_id)
+    dao.registerAnatomy(anatomy).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.post("/api/diagnosis/update-anatomy", (req,res)=>{
+    if(typeof req.body.id ==='undefined' ||
+        typeof req.body.part_name === 'undefined' ||
+        typeof req.body.animal_type_id === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const anatomy= new Anatomy(req.body.id, req.body.part_name.toUpperCase(), req.body.animal_type_id)
+
+    dao.updateAnatomy(anatomy).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/diagnosis/delete-anatomy",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+        return
+    }
+
+    const anatomy=new Anatomy(req.query.id,null,null)
+    dao.deleteAnatomy(anatomy).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.log(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/diagnosis/bind-medicine-to-symptom", (req,res)=>{
+    if(typeof req.body.medicine_id === 'undefined' ||
+       typeof req.body.symptom_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.bindMedicineToSymptom(new Medicine(req.body.medicine_id),new Symptoms(req.body.symptom_id)).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY){
+            res.status(500).send({
+                success:false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_FOREIGN_KEY
+            })
+        }else{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.delete("/api/diagnosis/delete-bind-medicine-to-symptom", (req, res)=>{
+    if (typeof req.query.bind_id === 'undefined' ){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.unbindMedicineSymptoms(req.query.bind_id).then(result=>{
+        res.status(200).send({
+            success: true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/diagnosis/retrieve-medicine-of-symptoms",(req,res)=>{
+    if(typeof req.query.symptom_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveMedicineForSymptom(new Symptoms(req.query.symptom_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
+    if(typeof req.body.medicine_id === 'undefined' ||
+        typeof req.body.disease_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.bindMedicineToDisease(new Medicine(req.body.medicine_id),new Disease(req.body.disease_id)).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY){
+            res.status(500).send({
+                success:false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_FOREIGN_KEY
+            })
+        }else{
+            console.log(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.delete("/api/diagnosis/delete-bind-medicine-to-disease", (req, res)=>{
+    if (typeof req.query.bind_id === 'undefined' ){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.unbindMedicineDisease(req.query.bind_id).then(result=>{
+        res.status(200).send({
+            success: true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/diagnosis/retrieve-medicine-of-disease",(req,res)=>{
+    if(typeof req.query.disease_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveMedicineForSymptom(new Disease(req.query.disease_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 /**
@@ -1269,10 +1548,11 @@ app.delete("/api/diagnosis/delete-patient",(req,res)=>{
  *     description: A successful response
  */
 
-app.post("/api/diagnosis/bind-symptom-to-disease-and-medicine", (req, res)=>{
+app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
     if (typeof req.body.symptom_id === 'undefined' ||
         typeof req.body.disease_id === 'undefined' ||
-        typeof req.body.animal_id === 'undefined'){
+        typeof req.body.animal_id === 'undefined'  ||
+        typeof req.body.anatomy_id === 'undefined'){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
@@ -1280,7 +1560,7 @@ app.post("/api/diagnosis/bind-symptom-to-disease-and-medicine", (req, res)=>{
         return
     }
 
-    dao.bindSymptomToDiseaseAndMedicine(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id), new Medicine(req.body.medicine_id)).then(result=>{
+    dao.bindSymptomToDisease(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id), new Anatomy(req.body.anatomy_id)).then(result=>{
         res.status(200).send({
             success: true,
             result: result
@@ -1359,7 +1639,7 @@ app.get("/api/diagnosis/retrieve-symptoms-of-disease", (req, res)=>{
         return
     }
 
-    dao.retrieveSymptomsAndMedicineForDisease(new Disease(req.query.disease_id)).then(result=>{
+    dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
         res.status(200).send({
             success: true,
             result: result

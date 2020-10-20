@@ -38,6 +38,14 @@ export class Disease{
 	}
 }
 
+export class Anatomy{
+	constructor(id, part_name, animal_type_id) {
+		this.id=id
+		this.part_name=part_name
+		this.animal_type_id=animal_type_id
+	}
+}
+
 export class Patient{
 	constructor(id, fullname, animal_type, birthdate, pet_owner) {
 		this.id=id
