@@ -78,6 +78,7 @@ export class Dao{
 							result[i].role
 						)
 						//delete user.password
+						delete(user.salt)
 						customers.push(user)
 					}
 
@@ -105,7 +106,9 @@ export class Dao{
 							result[i].password,
 							result[i].role
 						)
+						delete(user.salt)
 						customers.push(user)
+
 					}
 
 					resolve(customers)
@@ -129,6 +132,7 @@ export class Dao{
 				}
 
 				user.id = res.insertId
+				delete(user.salt)
 				resolve(user)
 			})
 		})
@@ -147,6 +151,7 @@ export class Dao{
 					return
 				}
 
+				delete(user.salt)
 				resolve(user)
 			})
 		})
@@ -166,6 +171,7 @@ export class Dao{
 				}
 
 				user.id=res.insertId
+				delete(user.salt)
 				resolve(user)
 			})
 		})
