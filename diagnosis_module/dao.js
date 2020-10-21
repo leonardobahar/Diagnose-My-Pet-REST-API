@@ -593,7 +593,7 @@ export class Dao{
 
 				else{
 					let patients=[]
-					for(let i=0; i<patients.length; i++){
+					for(let i=0; i<result.length; i++){
 						patients.push(new Patient(
 							result[i].id,
 							result[i].fullname,
@@ -618,7 +618,7 @@ export class Dao{
 
 				else{
 					let patients=[]
-					for(let i=0; i<patients.length;i++){
+					for(let i=0; i<result.length;i++){
 						patients.push(new Patient(
 							result[i].id,
 							result[i].fullname,
@@ -694,20 +694,20 @@ export class Dao{
 	}
 
 	retrieveAnatomy(){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.part_name, a.animal_type_id FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id"
-			this.mysqlConn.query(query,(error,result)=>{
-				if(error){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT a.id, a.part_name, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id"
+			this.mysqlConn.query(query, (error, result)=>{
+				if (error){
 					reject(error)
 					return
 				}
 
-				let parts=[]
-				for(let i=0; i<parts.length; i++){
+				let parts = []
+				for	(let i=0; i<result.length; i++){
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,
-						new AnimalType(result[i].id,result[i].animal_name,result[i].animal_category)
+						new AnimalType(result[i].id, result[i].animal_name, result[i].animal_category)
 					))
 				}
 				resolve(parts)
@@ -717,7 +717,7 @@ export class Dao{
 
 	retrieveOneAnatomy(anatomy){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.part_name, a.animal_type_id FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ?"
+			const query="SELECT a.id, a.part_name, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ?"
 			this.mysqlConn.query(query, anatomy.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -725,7 +725,7 @@ export class Dao{
 				}
 
 				let parts=[]
-				for(let i=0; i<parts.length; i++){
+				for(let i=0; i<result.length; i++){
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,

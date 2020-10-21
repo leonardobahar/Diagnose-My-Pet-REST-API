@@ -1273,12 +1273,12 @@ app.get("/api/diagnosis/retrieve-anatomy",(req,res)=>{
         })
     } else{
         const anatomy=new Anatomy(req.query.id,null,null)
-        dao.retrieveOneAnatomy(anatomy).then(result=>[
+        dao.retrieveOneAnatomy(anatomy).then(result=> {
             res.status(200).send({
-                success:true,
-                result:result
+                success: true,
+                result: result
             })
-        ]).catch(err=>{
+        }).catch(err=>{
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -1524,7 +1524,7 @@ app.get("/api/diagnosis/retrieve-medicine-of-disease",(req,res)=>{
         return
     }
 
-    dao.retrieveMedicineForSymptom(new Disease(req.query.disease_id)).then(result=>{
+    dao.retrieveMedicineForDisease(new Disease(req.query.disease_id)).then(result=>{
         res.status(200).send({
             success:true,
             result:result
