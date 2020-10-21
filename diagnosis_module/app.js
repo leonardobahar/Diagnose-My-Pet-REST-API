@@ -1160,7 +1160,7 @@ app.post("/api/diagnosis/add-patient",(req,res)=>{
         return
     }
 
-    const patient = new Patient(null,req.body.fullname,req.body.animal_type,req.body.birthdate,req.body.pet_owner)
+    const patient = new Patient(null,req.body.fullname.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
 
     dao.registerPatient(patient).then(result=>{
         res.status(200).send({
@@ -1207,7 +1207,7 @@ app.post("/api/diagnosis/update-patient",(req,res)=>{
         return
     }
 
-    const patient=new Patient(req.body.id,req.body.fullname,req.body.animal_type,req.body.birthdate,req.body.pet_owner)
+    const patient=new Patient(req.body.id,req.body.fullname.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
 
     dao.updatePatient(patient).then(result=>{
         res.status(200).send({

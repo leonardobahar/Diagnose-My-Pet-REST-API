@@ -896,7 +896,7 @@ export class Dao{
 	retrieveMedicineForDisease(disease){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT tp.id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name " +
-				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine.id=m.id " +
+				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine_id=m.id " +
 				"INNER JOIN disease d ON tp.disease_id=d.id " +
 				"WHERE tp.disease_id = ?"
 			this.mysqlConn.query(query, disease.id, (error,result)=>{
