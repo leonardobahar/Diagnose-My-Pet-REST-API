@@ -9,7 +9,17 @@ import {
 	ONLY_WITH_VENDORS, ORDER_PROCESSING,
 	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Anatomy, AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import {
+	Anatomy,
+	AnimalCategory,
+	AnimalType,
+	Disease,
+	MedicalRecords,
+	Medicine,
+	Patient,
+	Symptoms,
+	User
+} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -1057,6 +1067,27 @@ export class Dao{
 
 				resolve(SUCCESS)
 			})
+		})
+	}
+
+	addMedicalRecord(medical){
+		return new Promise((resolve,reject)=>{
+			if(medical instanceof MedicalRecords){
+				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`, `file_name`) VALUES(?, ?, ?, ?)"
+				this.mysqlConn.query(query, [medical.patient_id, medical.case_open_time, medical.status, medical.file_name],(error, result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					medical.id=result.insertId
+					resolve(medical)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 }

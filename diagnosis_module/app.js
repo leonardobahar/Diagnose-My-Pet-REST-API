@@ -10,7 +10,17 @@ import {
     SOMETHING_WENT_WRONG,
     WRONG_BODY_FORMAT
 } from "../strings";
-import {Anatomy, AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import {
+    Anatomy,
+    AnimalCategory,
+    AnimalType,
+    Disease,
+    MedicalRecords,
+    Medicine,
+    Patient,
+    Symptoms,
+    User
+} from "../model";
 import * as swaggerUi from "swagger-ui-express";
 
 require('dotenv').config()
@@ -18,6 +28,23 @@ require('dotenv').config()
 const app=express()
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json())
+
+const multer=require('multer')
+
+const storage=multer.diskStorage({
+    destination: function (req,file,cb){
+        cb(null,'./Uploads/')
+    },
+    filename: function (req,file,cb){
+        cb(null,file.originalname)
+    }
+})
+
+/*const fileFilter=(req,file,cb)=>{
+    if(file.mimetype)
+}*/
+
+const upload=multer({storage:storage})
 
 // ALLOW ACCESS CONTROL ORIGIN
 app.use(cors())
@@ -1686,6 +1713,43 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
                 error: SOMETHING_WENT_WRONG
             })
         }
+    })
+})
+
+app.post("/api/diagnosis/add-medical-records", upload.single('fine_name'), (req,res)=>{
+
+    if(typeof req.body.patient_id === 'undefined' ||
+       typeof req.body.status === 'undefined' ||
+       typeof req.file.path === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    upload(req,res, function (err){
+        const medical = new MedicalRecords(null,req.body.patient_id, ' NOW() ', req.body.status, req.file.path)
+        dao.addMedicalRecord(medical).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
     })
 })
 
