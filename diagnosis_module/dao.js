@@ -717,7 +717,7 @@ export class Dao{
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,
-						new AnimalType(result[i].id, result[i].animal_name, result[i].animal_category)
+						new AnimalType(result[i].animal_type_id, result[i].animal_name, result[i].animal_category)
 					))
 				}
 				resolve(parts)
@@ -739,7 +739,7 @@ export class Dao{
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,
-						new AnimalType(result[i].id,result[i].animal_name,result[i].animal_category)
+						new AnimalType(result[i].animal_type_id,result[i].animal_name,result[i].animal_category)
 					))
 				}
 				resolve(parts)
