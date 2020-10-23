@@ -46,6 +46,16 @@ export class Anatomy{
 	}
 }
 
+export class MedicalRecords{
+	constructor(id, patient_id, case_open_time, status, file_name){
+		this.id=id
+		this.patient_id=patient_id
+		this.case_open_time=case_open_time
+		this.status=status
+		this.file_name=file_name
+	}
+}
+
 export class Patient{
 	constructor(id, fullname, animal_type, birthdate, pet_owner) {
 		this.id=id

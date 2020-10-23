@@ -9,7 +9,17 @@ import {
 	ONLY_WITH_VENDORS, ORDER_PROCESSING,
 	SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Anatomy, AnimalCategory, AnimalType, Disease, Medicine, Patient, Symptoms, User} from "../model";
+import {
+	Anatomy,
+	AnimalCategory,
+	AnimalType,
+	Disease,
+	MedicalRecords,
+	Medicine,
+	Patient,
+	Symptoms,
+	User
+} from "../model";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -707,7 +717,7 @@ export class Dao{
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,
-						new AnimalType(result[i].id, result[i].animal_name, result[i].animal_category)
+						new AnimalType(result[i].animal_type_id, result[i].animal_name, result[i].animal_category)
 					))
 				}
 				resolve(parts)
@@ -729,7 +739,7 @@ export class Dao{
 					parts.push(new Anatomy(
 						result[i].id,
 						result[i].part_name,
-						new AnimalType(result[i].id,result[i].animal_name,result[i].animal_category)
+						new AnimalType(result[i].animal_type_id,result[i].animal_name,result[i].animal_category)
 					))
 				}
 				resolve(parts)
@@ -896,7 +906,7 @@ export class Dao{
 	retrieveMedicineForDisease(disease){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT tp.id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name " +
-				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine.id=m.id " +
+				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine_id=m.id " +
 				"INNER JOIN disease d ON tp.disease_id=d.id " +
 				"WHERE tp.disease_id = ?"
 			this.mysqlConn.query(query, disease.id, (error,result)=>{
@@ -1057,6 +1067,27 @@ export class Dao{
 
 				resolve(SUCCESS)
 			})
+		})
+	}
+
+	addMedicalRecord(medical){
+		return new Promise((resolve,reject)=>{
+			if(medical instanceof MedicalRecords){
+				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`, `file_name`) VALUES(?, ?, ?, ?)"
+				this.mysqlConn.query(query, [medical.patient_id, medical.case_open_time, medical.status, medical.file_name],(error, result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					medical.id=result.insertId
+					resolve(medical)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 }
