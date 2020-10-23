@@ -36,15 +36,13 @@ const storage=multer.diskStorage({
         cb(null,'./Uploads/')
     },
     filename: function (req,file,cb){
-        cb(null,file.originalname)
+        cb(null,file.fieldname)
     }
 })
 
 /*const fileFilter=(req,file,cb)=>{
     if(file.mimetype)
 }*/
-
-const upload=multer({storage:storage})
 
 // ALLOW ACCESS CONTROL ORIGIN
 app.use(cors())
@@ -1716,11 +1714,14 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
     })
 })
 
-app.post("/api/diagnosis/add-medical-records", upload.single('fine_name'), (req,res)=>{
+app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
 
-    if(typeof req.body.patient_id === 'undefined' ||
-       typeof req.body.status === 'undefined' ||
-       typeof req.file.path === 'undefined'){
+    const upload=multer({storage:storage}).single('file_name')
+
+    const patient=req.query.patient_id
+    console.log(patient)
+
+    if(typeof req.query.patient_id){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1728,8 +1729,19 @@ app.post("/api/diagnosis/add-medical-records", upload.single('fine_name'), (req,
         return
     }
 
-    upload(req,res, function (err){
-        const medical = new MedicalRecords(null,req.body.patient_id, ' NOW() ', req.body.status, req.file.path)
+    upload(req,res, async(err)=>{
+
+        if(err instanceof multer.MulterError){
+            return res.send(err)
+        }
+
+        else if(err){
+            return res.send(err)
+        }
+
+        console.log(req.file)
+
+        const medical = new MedicalRecords(null,patient, ' NOW() ', 'NEW', req.file.filename)
         dao.addMedicalRecord(medical).then(result=>{
             res.status(200).send({
                 success:true,
@@ -1752,6 +1764,10 @@ app.post("/api/diagnosis/add-medical-records", upload.single('fine_name'), (req,
         })
     })
 })
+
+/*
+DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, TELAH DI-DIAGNOSA DOKTER/DIAGNOSED BY THE DOCTOR, RAWAT INAP/INPATIENT, SELESAI/DONE
+ */
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
 app.listen(PORT, ()=>{
