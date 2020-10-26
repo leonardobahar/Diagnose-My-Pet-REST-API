@@ -29,14 +29,16 @@ const app=express()
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json())
 
+/*const fileUpload=require('express-fileupload')
+app.use(fileUpload)*/
+
 const multer=require('multer')
+const path=require('path')
 
 const storage=multer.diskStorage({
-    destination: function (req,file,cb){
-        cb(null,'./Uploads/')
-    },
+    destination: './Uploads/',
     filename: function (req,file,cb){
-        cb(null,file.fieldname)
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
 })
 
@@ -71,6 +73,13 @@ const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 const swaggerJsDoc=require('swagger-jsdoc')
 const swaggerUI=require('swagger-ui-express')
+const ejs=require('ejs')
+
+app.set('view engine', 'ejs')
+
+//EJS
+app.use(express.static('./Uploads'))
+app.get("/",(req,res) => res.render('diagnose'))
 
 //Extended: https://swagger.io/specification/#infoObject
 const swaggerOptions={
@@ -516,7 +525,22 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
                 error: SOMETHING_WENT_WRONG
             })
         })
-    }else{
+    } else{ //In progress. Please use the Retrieve Symptoms for Disease on line 1683 as that one is functioning properly
+        dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        })
+    }
+
+    /*else{
         const disease=new Disease(req.query.id,null,null,null)
 
         dao.retrieveOneDisease(disease).then(result=>{
@@ -531,7 +555,8 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
                 })
             })
         })
-    }
+        Delete in one week. (Only if there are no issues related to this code)
+    }*/
 })
 
 // /**
@@ -1718,10 +1743,10 @@ app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
 
     const upload=multer({storage:storage}).single('file_name')
 
-    const patient=req.query.patient_id
+    const patient=req.body.patient_id
     console.log(patient)
 
-    if(typeof req.query.patient_id){
+    if(typeof patient === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1764,6 +1789,46 @@ app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
         })
     })
 })
+
+/*app.post("/api/diagnosis/add-medical-records", (req,res)=>{
+
+    const patient=req.body.patient_id
+    console.log(patient)
+
+    if(typeof patient === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const file=req.files
+
+    file.mv('./Uploads/' + file.file_name, function (err,result){
+        const medical = new MedicalRecords(null,patient, ' NOW() ', 'NEW', req.file.filename)
+        dao.addMedicalRecord(medical).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    })
+})*/
 
 /*
 DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, TELAH DI-DIAGNOSA DOKTER/DIAGNOSED BY THE DOCTOR, RAWAT INAP/INPATIENT, SELESAI/DONE
