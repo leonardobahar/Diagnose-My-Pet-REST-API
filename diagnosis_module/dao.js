@@ -1016,7 +1016,7 @@ export class Dao{
 				for (let i=0; i<diagnoseResult.length; i++){
 					const resultSet = diagnoseResult[i]
 					resultSet.symptoms_met = Object(resultSet.symptoms).length
-					const diseaseSymptoms = await this.retrieveSymptomsAndMedicineForDisease(new Disease(resultSet.disease_id)).catch(err=>{console.error(err)})
+					const diseaseSymptoms = await this.retrieveSymptomsForDisease(new Disease(resultSet.disease_id)).catch(err=>{console.error(err)})
 					resultSet.total_disease_symptoms = diseaseSymptoms.length
 				}
 
