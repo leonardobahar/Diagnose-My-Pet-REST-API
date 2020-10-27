@@ -955,7 +955,7 @@ export class Dao{
 						return
 					}
 
-					const query = "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)";
+					const query = anatomy.id === "" ? "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`) VALUES (?, ?, ?)" : "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)";
 					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
 						if (err){
 							reject(err)
