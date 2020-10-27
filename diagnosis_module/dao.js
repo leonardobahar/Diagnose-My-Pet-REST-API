@@ -206,7 +206,7 @@ export class Dao{
 					return
 				}
 				const category_name = res[0].category_name
-				const query="SELECT at.id, at.animal_name, at.animal_category_id, ac.category_name FROM animal_type at INNER JOIN animal_category ac ON at.animal_category_id = ac.id WHERE at.animal_category_id=?"
+				const query="SELECT at.id, at.animal_name, at.animal_category_id, ac.category_name FROM animal_type at LEFT OUTER JOIN animal_category ac ON at.animal_category_id = ac.id WHERE at.animal_category_id=?"
 				this.mysqlConn.query(query, [animalCategory.id], (err, res)=>{
 					if (err){
 						reject(err)
@@ -840,8 +840,8 @@ export class Dao{
 	retrieveMedicineForSymptom(symptom){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT mcs.id, mcs.medicine_id, m.medicine_name, mcs.symptoms_id, s.symptom_name " +
-				"FROM medicine_cure_symptoms mcs INNER JOIN medicine m ON mcs.medicine_id=m.id " +
-				"INNER JOIN symptoms s ON mcs.symptoms_id=s.id " +
+				"FROM medicine_cure_symptoms mcs LEFT OUTER JOIN medicine m ON mcs.medicine_id=m.id " +
+				"LEFT OUTER JOIN symptoms s ON mcs.symptoms_id=s.id " +
 				"WHERE mcs.symptoms_id = ?"
 			this.mysqlConn.query(query, symptom.id, (error,result)=>{
 				if(error){
@@ -906,8 +906,8 @@ export class Dao{
 	retrieveMedicineForDisease(disease){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT tp.id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name " +
-				"FROM treatment_plan tp INNER JOIN medicine m ON tp.medicine_id=m.id " +
-				"INNER JOIN disease d ON tp.disease_id=d.id " +
+				"FROM treatment_plan tp LEFT OUTER JOIN medicine m ON tp.medicine_id=m.id " +
+				"LEFT OUTER JOIN disease d ON tp.disease_id=d.id " +
 				"WHERE tp.disease_id = ?"
 			this.mysqlConn.query(query, disease.id, (error,result)=>{
 				if(error){
@@ -1045,9 +1045,9 @@ export class Dao{
 						disease_id: rowDataPacket.disease_id,
 						disease_name: rowDataPacket.disease_name,
 						bind_id : rowDataPacket.id,
-						animal_type_id: rowDataPacket.animal_type_id,
-						animal_type_name: rowDataPacket.animal_type_name,
-						symptom_id: rowDataPacket.symptom_id,
+						animal_id: rowDataPacket.animal_id,
+						animal_name: rowDataPacket.animal_name,
+						symptoms_id: rowDataPacket.symptoms_id,
 						symptom_name : rowDataPacket.symptom_name,
 						anatomy_id: rowDataPacket.anatomy_id,
 						part_name: rowDataPacket.part_name

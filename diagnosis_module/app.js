@@ -1746,7 +1746,11 @@ app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async
     const patient=req.body.patient_id
     console.log(patient)
 
-    if(typeof patient === 'undefined'){
+    const filename=req.body.file_name
+    console.log(filename)
+
+    if(typeof patient === 'undefined' ||
+       typeof filename === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1764,9 +1768,7 @@ app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async
             return res.send(err)
         }
 
-        console.log(req.file)
-
-        const medical = new MedicalRecords(null,patient, ' NOW() ', 'NEW', req.file.filename)
+        const medical = new MedicalRecords(null,patient, ' NOW() ', 'NEW', filename)
         dao.addMedicalRecord(medical).then(result=>{
             res.status(200).send({
                 success:true,
