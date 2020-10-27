@@ -1029,9 +1029,9 @@ export class Dao{
 		return new Promise((resolve, reject) => {
 			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name, dsa.anatomy_id, at.part_name " +
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
-				"INNER JOIN symptoms s ON dsa.symptoms_id = s.id " +
-				"INNER JOIN animal_type a ON dsa.animal_id = a.id " +
-				"INNER JOIN anatomy at ON dsa.anatomy_id = at.id " +
+				"LEFT OUTER JOIN symptoms s ON dsa.symptoms_id = s.id " +
+				"LEFT OUTER JOIN animal_type a ON dsa.animal_id = a.id " +
+				"LEFT OUTER JOIN anatomy at ON dsa.anatomy_id = at.id " +
 				"WHERE dsa.disease_id = ?"
 
 			this.mysqlConn.query(query, disease.id, (err, res)=>{
@@ -1041,12 +1041,7 @@ export class Dao{
 				}
 
 				const symptoms = res.map(rowDataPacket => {
-					// return new Symptoms(
-					// 	rowDataPacket.id,
-					// 	rowDataPacket.symptom_name
-					// )
-
-					return {
+					return{
 						disease_id: rowDataPacket.disease_id,
 						disease_name: rowDataPacket.disease_name,
 						bind_id : rowDataPacket.id,
