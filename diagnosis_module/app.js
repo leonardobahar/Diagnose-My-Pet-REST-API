@@ -75,9 +75,8 @@ const swaggerJsDoc=require('swagger-jsdoc')
 const swaggerUI=require('swagger-ui-express')
 const ejs=require('ejs')
 
-app.set('view engine', 'ejs')
-
 //EJS
+app.set('view engine', 'ejs')
 app.use(express.static('./Uploads'))
 app.get("/",(req,res) => res.render('diagnose'))
 
@@ -512,7 +511,7 @@ app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
  */
 
 app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
-    if (typeof req.query.id==='undefined'){
+    if (typeof req.query.disease_id==='undefined'){
         dao.retrieveDisease().then(result=>{
             res.status(200).send({
                 success: true,
@@ -525,7 +524,7 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
                 error: SOMETHING_WENT_WRONG
             })
         })
-    } else{ //In progress. Please use the Retrieve Symptoms for Disease on line 1683 as that one is functioning properly
+    } else{
         dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
             res.status(200).send({
                 success: true,
@@ -1739,9 +1738,9 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
     })
 })
 
-app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
+const upload=multer({storage:storage})
 
-    const upload=multer({storage:storage}).single('file_name')
+app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async(req,res)=>{
 
     const patient=req.body.patient_id
     console.log(patient)
