@@ -1,6 +1,8 @@
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import express from 'express';
+import multer from 'multer';
+import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import {Dao} from "./dao";
@@ -25,27 +27,9 @@ import * as swaggerUi from "swagger-ui-express";
 
 require('dotenv').config()
 
-const app=express()
+const app = express()
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json())
-
-/*const fileUpload=require('express-fileupload')
-app.use(fileUpload)*/
-
-const multer=require('multer')
-const path=require('path')
-
-const storage=multer.diskStorage({
-    destination: './Uploads/',
-    filename: function (req,file,cb){
-        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
-
-/*const fileFilter=(req,file,cb)=>{
-    if(file.mimetype)
-}*/
 
 // ALLOW ACCESS CONTROL ORIGIN
 app.use(cors())
@@ -1739,17 +1723,30 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
     })
 })
 
-const upload=multer({storage:storage})
+// STARTING FROM THIS LINE COMES ENDPOINTS WHICH HANDLES FILE
+const storage=multer.diskStorage({
+    destination: './Uploads/',
+    filename: function (req,file,cb){
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
 
-app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async(req,res)=>{
+const medicalRecordFilter = (req, file, cb)=>{
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|doc|docx|pdf|txt|xls|csv|xlsx)$/)) {
+        req.fileValidationError = 'Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!';
+        return cb(new Error('Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!'), false);
+    }
+    cb(null, true);
+}
 
-    const patient=req.body.patient_id
-    console.log(patient)
+/* MAKE /api/diagnosis/attach-medical-records
+ / Pass query medical_record_id, filename
+ */
 
-    const filename=req.file.file_name
-    console.log(filename)
-
-    if(typeof patient === 'undefined'){
+app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
+    if(typeof req.query.patient_id === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1757,19 +1754,8 @@ app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async
         return
     }
 
-    upload(req,res, async(err)=>{
-
-        if(err instanceof multer.MulterError){
-            return res.send(err)
-        }
-
-        else if(err){
-            return res.send(err)
-        }
-
-        console.log(filename)
-
-        const medical = new MedicalRecords(null,patient, ' NOW() ', 'NEW', filename)
+    if (typeof req.file === 'undefined'){
+        const medical = new MedicalRecords(null,req.query.patient_id, 'NOW', 'NEW', null)
         dao.addMedicalRecord(medical).then(result=>{
             res.status(200).send({
                 success:true,
@@ -1790,8 +1776,51 @@ app.post("/api/diagnosis/add-medical-records", upload.single('file_name'), async
                 })
             }
         })
-    })
+    }else{
+        const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
+
+        upload(req,res, async(err)=>{
+
+            if(err instanceof multer.MulterError){
+                return res.send(err)
+            }
+
+            else if(err){
+                return res.send(err)
+            }
+
+            console.log(req.file.filename)
+
+            const medical = new MedicalRecords(null,req.query.patient_id, 'NOW', 'NEW', req.file.filename)
+            dao.addMedicalRecord(medical).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        success: false,
+                        error: 'DUPLICATE-ENTRY'
+                    })
+                    res.end()
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                }
+            })
+        })
+    }
 })
+
+/*
+ / RETRIEVE MEDICAL RECORD
+ / RETURN MEDICAL_RECORD_ITSELF + FILENAMES
+ / { medical_record_id : x, case_open_time: x, attachments: [{filename: x1}, {filename:x2}] }
+ */
 
 /*app.post("/api/diagnosis/add-medical-records", (req,res)=>{
 

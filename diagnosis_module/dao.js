@@ -1075,8 +1075,8 @@ export class Dao{
 	addMedicalRecord(medical){
 		return new Promise((resolve,reject)=>{
 			if(medical instanceof MedicalRecords){
-				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`, `file_name`) VALUES(?, ?, ?, ?)"
-				this.mysqlConn.query(query, [medical.patient_id, medical.case_open_time, medical.status, medical.file_name],(error, result)=>{
+				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`, `file_name`) VALUES(?, NOW(), ?, ?)"
+				this.mysqlConn.query(query, [medical.patient_id, medical.status, medical.file_name],(error, result)=>{
 					if(error){
 						reject(error)
 						return
