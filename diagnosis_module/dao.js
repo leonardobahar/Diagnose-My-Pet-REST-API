@@ -13,7 +13,7 @@ import {
 	Anatomy,
 	AnimalCategory,
 	AnimalType,
-	Disease,
+	Disease, MedicalRecordAttachment,
 	MedicalRecords,
 	Medicine,
 	Patient,
@@ -1075,8 +1075,8 @@ export class Dao{
 	addMedicalRecord(medical){
 		return new Promise((resolve,reject)=>{
 			if(medical instanceof MedicalRecords){
-				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`, `file_name`) VALUES(?, NOW(), ?, ?)"
-				this.mysqlConn.query(query, [medical.patient_id, medical.status, medical.file_name],(error, result)=>{
+				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`) VALUES(?, NOW(), ?)"
+				this.mysqlConn.query(query, [medical.patient_id, medical.status],(error, result)=>{
 					if(error){
 						reject(error)
 						return
@@ -1092,4 +1092,73 @@ export class Dao{
 			}
 		})
 	}
+
+	retrieveMedicalRecord(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM medical_records"
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let records=[]
+				for(let i=0;i<records.length;i++){
+					records.push(new MedicalRecords(
+						result[i].id,
+						result[i].patient_id,
+						result[i].case_open_time,
+						result[i].status
+					))
+				}
+				resolve(records)
+			})
+		})
+	}
+
+	retrieveOneMedicalRecord(record){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM medical_records WHERE id=?"
+			this.mysqlConn.query(query, record.id, (error, result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let records=[]
+				for(let i=0; i<records.length; i++){
+					records.push(new MedicalRecords(
+						result[i].id,
+						result[i].patient_id,
+						result[i].case_open_time,
+						result[i].status
+					))
+				}
+				resolve(records)
+			})
+		})
+	}
+
+	addMedicalRecordAttachment(attachment){
+		return new Promise((resolve,reject)=>{
+			if(attachment instanceof MedicalRecordAttachment){
+				const query="INSERT INTO `medical_record_attachment` (`medical_record_id`, `file_name`) VALUES(?, ?)"
+				this.mysqlConn.query(query, [attachment.medical_record_id, attachment.file_name],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					attachment.id=result.insertId
+					resolve(attachment)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+
 }

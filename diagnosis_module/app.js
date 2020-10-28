@@ -18,6 +18,7 @@ import {
     AnimalType,
     Disease,
     MedicalRecords,
+    MedicalRecordAttachment,
     Medicine,
     Patient,
     Symptoms,
@@ -72,7 +73,7 @@ const swaggerOptions={
             title:'Diagnosis Module',
             description:"Diagnosis API Information",
             contact:{
-              Team: "BaharTech CodeDoc"
+                Team: "BaharTech CodeDoc"
             },
             servers:["http://localhost:8086"]
         }
@@ -218,7 +219,7 @@ app.post("/api/diagnosis/add-animal-category", (req, res)=>{
 
 app.post("/api/diagnosis/update-animal-category",(req,res)=>{
     if(typeof req.body.id==='undefined' ||
-       typeof req.body.category_name==='undefined'){
+        typeof req.body.category_name==='undefined'){
         res.status(400).send({
             success:false,
             error: WRONG_BODY_FORMAT
@@ -417,8 +418,8 @@ app.post("/api/diagnosis/add-animal-type", (req, res)=>{
 
 app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     if(typeof req.body.id==='undefined' ||
-       typeof req.body.animal_name==='undefined' ||
-       typeof req.body.animal_category==='undefined'){
+        typeof req.body.animal_name==='undefined' ||
+        typeof req.body.animal_category==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -638,11 +639,11 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
 
     if(typeof req.body.id==='undefined' ||
         typeof req.body.disease_name === 'undefined'){
-            res.status(400).send({
-                success:false,
-                error:WRONG_BODY_FORMAT
-            })
-            return
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
     }
 
     const disease=new Disease(req.body.id,req.body.disease_name.toUpperCase())
@@ -809,7 +810,7 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
             result: result
         })
     }).catch(err=>{
-        
+
         if(err.code==='WR_DUPLICATE_ENTRY'){
             res.status(500).send({
                 success:false,
@@ -1324,7 +1325,7 @@ app.get("/api/diagnosis/retrieve-anatomy",(req,res)=>{
 
 app.post("/api/diagnosis/register-anatomy",(req,res)=>{
     if(typeof req.body.part_name ==='undefined' ||
-       typeof req.body.animal_type_id === 'undefined'){
+        typeof req.body.animal_type_id === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1408,7 +1409,7 @@ app.delete("/api/diagnosis/delete-anatomy",(req,res)=>{
 
 app.post("/api/diagnosis/bind-medicine-to-symptom", (req,res)=>{
     if(typeof req.body.medicine_id === 'undefined' ||
-       typeof req.body.symptom_id === 'undefined'){
+        typeof req.body.symptom_id === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1723,12 +1724,43 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
     })
 })
 
+app.post("/api/diagnosis/add-medical-record", (req,res)=>{
+    if(typeof req.body.patient_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const medical=new MedicalRecords(null,req.body.patient_id, 'NOW','NEW')
+    dao.addMedicalRecord(medical).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if(err.code==='ER_DUP_ENTRY'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_DUPLICATE_ENTRY
+            })
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
 // STARTING FROM THIS LINE COMES ENDPOINTS WHICH HANDLES FILE
 const storage=multer.diskStorage({
     destination: './Uploads/',
     filename: function (req,file,cb){
         cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+        //cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
 })
 
@@ -1745,8 +1777,8 @@ const medicalRecordFilter = (req, file, cb)=>{
  / Pass query medical_record_id, filename
  */
 
-app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
-    if(typeof req.query.patient_id === 'undefined'){
+app.post("/api/diagnosis/attach-medical-records", async(req,res)=>{
+    if(typeof req.query.medical_record_id === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1755,8 +1787,8 @@ app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
     }
 
     if (typeof req.file === 'undefined'){
-        const medical = new MedicalRecords(null,req.query.patient_id, 'NOW', 'NEW', null)
-        dao.addMedicalRecord(medical).then(result=>{
+        const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, 'NULL')
+        dao.addMedicalRecordAttachment(attachment).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -1789,10 +1821,10 @@ app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
                 return res.send(err)
             }
 
-            console.log(req.file.filename)
+            console.log(req.file.file_name)
 
-            const medical = new MedicalRecords(null,req.query.patient_id, 'NOW', 'NEW', req.file.filename)
-            dao.addMedicalRecord(medical).then(result=>{
+            const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.file_name)
+            dao.addMedicalRecordAttachment(attachment).then(result=>{
                 res.status(200).send({
                     success:true,
                     result:result
@@ -1815,6 +1847,8 @@ app.post("/api/diagnosis/add-medical-records", async(req,res)=>{
         })
     }
 })
+
+
 
 /*
  / RETRIEVE MEDICAL RECORD
