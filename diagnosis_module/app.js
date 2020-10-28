@@ -1755,6 +1755,35 @@ app.post("/api/diagnosis/add-medical-record", (req,res)=>{
     })
 })
 
+app.get("/api/diagnosis/retrieve-medical-record",(req,res)=>{
+    if(typeof req.query.medical_record_id==='undefined'){
+        dao.retrieveMedicalRecord().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+        })
+    }else {
+        const record=new MedicalRecords(req.query.id,null,null,null)
+        dao.retrieveOneMedicalRecord(record).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+        })
+    }
+})
+
 // STARTING FROM THIS LINE COMES ENDPOINTS WHICH HANDLES FILE
 const storage=multer.diskStorage({
     destination: './Uploads/',
@@ -1778,16 +1807,33 @@ const medicalRecordFilter = (req, file, cb)=>{
  */
 
 app.post("/api/diagnosis/attach-medical-records", async(req,res)=>{
-    if(typeof req.query.medical_record_id === 'undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
 
-    if (typeof req.file === 'undefined'){
-        const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, 'NULL')
+    upload(req,res, async(err)=>{
+
+        console.log(req.query.medical_record_id)
+        console.log(req.file.filename)
+
+        if(typeof req.query.medical_record_id === 'undefined' ||
+            typeof req.file.filename === 'undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        if(err instanceof multer.MulterError){
+            return res.send(err)
+        }
+
+        else if(err){
+            return res.send(err)
+        }
+
+        console.log(req.file.filename)
+
+        const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
         dao.addMedicalRecordAttachment(attachment).then(result=>{
             res.status(200).send({
                 success:true,
@@ -1808,44 +1854,7 @@ app.post("/api/diagnosis/attach-medical-records", async(req,res)=>{
                 })
             }
         })
-    }else{
-        const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
-
-        upload(req,res, async(err)=>{
-
-            if(err instanceof multer.MulterError){
-                return res.send(err)
-            }
-
-            else if(err){
-                return res.send(err)
-            }
-
-            console.log(req.file.file_name)
-
-            const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.file_name)
-            dao.addMedicalRecordAttachment(attachment).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(err=>{
-                if (err.code === 'ER_DUP_ENTRY') {
-                    res.status(500).send({
-                        success: false,
-                        error: 'DUPLICATE-ENTRY'
-                    })
-                    res.end()
-                }else{
-                    console.error(err)
-                    res.status(500).send({
-                        success: false,
-                        error: SOMETHING_WENT_WRONG
-                    })
-                }
-            })
-        })
-    }
+    })
 })
 
 
