@@ -1028,7 +1028,7 @@ export class Dao{
 	retrieveSymptomsForDisease(disease){
 		return new Promise((resolve, reject) => {
 			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, dsa.animal_id, a.animal_name, dsa.symptoms_id, s.symptom_name, dsa.anatomy_id, at.part_name " +
-				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
+				"FROM disease_symptoms_animal dsa LEFT OUTER JOIN disease d ON dsa.disease_id = d.id " +
 				"LEFT OUTER JOIN symptoms s ON dsa.symptoms_id = s.id " +
 				"LEFT OUTER JOIN animal_type a ON dsa.animal_id = a.id " +
 				"LEFT OUTER JOIN anatomy at ON dsa.anatomy_id = at.id " +
@@ -1135,6 +1135,20 @@ export class Dao{
 					))
 				}
 				resolve(records)
+			})
+		})
+	}
+
+	retrieveMedicalAttachmentRecord(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mra.id, mra.medical_record_id, mra.file_name FROM medical_record_attachment mra "+
+				"LEFT OUTER JOIN medical_record mr ON mra.medical_record_id=mr.id "
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
 			})
 		})
 	}

@@ -1756,7 +1756,7 @@ app.post("/api/diagnosis/add-medical-record", (req,res)=>{
 })
 
 app.get("/api/diagnosis/retrieve-medical-record",(req,res)=>{
-    if(typeof req.query.medical_record_id==='undefined'){
+    if(typeof req.query.file_name==='undefined'){
         dao.retrieveMedicalRecord().then(result=>{
             res.status(200).send({
                 success:true,
@@ -1769,7 +1769,7 @@ app.get("/api/diagnosis/retrieve-medical-record",(req,res)=>{
             })
         })
     }else {
-        const record=new MedicalRecords(req.query.id,null,null,null)
+        const record=new MedicalRecordAttachment(null,null,req.query.file_name)
         dao.retrieveOneMedicalRecord(record).then(result=>{
             res.status(200).send({
                 success:true,
