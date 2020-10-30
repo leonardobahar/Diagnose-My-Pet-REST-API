@@ -1072,27 +1072,6 @@ export class Dao{
 		})
 	}
 
-	addMedicalRecord(medical){
-		return new Promise((resolve,reject)=>{
-			if(medical instanceof MedicalRecords){
-				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`) VALUES(?, NOW(), ?)"
-				this.mysqlConn.query(query, [medical.patient_id, medical.status],(error, result)=>{
-					if(error){
-						reject(error)
-						return
-					}
-
-					medical.id=result.insertId
-					resolve(medical)
-				})
-			}
-
-			else {
-				reject(MISMATCH_OBJ_TYPE)
-			}
-		})
-	}
-
 	retrieveMedicalRecord(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM medical_records"
@@ -1103,7 +1082,7 @@ export class Dao{
 				}
 
 				let records=[]
-				for(let i=0;i<records.length;i++){
+				for(let i=0;i<result.length;i++){
 					records.push(new MedicalRecords(
 						result[i].id,
 						result[i].patient_id,
@@ -1126,7 +1105,7 @@ export class Dao{
 				}
 
 				let records=[]
-				for(let i=0; i<records.length; i++){
+				for(let i=0; i<result.length; i++){
 					records.push(new MedicalRecords(
 						result[i].id,
 						result[i].patient_id,
@@ -1139,16 +1118,106 @@ export class Dao{
 		})
 	}
 
-	retrieveMedicalAttachmentRecord(){
+	addMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT mra.id, mra.medical_record_id, mra.file_name FROM medical_record_attachment mra "+
-				"LEFT OUTER JOIN medical_record mr ON mra.medical_record_id=mr.id "
+			if(record instanceof MedicalRecords){
+				const query="INSERT INTO `medical_records` (`patient_id`, `case_open_time`, `status`) VALUES(?, NOW(), ?)"
+				this.mysqlConn.query(query, [record.patient_id, record.status],(error, result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					record.id=result.insertId
+					resolve(record)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	updateMedicalRecord(record){
+		return new Promise((resolve,reject)=>{
+			if(record instanceof MedicalRecords){
+				const query="UPDATE medical_records SET patient_id=?, case_open_time=NOW(), status=? WHERE id=?"
+				this.mysqlConn.query(query, [record.patient_id, record.status, record.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					record.id=result.insertId
+					resolve(record)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	deleteMedicalRecord(record){
+		return new Promise((resolve,reject)=>{
+			if(record instanceof MedicalRecords){
+				const query="DELETE FROM medical_records WHERE id=?"
+				this.mysqlConn.query(query, record.id, (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					record.id=result.insertId
+					resolve(record)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveMedicalRecordAttachment(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mra.file_name FROM medical_record_attachment mra "
+
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
+				const attachment=result.map(rowDataPacket=>{
+					return{
+						file_name:rowDataPacket.file_name
+					}
+				})
+				resolve(attachment)
+			})
+		})
+	}
+
+	retrieveOneMedicalRecordAttachment(record){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mra.file_name FROM medical_record_attachment mra WHERE mra.file_name=?"
+
+			this.mysqlConn.query(query, record.file_name, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const attachment=result.map(rowDataPacket=>{
+					return{
+
+						file_name:rowDataPacket.file_name
+					}
+				})
+				resolve(attachment)
 			})
 		})
 	}
@@ -1174,5 +1243,45 @@ export class Dao{
 		})
 	}
 
+	updateMedicalRecordAttachment(attachment){
+		return new Promise((resolve,reject)=> {
+			if (attachment instanceof MedicalRecordAttachment) {
+				const query = "UPDATE medical_record_attachment SET file_name=? WHERE medical_record_id=?"
+				this.mysqlConn.query(query, [attachment.file_name,attachment.medical_record_id],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
 
+					attachment.id=result.insertId
+					resolve(attachment)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	deleteMedicalRecordAttachment(attachment){
+		return new Promise((resolve,reject)=>{
+			if(attachment instanceof MedicalRecordAttachment){
+				const query="DELETE FROM medical_record_attachment WHERE id=?"
+				this.mysqlConn.query(query, attachment.id,(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					attachment.id=result.insertId
+					resolve(attachment)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
 }
