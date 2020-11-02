@@ -177,12 +177,6 @@ export class Dao{
 		})
 	}
 
-	retrieveUserPets(user_id){
-		return new Promise((resolve, reject)=>{
-
-		})
-	}
-
 	bindUserToPet(user,patient){
 		return new Promise((resolve,reject)=>{
 			if(user instanceof User &&
@@ -207,6 +201,12 @@ export class Dao{
 			}else {
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	retrieveUserPets(user_id){
+		return new Promise((resolve, reject)=>{
+
 		})
 	}
 }

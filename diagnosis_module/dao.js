@@ -12,7 +12,7 @@ import {
 import {
 	Anatomy,
 	AnimalCategory,
-	AnimalType,
+	AnimalType, Appointment,
 	Disease, MedicalRecordAttachment,
 	MedicalRecords,
 	Medicine,
@@ -1276,6 +1276,117 @@ export class Dao{
 
 					attachment.id=result.insertId
 					resolve(attachment)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveAppointment(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM appointment"
+			this.mysqlConn.query(query, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let appointments=[]
+				for(let i=0; i<result.length; i++){
+					appointments.push(new Appointment(
+						result[i].id,
+						result[i].appointment_name,
+						result[i].appointment_time,
+						result[i].user_id,
+						result[i].patient_id
+					))
+				}
+				resolve(appointments)
+			})
+		})
+	}
+
+	retrieveOneAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM appointment WHERE id=?"
+			this.mysqlConn.query(query, appointment.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				let appointments=[]
+				for(let i=0; i<result.length; i++){
+					appointments.push(new Appointment(
+						result[i].id,
+						result[i].appointment_name,
+						result[i].appointment_time,
+						result[i].user_id,
+						result[i].patient_id
+					))
+				}
+				resolve(appointments)
+			})
+		})
+	}
+
+	addAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof  Appointment){
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `user_id`, `patient_id`) VALUES(?, ?, ?, ?)"
+				this.mysqlConn.query(query, [appointment.appointment_name, appointment.appointment_time, appointment.user_id, appointment.patient_id],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					appointment.id=result.insertId
+					resolve(appointment)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	updateAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, user_id=?, patient_id=? WHERE id=?"
+				this.mysqlConn.query(query, [appointment.appointment_name, appointment.appointment_time, appointment.user_id, appointment.patient_id, appointment.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					appointment.id=result.insertId
+					resolve(appointment)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	deleteAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof  Appointment){
+				const query="DELETE FROM appointment WHERE id=?"
+				this.mysqlConn.query(query, appointment.id, (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					appointment.id=result.insertId
+					resolve(appointment)
 				})
 			}
 

@@ -22,7 +22,7 @@ import {
     Medicine,
     Patient,
     Symptoms,
-    User
+    User, Appointment
 } from "../model";
 import * as swaggerUi from "swagger-ui-express";
 
@@ -2032,7 +2032,118 @@ app.delete("/api/diagnosis/delete-medical-attachment",(req,res)=>{
             result:result
         })
     }).catch(err=>{
-        console.error(500).send({
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/diagnosis/retrieve-appointment", (req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveAppointment().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const appointment=new Appointment(req.query.id,null,null,null,null)
+        dao.retrieveOneAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/diagnosis/add-appointment", (req,res)=>{
+    if(typeof req.body.appointment_name === 'undefined' ||
+       typeof req.body.appointment_time === 'undefined' ||
+       typeof req.body.user_id === 'undefined' ||
+       typeof  req.body.patient_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(null, req.body.appointment_name, req.body.appointment_time, req.body.user_id, req.body.patient_id)
+    dao.addAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/diagnosis/update-appointment", (req,res)=>{
+    if(typeof req.body.id==='undefined' ||
+       typeof req.body.appointment_name==='undefined' ||
+       typeof req.body.appointment_time==='undefined' ||
+       typeof req.body.user_id==='undefined' ||
+       typeof req.body.patient_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time,req.body.user_id,req.body.patient_id)
+    dao.updateAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/diagnosis/delete-appointment", (req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.query.id,null,null,null,null)
+    dao.deleteAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
