@@ -2083,7 +2083,7 @@ app.post("/api/diagnosis/add-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(null, req.body.appointment_name, req.body.appointment_time, req.body.user_id, req.body.patient_id)
+    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id, req.body.patient_id)
     dao.addAppointment(appointment).then(result=>{
         res.status(200).send({
             success:true,

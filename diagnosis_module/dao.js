@@ -1213,7 +1213,6 @@ export class Dao{
 
 				const attachment=result.map(rowDataPacket=>{
 					return{
-
 						file_name:rowDataPacket.file_name
 					}
 				})
@@ -1287,48 +1286,55 @@ export class Dao{
 
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM appointment"
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.fullname, a.patient_id, p.fullname " +
+				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id "
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				let appointments=[]
-				for(let i=0; i<result.length; i++){
-					appointments.push(new Appointment(
-						result[i].id,
-						result[i].appointment_name,
-						result[i].appointment_time,
-						result[i].user_id,
-						result[i].patient_id
-					))
-				}
-				resolve(appointments)
+				const attachment=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						appointment_name:rowDataPacket.appointment_name,
+						appointment_time:rowDataPacket.appointment_time,
+						user_id:rowDataPacket.user_id,
+						user_name:rowDataPacket.fullname,
+						patient_id:rowDataPacket.patient_id,
+						pet_name:rowDataPacket.fullname
+					}
+				})
+				resolve(attachment)
 			})
 		})
 	}
 
 	retrieveOneAppointment(appointment){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM appointment WHERE id=?"
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.fullname, a.patient_id, p.fullname " +
+				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
+				"WHERE a.id=?"
 			this.mysqlConn.query(query, appointment.id, (error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				let appointments=[]
-				for(let i=0; i<result.length; i++){
-					appointments.push(new Appointment(
-						result[i].id,
-						result[i].appointment_name,
-						result[i].appointment_time,
-						result[i].user_id,
-						result[i].patient_id
-					))
-				}
-				resolve(appointments)
+				const attachment=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						appointment_name:rowDataPacket.appointment_name,
+						appointment_time:rowDataPacket.appointment_time,
+						user_id:rowDataPacket.user_id,
+						user_name:rowDataPacket.fullname,
+						patient_id:rowDataPacket.patient_id,
+						pet_name:rowDataPacket.fullname
+					}
+				})
+				resolve(attachment)
 			})
 		})
 	}
@@ -1358,7 +1364,7 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
 				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, user_id=?, patient_id=? WHERE id=?"
-				this.mysqlConn.query(query, [appointment.appointment_name, appointment.appointment_time, appointment.user_id, appointment.patient_id, appointment.id], (error,result)=>{
+				this.mysqlConn.query(query, [appointment.appointment_name.toUpperCase(), appointment.appointment_time, appointment.user_id, appointment.patient_id, appointment.id], (error,result)=>{
 					if(error){
 						reject(error)
 						return
