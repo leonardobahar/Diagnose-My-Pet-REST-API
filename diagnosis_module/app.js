@@ -1184,7 +1184,7 @@ app.get("/api/diagnosis/retrieve-patient",(req,res)=>{
  */
 
 app.post("/api/diagnosis/add-patient",(req,res)=>{
-    if (typeof req.body.fullname === 'undefined' ||
+    if (typeof req.body.patient_name === 'undefined' ||
         typeof req.body.animal_type === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.pet_owner === 'undefined'){
@@ -1195,7 +1195,7 @@ app.post("/api/diagnosis/add-patient",(req,res)=>{
         return
     }
 
-    const patient = new Patient(null,req.body.fullname.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
+    const patient = new Patient(null,req.body.patient_name.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
 
     dao.registerPatient(patient).then(result=>{
         res.status(200).send({
@@ -1231,7 +1231,7 @@ app.post("/api/diagnosis/add-patient",(req,res)=>{
 
 app.post("/api/diagnosis/update-patient",(req,res)=>{
     if(typeof req.body.id ==='undefined' ||
-        typeof req.body.fullname === 'undefined' ||
+        typeof req.body.patient_name === 'undefined' ||
         typeof req.body.animal_type === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.pet_owner === 'undefined'){
@@ -1242,7 +1242,7 @@ app.post("/api/diagnosis/update-patient",(req,res)=>{
         return
     }
 
-    const patient=new Patient(req.body.id,req.body.fullname.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
+    const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
 
     dao.updatePatient(patient).then(result=>{
         res.status(200).send({

@@ -283,7 +283,7 @@ app.delete("/api/user/delete-user",(req,res)=>{
  *     description: A successful response
  */
 
-app.post("/api/diagnosis/bind-user-to-pet", (req,res)=>{
+app.post("/api/user/bind-user-to-pet", (req,res)=>{
     if(typeof req.body.user_id === 'undefined' ||
         typeof req.body.patient_id === 'undefined'){
         res.status(400).send({

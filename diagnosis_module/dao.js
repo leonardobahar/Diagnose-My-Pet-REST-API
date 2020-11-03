@@ -606,7 +606,7 @@ export class Dao{
 					for(let i=0; i<result.length; i++){
 						patients.push(new Patient(
 							result[i].id,
-							result[i].fullname,
+							result[i].patient_name,
 							result[i].animal_type,
 							result[i].birthdate,
 							result[i].pet_owner
@@ -631,7 +631,7 @@ export class Dao{
 					for(let i=0; i<result.length;i++){
 						patients.push(new Patient(
 							result[i].id,
-							result[i].fullname,
+							result[i].patient_name,
 							result[i].animal_type,
 							result[i].birthdate,
 							result[i].pet_owner
@@ -646,8 +646,8 @@ export class Dao{
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
-				const query="INSERT INTO `patients`(`fullname`,`animal_type_id`,`birthdate`, `pet_owner_id`) VALUES(?, ?, ?, ?)"
-				this.mysqlConn.query(query,[patient.fullname, patient.animal_type, patient.birthdate, patient.pet_owner],(err,res)=>{
+				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`birthdate`, `pet_owner_id`) VALUES(?, ?, ?, ?)"
+				this.mysqlConn.query(query,[patient.patient_name, patient.animal_type, patient.birthdate, patient.pet_owner],(err,res)=>{
 					if(err){
 						reject(err)
 						return
@@ -670,8 +670,8 @@ export class Dao{
 			}
 
 			else{
-				const query="UPDATE patients SET fullname=?, animal_type_id=?, birthdate=?, pet_owner_id=? WHERE id=?"
-				this.mysqlConn.query(query, [patient.fullname, patient.animal_type, patient.birthdate, patient.pet_owner, patient.id], (err, res)=>{
+				const query="UPDATE patients SET patient_name=?, animal_type_id=?, birthdate=?, pet_owner_id=? WHERE id=?"
+				this.mysqlConn.query(query, [patient.patient_name, patient.animal_type, patient.birthdate, patient.pet_owner, patient.id], (err, res)=>{
 					if(err){
 						reject(err)
 						return
@@ -853,7 +853,9 @@ export class Dao{
 					return{
 						bind_id:rowDataPacket.id,
 						medicine_id:rowDataPacket.medicine_id,
-						medicine_name:rowDataPacket.medicine_name
+						medicine_name:rowDataPacket.medicine_name,
+						symptoms_id:rowDataPacket.symptoms_id,
+						symptom_name:rowDataPacket.symptom_name
 					}
 				})
 
@@ -919,7 +921,9 @@ export class Dao{
 					return{
 						bind_id:rowDataPacket.id,
 						medicine_id:rowDataPacket.medicine_id,
-						medicine_name:rowDataPacket.medicine_name
+						medicine_name:rowDataPacket.medicine_name,
+						disease_id:rowDataPacket.disease_id,
+						disease_name:rowDataPacket.disease_name
 					}
 				})
 
@@ -1286,7 +1290,7 @@ export class Dao{
 
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.fullname, a.patient_id, p.fullname " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id "
 			this.mysqlConn.query(query, (error,result)=>{
@@ -1301,9 +1305,9 @@ export class Dao{
 						appointment_name:rowDataPacket.appointment_name,
 						appointment_time:rowDataPacket.appointment_time,
 						user_id:rowDataPacket.user_id,
-						user_name:rowDataPacket.fullname,
+						user_name:rowDataPacket.user_name,
 						patient_id:rowDataPacket.patient_id,
-						pet_name:rowDataPacket.fullname
+						pet_name:rowDataPacket.patient_name
 					}
 				})
 				resolve(attachment)
@@ -1313,7 +1317,7 @@ export class Dao{
 
 	retrieveOneAppointment(appointment){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.fullname, a.patient_id, p.fullname " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"WHERE a.id=?"
@@ -1329,9 +1333,9 @@ export class Dao{
 						appointment_name:rowDataPacket.appointment_name,
 						appointment_time:rowDataPacket.appointment_time,
 						user_id:rowDataPacket.user_id,
-						user_name:rowDataPacket.fullname,
+						user_name:rowDataPacket.user_name,
 						patient_id:rowDataPacket.patient_id,
-						pet_name:rowDataPacket.fullname
+						pet_name:rowDataPacket.patient_name
 					}
 				})
 				resolve(attachment)

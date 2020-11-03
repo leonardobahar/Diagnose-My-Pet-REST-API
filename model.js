@@ -64,9 +64,9 @@ export class MedicalRecordAttachment{
 }
 
 export class Patient{
-	constructor(id, fullname, animal_type, birthdate, pet_owner) {
+	constructor(id, patient_name, animal_type, birthdate, pet_owner) {
 		this.id=id
-		this.fullname=fullname
+		this.patient_name=patient_name
 		this.animal_type=animal_type
 		this.birthdate=birthdate
 		this.pet_owner=pet_owner
@@ -84,9 +84,9 @@ export class Appointment{
 }
 
 export class User{
-	constructor(id, fullname, mobile, email, birthdate, password, salt, role){
+	constructor(id, user_name, mobile, email, birthdate, password, salt, role){
 		this.id = id
-		this.fullname = fullname
+		this.user_name = user_name
 		this.mobile = mobile
 		this.email = email
 		this.birthdate = birthdate
