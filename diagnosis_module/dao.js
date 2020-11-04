@@ -595,50 +595,55 @@ export class Dao{
 
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
-			const query="SELECT * FROM patients"
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
+				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
+				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id"
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
+					return
 				}
 
-				else{
-					let patients=[]
-					for(let i=0; i<result.length; i++){
-						patients.push(new Patient(
-							result[i].id,
-							result[i].patient_name,
-							result[i].animal_type,
-							result[i].birthdate,
-							result[i].pet_owner
-						))
+				const patients=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						patient_name:rowDataPacket.patient_name,
+						animal_type_id:rowDataPacket.animal_type_id,
+						animal_name:rowDataPacket.animal_name,
+						birthdate:rowDataPacket.birthdate,
+						pet_owner_id:rowDataPacket.pet_owner_id,
+						pet_owner_name:rowDataPacket.user_name
 					}
-					resolve(patients)
-				}
+				})
+				resolve(patients)
 			})
 		})
 	}
 
 	retrieveOnePatient(patient){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM patients WHERE id=?"
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
+				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
+				"LEFT OUTER JOIN user u ON p.pet_owner_id=u.id "+
+				"WHERE p.id=?"
 			this.mysqlConn.query(query,patient.id,(error,result)=>{
 				if(error){
 					reject(error)
+					return
 				}
 
-				else{
-					let patients=[]
-					for(let i=0; i<result.length;i++){
-						patients.push(new Patient(
-							result[i].id,
-							result[i].patient_name,
-							result[i].animal_type,
-							result[i].birthdate,
-							result[i].pet_owner
-						))
+				const patients=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						patient_name:rowDataPacket.patient_name,
+						animal_type_id:rowDataPacket.animal_type_id,
+						animal_name:rowDataPacket.animal_name,
+						birthdate:rowDataPacket.birthdate,
+						pet_owner_id:rowDataPacket.pet_owner_id,
+						pet_owner_name:rowDataPacket.user_name
 					}
-					resolve(patients)
-				}
+				})
+				resolve(patients)
 			})
 		})
 	}
