@@ -111,3 +111,13 @@ CREATE TABLE IF NOT EXISTS `treatment_plan`(
 );
 
 ALTER TABLE disease_symptoms_animal DROP COLUMN medicine_id;
+
+CREATE TABLE IF NOT EXISTS `appointment`(
+    id INT(7) PRIMARY KEY AUTO_INCREMENT,
+    appointment_name varchar(20),
+    appointment_time timestamp,
+    user_id INT(7) NOT NULL,
+    patient_id INT(7) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

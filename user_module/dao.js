@@ -70,7 +70,7 @@ export class Dao{
 					for (let i=0; i<result.length; i++){
 						const user = new User(
 							result[i].id,
-							result[i].fullname,
+							result[i].user_name,
 							result[i].mobile,
 							result[i].email,
 							result[i].birthdate,
@@ -99,7 +99,7 @@ export class Dao{
 					for(let i=0;i<result.length;i++){
 						const user=new User(
 							result[i].id,
-							result[i].fullname,
+							result[i].user_name,
 							result[i].mobile,
 							result[i].email,
 							result[i].birthdate,
