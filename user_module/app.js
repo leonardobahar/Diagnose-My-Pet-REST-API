@@ -9,7 +9,17 @@ import {
     SOMETHING_WENT_WRONG,
     WRONG_BODY_FORMAT
 } from "../strings";
-import {AnimalCategory, AnimalType, Disease, Patient, Symptoms, User} from "../model";
+import {
+    AnimalCategory,
+    AnimalType, Appointment,
+    Disease,
+    MedicalRecordAttachment,
+    MedicalRecords,
+    Patient,
+    Symptoms,
+    User
+} from "../model";
+import multer from "multer";
 
 dotenv.config();
 
@@ -319,6 +329,444 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
         }
     })
 })
+
+app.get("/api/user/retrieve-medical-record",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveMedicalRecord().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else {
+        const record=new MedicalRecords(req.query.id,null,null,null)
+        dao.retrieveOneMedicalRecord(record).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/user/add-medical-record", (req,res)=>{
+    if(typeof req.body.patient_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const medical=new MedicalRecords(null,req.body.patient_id, 'NOW','NEW')
+    dao.addMedicalRecord(medical).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if(err.code==='ER_DUP_ENTRY'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_DUPLICATE_ENTRY
+            })
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.post("/api/user/update-medical-record",(req,res)=>{
+    if( typeof req.body.id === 'undefined' ||
+        typeof req.body.patient_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const medical=new MedicalRecords(req.body.id,req.body.patient_id,'NOW','UPDATED')
+    dao.updateMedicalRecord(medical).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if(err.code==='ER_DUP_ENTRY'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_DUPLICATE_ENTRY
+            })
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.delete("/api/user/delete-medical-record", (req,res)=>{
+    if(typeof req.query.id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const medical=new MedicalRecords(req.query.id, null, null,null)
+    dao.deleteMedicalRecord(medical).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if(err.code==='ER_DUP_ENTRY'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_DUPLICATE_ENTRY
+            })
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+// STARTING FROM THIS LINE COMES ENDPOINTS WHICH HANDLES FILE
+const storage=multer.diskStorage({
+    destination: './Uploads/',
+    filename: function (req,file,cb){
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+        //cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+const medicalRecordFilter = (req, file, cb)=>{
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|doc|docx|pdf|txt|xls|csv|xlsx)$/)) {
+        req.fileValidationError = 'Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!';
+        return cb(new Error('Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!'), false);
+    }
+    cb(null, true);
+}
+
+/* MAKE /api/diagnosis/attach-medical-records
+ / Pass query medical_record_id, filename
+ */
+
+app.get("/api/user/retrieve-medical-attachment", (req,res)=>{
+    if(typeof req.query.file_name==='undefined'){
+        dao.retrieveMedicalRecordAttachment().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:ERROR_DUPLICATE_ENTRY
+                })
+            }else{
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }else{
+        const record=new MedicalRecordAttachment(null,null,req.query.file_name)
+        dao.retrieveOneMedicalRecordAttachment(record).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:ERROR_DUPLICATE_ENTRY
+                })
+            }else{
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
+app.post("/api/user/attach-medical-records", async(req,res)=>{
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
+
+    upload(req,res, async(err)=>{
+
+        console.log(req.query.medical_record_id)
+        console.log(req.file.filename)
+
+        if(typeof req.query.medical_record_id === 'undefined' ||
+            typeof req.file.filename === 'undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        if(err instanceof multer.MulterError){
+            return res.send(err)
+        }
+
+        else if(err){
+            return res.send(err)
+        }
+
+        console.log(req.file.filename)
+
+        const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
+        dao.addMedicalRecordAttachment(attachment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    })
+})
+
+app.post("/api/user/update-medical-attachment",async(req,res)=>{
+    const upload=multer({storage:storage, fileFilter:medicalRecordFilter}).single('mc_attachment')
+
+    upload(req,res, async(err)=>{
+
+        console.log(req.query.medical_record_id)
+        console.log(req.file.filename)
+
+        if(typeof req.query.medical_record_id === 'undefined' ||
+            typeof req.file.filename === 'undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        if(err instanceof multer.MulterError){
+            return res.send(err)
+        }
+
+        else if(err){
+            return res.send(err)
+        }
+
+        console.log(req.file.filename)
+
+        const attachment=new MedicalRecordAttachment(req.query.id,req.query.medical_record_id,req.file.filename)
+        dao.updateMedicalRecordAttachment(attachment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:ERROR_DUPLICATE_ENTRY
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    })
+})
+
+app.delete("/api/user/delete-medical-attachment",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const attachment=new MedicalRecordAttachment(req.query.id,null,null)
+    dao.deleteMedicalRecordAttachment(attachment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/user/retrieve-appointment", (req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveAppointment().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const appointment=new Appointment(req.query.id,null,null,null,null)
+        dao.retrieveOneAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/user/add-appointment", (req,res)=>{
+    if(typeof req.body.appointment_name === 'undefined' ||
+        typeof req.body.appointment_time === 'undefined' ||
+        typeof req.body.user_id === 'undefined' ||
+        typeof  req.body.patient_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id, req.body.patient_id)
+    dao.addAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/update-appointment", (req,res)=>{
+    if(typeof req.body.id==='undefined' ||
+        typeof req.body.appointment_name==='undefined' ||
+        typeof req.body.appointment_time==='undefined' ||
+        typeof req.body.user_id==='undefined' ||
+        typeof req.body.patient_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time,req.body.user_id,req.body.patient_id)
+    dao.updateAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/user/delete-appointment", (req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.query.id,null,null,null,null)
+    dao.deleteAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+/*
+ / RETRIEVE MEDICAL RECORD
+ / RETURN MEDICAL_RECORD_ITSELF + FILENAMES
+ / { medical_record_id : x, case_open_time: x, attachments: [{filename: x1}, {filename:x2}] }
+ */
+
+/*
+DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, TELAH DI-DIAGNOSA DOKTER/DIAGNOSED BY THE DOCTOR, RAWAT INAP/INPATIENT, SELESAI/DONE
+ */
+
+
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
