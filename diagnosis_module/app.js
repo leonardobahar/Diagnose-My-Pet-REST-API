@@ -1632,7 +1632,7 @@ app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
  */
 
 app.delete("/api/diagnosis/delete-bind-symptom-to-disease", (req, res)=>{
-    if (typeof req.query.bind_id === 'undefined' ){
+    if (typeof req.query.id === 'undefined' ){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
@@ -1640,7 +1640,7 @@ app.delete("/api/diagnosis/delete-bind-symptom-to-disease", (req, res)=>{
         return
     }
 
-    dao.unbindDiseaseSymptoms(req.query.bind_id).then(result=>{
+    dao.unbindDiseaseSymptoms(req.query.id).then(result=>{
         res.status(200).send({
             success: true
         })

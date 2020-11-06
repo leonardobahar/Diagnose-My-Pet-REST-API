@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY,
@@ -156,7 +157,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
  */
 
 app.post("/api/user/register-user", (req, res)=>{
-    if (typeof req.body.fullname === 'undefined' ||
+    if (typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefiend' ||
         typeof req.body.birthdate === 'undefined' ||
@@ -168,7 +169,7 @@ app.post("/api/user/register-user", (req, res)=>{
         return
     }else{
         const user = new User(null,
-            req.body.fullname,
+            req.body.user_name,
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
@@ -211,7 +212,7 @@ app.post("/api/user/register-user", (req, res)=>{
 
 app.post("/api/user/update-user",(req,res)=>{
     if(typeof req.body.id ==='undefined' ||
-        typeof req.body.fullname === 'undefined' ||
+        typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
@@ -226,7 +227,7 @@ app.post("/api/user/update-user",(req,res)=>{
     else{
         const salt = "GAREM"
         const user=new User(req.body.id,
-            req.body.fullname,
+            req.body.user_name,
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
@@ -331,7 +332,7 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
 })
 
 app.get("/api/user/retrieve-medical-record",(req,res)=>{
-    if(typeof req.query.id==='undefined'){
+    if(typeof req.query.patient_id==='undefined'){
         dao.retrieveMedicalRecord().then(result=>{
             res.status(200).send({
                 success:true,
@@ -345,7 +346,7 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
             })
         })
     }else {
-        const record=new MedicalRecords(req.query.id,null,null,null)
+        const record=new MedicalRecords(null,req.query.patient_id,null,null)
         dao.retrieveOneMedicalRecord(record).then(result=>{
             res.status(200).send({
                 success:true,
@@ -632,6 +633,7 @@ app.delete("/api/user/delete-medical-attachment",(req,res)=>{
     }
 
     const attachment=new MedicalRecordAttachment(req.query.id,null,null)
+
     dao.deleteMedicalRecordAttachment(attachment).then(result=>{
         res.status(200).send({
             success:true,
@@ -643,6 +645,26 @@ app.delete("/api/user/delete-medical-attachment",(req,res)=>{
             success:false,
             error:SOMETHING_WENT_WRONG
         })
+    })
+
+    fs.unlink('./Uploads/'+
+        dao.getAttachmentFileName(attachment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    }),(err)=>{
+        if(err){
+            console.error(err)
+            return
+        }
+        console.log('File Deleted')
     })
 })
 

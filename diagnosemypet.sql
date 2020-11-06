@@ -121,3 +121,10 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS `medical_record_attachment`(
+    id INT(7) PRIMARY KEY AUTO_INCREMENT,
+    medical_record_id INT(7),
+    file_name varchar(150),
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
