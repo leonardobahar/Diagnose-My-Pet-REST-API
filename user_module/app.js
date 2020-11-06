@@ -6,8 +6,8 @@ import cors from 'cors';
 import path from 'path';
 import {Dao} from "./dao";
 import {
-    ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY,
-    SOMETHING_WENT_WRONG,
+    ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
+    SOMETHING_WENT_WRONG, SUCCESS,
     WRONG_BODY_FORMAT
 } from "../strings";
 import {
@@ -526,9 +526,6 @@ app.post("/api/user/attach-medical-records", async(req,res)=>{
 
     upload(req,res, async(err)=>{
 
-        console.log(req.query.medical_record_id)
-        console.log(req.file.filename)
-
         if(typeof req.query.medical_record_id === 'undefined' ||
             typeof req.file.filename === 'undefined'){
             res.status(400).send({
@@ -634,37 +631,36 @@ app.delete("/api/user/delete-medical-attachment",(req,res)=>{
 
     const attachment=new MedicalRecordAttachment(req.query.id,null,null)
 
-    dao.deleteMedicalRecordAttachment(attachment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
+    dao.getAttachmentFileName(attachment).then(result=>{
 
-    fs.unlink('./Uploads/'+
-        dao.getAttachmentFileName(attachment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+        fs.unlinkSync('./Uploads/'+result.toString())
+
+        dao.deleteMedicalRecordAttachment(attachment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:SUCCESS
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    }),(err)=>{
-        if(err){
-            console.error(err)
-            return
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
         }
-        console.log('File Deleted')
+        else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
     })
 })
 

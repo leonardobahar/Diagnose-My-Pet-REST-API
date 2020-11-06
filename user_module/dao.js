@@ -361,6 +361,26 @@ export class Dao{
 		})
 	}
 
+	getAttachmentFileName(attachment){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT file_name FROM medical_record_attachment WHERE id=? "
+			this.mysqlConn.query(query,attachment.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				else if(result.length>0){
+					resolve(result[0].file_name)
+				}
+
+				else {
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	addMedicalRecordAttachment(attachment){
 		return new Promise((resolve,reject)=>{
 			if(attachment instanceof MedicalRecordAttachment){
@@ -539,25 +559,6 @@ export class Dao{
 			else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
-		})
-	}
-
-	getAttachmentFileName(attachment){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT file_name FROM medical_record_attachment WHERE id=? "
-			this.mysqlConn.query(query,attachment.id, (error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}
-
-				const attach=result.map(rowDataPacket=>{
-					return{
-						file_name:rowDataPacket.file_name
-					}
-				})
-				resolve(attach)
-			})
 		})
 	}
 }
