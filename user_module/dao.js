@@ -14,8 +14,8 @@ import {
 	AnimalType,
 	Appointment,
 	MedicalRecordAttachment,
-	MedicalRecords,
-	Patient,
+	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
+	Patient, Symptoms, TreatmentPlan,
 	User
 } from "../model";
 
@@ -433,6 +433,213 @@ export class Dao{
 			else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	retrieveMedicalRecordSymptoms(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mrs.medical_records_id, mr.patient_id, mr.case_open_time, mr.status, mrs.symptoms_id, s.symptom_name "+
+				"FROM medical_records_symptoms mrs LEFT OUTER JOIN medical_records mr ON mrs.medical_records_id=mr.id "+
+				"LEFT OUTER JOIN symptoms s ON mrs.symptoms_id=s.id "
+
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const records=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						patient_id:rowDataPacket.patient_id,
+						case_open_time:rowDataPacket.case_open_time,
+						status:rowDataPacket.status,
+						symptoms_id:rowDataPacket.symptoms_id,
+						symptom_name:rowDataPacket.symptom_name
+					}
+				})
+				resolve(records)
+			})
+		})
+	}
+
+	retrieveOneMedicalRecordSymptoms(record){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mrs.medical_records_id, mr.patient_id, mr.case_open_time, mr.status, mrs.symptoms_id, s.symptom_name "+
+				"FROM medical_records_symptoms mrs LEFT OUTER JOIN medical_records mr ON mrs.medical_records_id=mr.id "+
+				"LEFT OUTER JOIN symptoms s ON mrs.symptoms_id=s.id "+
+				"WHERE mrs.medical_records_id=? "
+
+			this.mysqlConn.query(query,record.medical_record_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const records=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						patient_id:rowDataPacket.patient_id,
+						case_open_time:rowDataPacket.case_open_time,
+						status:rowDataPacket.status,
+						symptoms_id:rowDataPacket.symptoms_id,
+						symptom_name:rowDataPacket.symptom_name
+					}
+				})
+				resolve(records)
+			})
+		})
+	}
+
+	bindMedicalRecordWithSymptoms(record,symptoms){
+		return new Promise((resolve,reject)=>{
+			if(record instanceof MedicalRecordSymptoms &&
+			   symptoms instanceof Symptoms){
+				const query="INSERT INTO `medical_records_symptoms` (`medical_records_id`,`symptoms_id`) VALUES(?,?) "
+				this.mysqlConn.query(query,[record.id,symptoms.id], (error,result)=>{
+					if(result.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					resolve(SUCCESS)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	/*updateMedicalRecordSymptoms(record){
+		return new Promise((resolve,reject)=>{
+			if(record instanceof MedicalRecordSymptoms){
+				const query="UPDATE medical_records_symptoms SET medical_records_id=?, symptoms_id=? WHERE id=?"
+				this.mysqlConn.query(query,[record.medical_record_id, record.symptoms_id, record.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					record.id=result.insertId
+					resolve(record)
+				})
+			}
+
+			else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}*/
+
+	unbindMedicalRecordWithSymptoms(bind_id){
+		return new Promise((resolve,reject)=>{
+			const query="DELETE FROM medical_records_symptoms WHERE id=?"
+			this.mysqlConn.query(query,bind_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	retrieveMedicalRecordTreatmentPlan(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, tp.disease_id "+
+				"FROM medical_record_treatment_plan mrtp LEFT OUTER JOIN medical_records mr ON mrtp.medical_record_id=mr.id "+
+				"LEFT OUTER JOIN treatment_plan tp ON mrtp.treatment_plan_id=tp.id "
+
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const record=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						medical_record_id:rowDataPacket.medical_record_id,
+						patient_id:rowDataPacket.patient_id,
+						case_open_time:rowDataPacket.case_open_time,
+						status:rowDataPacket.status,
+						treatment_plan_id:rowDataPacket.treatment_plan_id,
+						medicine_id:rowDataPacket.medicine_id,
+						disease_id:rowDataPacket.disease_id
+					}
+				})
+
+				resolve(record)
+			})
+		})
+	}
+
+	retrieveOneMedicalRecordTreatmentPlan(record){
+		return new Promise((reject,resolve)=>{
+			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, tp.disease_id "+
+				"FROM medical_record_treatment_plan mrtp LEFT OUTER JOIN medical_records mr ON mrtp.medical_record_id=mr.id "+
+				"LEFT OUTER JOIN treatment_plan tp ON mrtp.treatment_plan_id=tp.id "+
+				"WHERE mrtp.medical_record_id=? "
+
+			this.mysqlConn.query(query,record.medical_record_id,(error,result)=> {
+				if (error) {
+					reject(error)
+					return
+				}
+
+				const record = result.map(rowDataPacket => {
+					return {
+						id: rowDataPacket.id,
+						medical_record_id: rowDataPacket.medical_record_id,
+						patient_id: rowDataPacket.patient_id,
+						case_open_time: rowDataPacket.case_open_time,
+						status: rowDataPacket.status,
+						treatment_plan_id: rowDataPacket.treatment_plan_id,
+						medicine_id: rowDataPacket.medicine_id,
+						disease_id: rowDataPacket.disease_id
+					}
+				})
+
+				resolve(record)
+			})
+		})
+	}
+
+	bindMedicalRecordToTreatmentPlan(record,treatment){
+		return new Promise((resolve,reject)=>{
+			if(record instanceof MedicalRecords &&
+			   treatment instanceof TreatmentPlan){
+				const query="INSERT INTO `medical_record_treatment_plan` (`medical_record_id`, `treatment_plan_id`) VALUES(?, ?)"
+				this.mysqlConn.query(query, [record.id,treatment.id],(error,result)=>{
+					if(result.length>1){
+						reject(ERROR_DUPLICATE_ENTRY)
+						return
+					}
+
+					resolve(SUCCESS)
+				})
+			}
+
+			else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	unbindMedicalRecordWithTreatmentPlan(bind_id){
+		return new Promise((resolve,reject)=>{
+			const query="DELETE FROM medical_record_treatment_plan WHERE ID=?"
+			this.mysqlConn.query(query,bind_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
 		})
 	}
 

@@ -774,10 +774,6 @@ export class Dao{
 			   disease instanceof Disease){
 				const checkQuery="SELECT id FROM treatment_plan WHERE medicine_id = ? AND disease_id = ?"
 				this.mysqlConn.query(checkQuery, [medicine.id,disease.id], (error,result)=>{
-					if(result.length>1){
-						reject(ERROR_DUPLICATE_ENTRY)
-						return
-					}
 
 					const query="INSERT INTO `treatment_plan`(`medicine_id`, `disease_id`) VALUES(?, ?)"
 					this.mysqlConn.query(query,[medicine.id, disease.id], (error,result)=>{

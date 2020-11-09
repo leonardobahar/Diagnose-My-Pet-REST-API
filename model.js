@@ -55,6 +55,30 @@ export class MedicalRecords{
 	}
 }
 
+export class MedicalRecordSymptoms{
+	constructor(id, medical_records_id, symptoms_id) {
+		this.id=id
+		this.medical_records_id=medical_records_id
+		this.symptoms_id=symptoms_id
+	}
+}
+
+export class MedicalRecordTreatmentPlan{
+	constructor(id, medical_record_id, treatment_plan_id) {
+		this.id=id
+		this.medical_record_id=medical_record_id
+		this.treatment_plan_id=treatment_plan_id
+	}
+}
+
+export class TreatmentPlan{
+	constructor(id, medicine_id, disease_id) {
+		this.id=id
+		this.medicine_id=medicine_id
+		this.disease_id=disease_id
+	}
+}
+
 export class MedicalRecordAttachment{
 	constructor(id, medical_record_id, file_name) {
 		this.id=id

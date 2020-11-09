@@ -128,3 +128,11 @@ CREATE TABLE IF NOT EXISTS `medical_record_attachment`(
     file_name varchar(150),
     FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS`diagnose_my_pet`.`medical_record_treatment_plan` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT ,
+    `medical_record_id` INT(11) NOT NULL ,
+    `treatment_plan_id` INT(11) NOT NULL ,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB;

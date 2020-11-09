@@ -15,9 +15,9 @@ import {
     AnimalType, Appointment,
     Disease,
     MedicalRecordAttachment,
-    MedicalRecords,
+    MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
     Patient,
-    Symptoms,
+    Symptoms, TreatmentPlan,
     User
 } from "../model";
 import multer from "multer";
@@ -582,7 +582,6 @@ const storage=multer.diskStorage({
     destination: './Uploads/',
     filename: function (req,file,cb){
         cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-        //cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
 })
 
@@ -782,6 +781,162 @@ app.delete("/api/user/delete-medical-attachment",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         }
+    })
+})
+
+app.get("/api/user/retrieve-medical-record-symptoms",(req,res)=>{
+    if(typeof req.query.medical_record_id==='undefined'){
+        dao.retrieveMedicalRecordSymptoms().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const record=new MedicalRecordSymptoms(null,req.query.medical_record_id,null)
+        dao.retrieveOneMedicalRecordSymptoms(record).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/user/add-medical-record-symptoms",(req,res)=>{
+    if(typeof req.body.medical_record_id==='undefined' ||
+       typeof req.body.symptoms_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.bindMedicalRecordWithSymptoms(new MedicalRecords(req.body.medical_record_id),new Symptoms(req.body.symptoms_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/user/delete-medical-record-symptoms",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.unbindMedicalRecordWithSymptoms(req.query.id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/user/retrieve-medical-record-treatment-plan",(req,res)=>{
+    if(typeof req.query.medical_record_id==='undefined'){
+        dao.retrieveMedicalRecordTreatmentPlan().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const record=new MedicalRecordTreatmentPlan(null,req.query.medical_record_id,null)
+        dao.retrieveOneMedicalRecordTreatmentPlan(record).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/user/add-medical-record-treatment-plan",(req,res)=>{
+    if(typeof req.body.medical_record_id==='undefined'||
+       typeof req.body.treatment_plan_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.bindMedicalRecordToTreatmentPlan(new MedicalRecords(req.body.medical_record_id),new TreatmentPlan(req.body.treatment_plan_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/user/delete-medical-record-treatment-plan", (req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.unbindMedicalRecordWithTreatmentPlan(req.query.id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
     })
 })
 
