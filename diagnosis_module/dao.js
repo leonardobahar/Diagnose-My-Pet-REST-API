@@ -42,7 +42,7 @@ export class Dao{
 				this.mysqlConn.connect(err=>{
 					if(err) {  // or restarting (takes a while sometimes).
 						console.error('error when connecting to db:', err)
-						setTimeout(handleConnection(), 2000)
+						setTimeout(handleConnection, 2000)
 					}else{
 						this.mysqlConn.query(this._initSqlStmt, (err, res, fields)=>{
 							if (err){
