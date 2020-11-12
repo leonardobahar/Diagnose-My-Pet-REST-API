@@ -48,7 +48,7 @@ export class Dao{
 							if (err){
 								throw err
 							} else{
-								//console.info("CONNECTION TO DB TABLES SUCCESS")
+								console.info("CONNECTION TO DB TABLES SUCCESS")
 								resolve(1)
 							}
 						})
@@ -60,7 +60,8 @@ export class Dao{
 					if(err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') { // Connection to the MySQL server is usually
 						handleConnection()                         // lost due to either server restart, or a
 					} else {                                      // connection idle timeout (the wait_timeout
-						throw err                                  // server variable configures this)
+						console.error(err)
+						handleConnection()// server variable configures this)
 					}
 				})
 			})
