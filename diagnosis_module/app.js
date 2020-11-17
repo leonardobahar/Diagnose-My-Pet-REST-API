@@ -55,30 +55,12 @@ const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
-const swaggerJsDoc=require('swagger-jsdoc')
-const swaggerUI=require('swagger-ui-express')
 const ejs=require('ejs')
 
 //EJS
 app.set('view engine', 'ejs')
 app.use(express.static('./Uploads'))
 app.get("/",(req,res) => res.render('diagnose'))
-
-//Extended: https://swagger.io/specification/#infoObject
-const swaggerOptions={
-    swaggerDefinition: {
-        info:{
-            title:'Diagnosis Module',
-            description:"Diagnosis API Information",
-            contact:{
-                Team: "BaharTech CodeDoc"
-            },
-            servers:["http://localhost:8086"]
-        }
-    },
-    //[`.routes/*.js`]
-    apis:["/diagnosis_module/app.js"]
-};
 
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
     if (typeof req.query.id === 'undefined'){

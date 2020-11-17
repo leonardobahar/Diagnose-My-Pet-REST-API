@@ -143,9 +143,7 @@ app.post("/api/user/update-user",(req,res)=>{
             success: false,
             error: WRONG_BODY_FORMAT
         })
-    }
-
-    else{
+    }else{
         const salt = "GAREM"
         const user=new User(req.body.id,
             req.body.user_name,
