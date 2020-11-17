@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `medical_records_symptoms`(
 CREATE TABLE IF NOT EXISTS `anatomy`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	part_name VARCHAR(20) NOT NULL,
-        animal_type_id INT(11) NOT NULL,
+    animal_type_id INT(11) NOT NULL,
 	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -104,10 +104,17 @@ CREATE TABLE IF NOT EXISTS `medicine_cure_symptoms`(
 
 CREATE TABLE IF NOT EXISTS `treatment_plan`(
     id INT(11) PRIMARY KEY AUTO_INCREMENT,
-    medicine_id INT(11) NOT NULL,
+    plan_name VARCHAR(255) UNIQUE NOT NULL,
     disease_id INT(11) NOT NULL,
-    FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `treatment_plan_details`(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    treatment_plan_id INT(11),
+    medicine_id INT(11) NOT NULL,
+    FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE disease_symptoms_animal DROP COLUMN medicine_id;
@@ -116,10 +123,10 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     id INT(7) PRIMARY KEY AUTO_INCREMENT,
     appointment_name varchar(20),
     appointment_time timestamp,
-    user_id INT(7) NOT NULL,
-    patient_id INT(7) NOT NULL,
+    user_id INT(11) NOT NULL,
+    patient_id INT(11) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_record_attachment`(
@@ -135,4 +142,5 @@ CREATE TABLE IF NOT EXISTS`diagnose_my_pet`.`medical_record_treatment_plan` (
     `treatment_plan_id` INT(11) NOT NULL ,
     PRIMARY KEY (`id`),
     FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE = InnoDB;
+    FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB;

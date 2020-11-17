@@ -773,18 +773,14 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(medicine instanceof Medicine &&
 			   disease instanceof Disease){
-				const checkQuery="SELECT id FROM treatment_plan WHERE medicine_id = ? AND disease_id = ?"
-				this.mysqlConn.query(checkQuery, [medicine.id,disease.id], (error,result)=>{
+				const query="INSERT INTO `treatment_plan`(`medicine_id`, `disease_id`) VALUES(?, ?)"
+				this.mysqlConn.query(query,[medicine.id, disease.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
 
-					const query="INSERT INTO `treatment_plan`(`medicine_id`, `disease_id`) VALUES(?, ?)"
-					this.mysqlConn.query(query,[medicine.id, disease.id], (error,result)=>{
-						if(error){
-							reject(error)
-							return
-						}
-
-						resolve(SUCCESS)
-					})
+					resolve(SUCCESS)
 				})
 			}else {
 				reject(MISMATCH_OBJ_TYPE)
