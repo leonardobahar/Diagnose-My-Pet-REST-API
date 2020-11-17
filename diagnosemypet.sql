@@ -1,4 +1,5 @@
 CREATE DATABASE IF NOT EXISTS `diagnose_my_pet`;
+USE `diagnose_my_pet`;
 
 CREATE TABLE IF NOT EXISTS `animal_category`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
@@ -34,9 +35,11 @@ CREATE TABLE IF NOT EXISTS `disease_symptoms_animal`(
 	disease_id INT(11),
 	animal_id INT(11),
 	symptoms_id INT(11),
+	anatomy_id INT(11),
 	FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (animal_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (anatomy_id) REFERENCES anatomy(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medicine_for_disease_symptoms`(
@@ -91,9 +94,6 @@ CREATE TABLE IF NOT EXISTS `anatomy`(
 	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-ALTER TABLE disease_symptoms_animal ADD COLUMN IF NOT EXISTS medicine_id INT(11) AFTER symptoms_id;
-ALTER TABLE disease_symptoms_animal ADD COLUMN IF NOT EXISTS anatomy_id INT(11) AFTER medicine_id;
-
 CREATE TABLE IF NOT EXISTS `medicine_cure_symptoms`(
     id INT(11) PRIMARY KEY AUTO_INCREMENT,
     medicine_id INT(11) NOT NULL,
@@ -116,8 +116,6 @@ CREATE TABLE IF NOT EXISTS `treatment_plan_details`(
     FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-ALTER TABLE disease_symptoms_animal DROP COLUMN medicine_id;
 
 CREATE TABLE IF NOT EXISTS `appointment`(
     id INT(7) PRIMARY KEY AUTO_INCREMENT,
