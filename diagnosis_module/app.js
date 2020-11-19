@@ -882,7 +882,8 @@ app.get("/api/diagnosis/retrieve-medicine-of-symptoms",(req,res)=>{
 
 app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
     if(typeof req.body.medicine_id === 'undefined' ||
-        typeof req.body.disease_id === 'undefined'){
+        typeof req.body.disease_id_array === 'undefined' ||
+        typeof req.body.treatment_plan_name === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -890,7 +891,7 @@ app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
         return
     }
 
-    dao.bindMedicineToDisease(new Medicine(req.body.medicine_id),new Disease(req.body.disease_id)).then(result=>{
+    dao.bindTreatmentToDisease(req.body.treatment_plan_name, req.body.medicine_id_array, req.body.disease_id).then(result=>{
         res.status(200).send({
             success: true,
             result: result
