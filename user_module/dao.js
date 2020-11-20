@@ -1,5 +1,6 @@
 import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
+import bcrypt from 'bcrypt'
 import {
 	ADMIN_VALIDATED,
 	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
@@ -103,7 +104,7 @@ export class Dao{
 			this.mysqlConn.query(query,user.id, (error,result)=>{
 				if(error){
 					reject(error)
-				}else{
+				}else if(result.length>0){
 					let customers=[]
 					for(let i=0;i<result.length;i++){
 						const user=new User(
@@ -121,28 +122,56 @@ export class Dao{
 					}
 
 					resolve(customers)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})
 	}
 
 	registerCustomer(user){
-		return new Promise((resolve, reject) => {
+		return new Promise(async (resolve, reject) => {
 			if (!user instanceof User) {
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
-			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `role`) VALUES (?, ?, ?, ?, ?, ?)"
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.password, user.role], (err, res)=>{
+			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, 'CUSTOMER')"
+			const salt = await bcrypt.genSalt(5)
+			const hash = await bcrypt.hash(user.password,salt)
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt.value], (err, res)=>{
 				if (err){
 					reject(err)
 					return
 				}
 
 				user.id = res.insertId
-				delete(user.salt)
-				resolve(user)
+				resolve(user,hash)
+			})
+		})
+	}
+
+	loginCustomer(user){
+		return new Promise(async (resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT user_name, password FROM users WHERE user_name=? AND password=?"
+			const salt = await bcrypt.genSalt(5)
+			const hash = await bcrypt.hash(user.password,salt)
+			this.mysqlConn.query(query,[user.user_name, hash], (error,result)=>{
+				const bcryptedPassword = bcrypt.compareSync(user.password,hash)
+				if(error){
+					reject(error)
+					return
+				}else if(bcryptedPassword){
+					resolve(user,hash)
+					console.log("Logged in")
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -495,7 +524,7 @@ export class Dao{
 	bindMedicalRecordWithSymptoms(record,symptoms){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecordSymptoms &&
-			   symptoms instanceof Symptoms){
+				symptoms instanceof Symptoms){
 				const query="INSERT INTO `medical_records_symptoms` (`medical_records_id`,`symptoms_id`) VALUES(?,?) "
 				this.mysqlConn.query(query,[record.id,symptoms.id], (error,result)=>{
 					if(result.length>1){
@@ -550,9 +579,11 @@ export class Dao{
 
 	retrieveMedicalRecordTreatmentPlan(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, tp.disease_id "+
+			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name "+
 				"FROM medical_record_treatment_plan mrtp LEFT OUTER JOIN medical_records mr ON mrtp.medical_record_id=mr.id "+
-				"LEFT OUTER JOIN treatment_plan tp ON mrtp.treatment_plan_id=tp.id "
+				"LEFT OUTER JOIN treatment_plan tp ON mrtp.treatment_plan_id=tp.id "+
+				"LEFT OUTER JOIN medicine m ON tp.medicine_id=m.id "+
+				"LEFT OUTER JOIN disease d ON tp.disease_id=d.id "
 
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
@@ -569,7 +600,9 @@ export class Dao{
 						status:rowDataPacket.status,
 						treatment_plan_id:rowDataPacket.treatment_plan_id,
 						medicine_id:rowDataPacket.medicine_id,
-						disease_id:rowDataPacket.disease_id
+						medicine_name:rowDataPacket.medicine_name,
+						disease_id:rowDataPacket.disease_id,
+						disease_name:rowDataPacket.disease_name
 					}
 				})
 
@@ -580,9 +613,11 @@ export class Dao{
 
 	retrieveOneMedicalRecordTreatmentPlan(record){
 		return new Promise((reject,resolve)=>{
-			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, tp.disease_id "+
+			const query="SELECT mrtp.id, mrtp.medical_record_id, mr.patient_id, mr.case_open_time, mr.status, mrtp.treatment_plan_id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name "+
 				"FROM medical_record_treatment_plan mrtp LEFT OUTER JOIN medical_records mr ON mrtp.medical_record_id=mr.id "+
 				"LEFT OUTER JOIN treatment_plan tp ON mrtp.treatment_plan_id=tp.id "+
+				"LEFT OUTER JOIN medicine m ON tp.medicine_id=m.id "+
+				"LEFT OUTER JOIN disease d ON tp.disease_id=d.id "+
 				"WHERE mrtp.medical_record_id=? "
 
 			this.mysqlConn.query(query,record.medical_record_id,(error,result)=> {
@@ -600,7 +635,9 @@ export class Dao{
 						status: rowDataPacket.status,
 						treatment_plan_id: rowDataPacket.treatment_plan_id,
 						medicine_id: rowDataPacket.medicine_id,
-						disease_id: rowDataPacket.disease_id
+						medicine_name:rowDataPacket.medicine_name,
+						disease_id: rowDataPacket.disease_id,
+						disease_name:rowDataPacket.disease_name
 					}
 				})
 
@@ -612,7 +649,7 @@ export class Dao{
 	bindMedicalRecordToTreatmentPlan(record,treatment){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords &&
-			   treatment instanceof TreatmentPlan){
+				treatment instanceof TreatmentPlan){
 				const query="INSERT INTO `medical_record_treatment_plan` (`medical_record_id`, `treatment_plan_id`) VALUES(?, ?)"
 				this.mysqlConn.query(query, [record.id,treatment.id],(error,result)=>{
 					if(result.length>1){
@@ -804,20 +841,22 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
+				}else if(result.length>0){
+					const attachment=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							appointment_name:rowDataPacket.appointment_name,
+							appointment_time:rowDataPacket.appointment_time,
+							user_id:rowDataPacket.user_id,
+							user_name:rowDataPacket.user_name,
+							patient_id:rowDataPacket.patient_id,
+							pet_name:rowDataPacket.patient_name
+						}
+					})
+					resolve(attachment)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
-
-				const attachment=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						appointment_name:rowDataPacket.appointment_name,
-						appointment_time:rowDataPacket.appointment_time,
-						user_id:rowDataPacket.user_id,
-						user_name:rowDataPacket.user_name,
-						patient_id:rowDataPacket.patient_id,
-						pet_name:rowDataPacket.patient_name
-					}
-				})
-				resolve(attachment)
 			})
 		})
 	}

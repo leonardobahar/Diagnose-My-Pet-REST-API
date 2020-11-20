@@ -9,7 +9,8 @@ import {
     ERROR_DUPLICATE_ENTRY,
     ERROR_FOREIGN_KEY,
     SOMETHING_WENT_WRONG,
-    WRONG_BODY_FORMAT
+    WRONG_BODY_FORMAT,
+    NO_SUCH_CONTENT
 } from "../strings";
 import {
     Anatomy,
@@ -87,6 +88,13 @@ app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
                 result: result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.log(err)
             res.status(500).send({
                 success:false,
@@ -139,26 +147,42 @@ app.post("/api/diagnosis/update-animal-category",(req,res)=>{
     }
     const category=new AnimalCategory(req.body.id,req.body.category_name.toUpperCase())
 
-    dao.updateAnimalCategory(category).then(result=>{
-        res.status(200).send({
-            success:true,
-            result: result
+    dao.getAnimalCategoryID(new AnimalCategory(req.body.id)).then(result=>{
+        dao.updateAnimalCategory(category).then(result=>{
+            res.status(200).send({
+                success:true,
+                result: result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error: SOMETHING_WENT_WRONG
+                })
+                res.end()
+            }
         })
     }).catch(err=>{
-        if(err.code==='ER_DUP_ENTRY'){
-            res.status(500).send({
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
                 success:false,
-                error:'DUPLICATE-ENTRY'
+                error:NO_SUCH_CONTENT
             })
-            res.end()
-        }else{
-            console.error(err)
-            res.status(500).send({
-                success:false,
-                error: SOMETHING_WENT_WRONG
-            })
-            res.end()
+            return
         }
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error: SOMETHING_WENT_WRONG
+        })
+        res.end()
     })
 })
 
@@ -172,16 +196,33 @@ app.delete("/api/diagnosis/delete-animal-category", (req,res)=>{
     else {
         const category=new AnimalCategory(req.query.id,null)
 
-        dao.deleteAnimalCategory(category).then(result=>{
-            res.status(200).send({
-                success:true
+        dao.getAnimalCategoryID(new AnimalCategory(req.query.id)).then(result=>{
+            dao.deleteAnimalCategory(category).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.log(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
             })
         }).catch(err=>{
-            console.log(err)
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(err)
             res.status(500).send({
-                success: false,
+                success:false,
                 error: SOMETHING_WENT_WRONG
             })
+            res.end()
         })
     }
 })
@@ -209,6 +250,13 @@ app.get("/api/diagnosis/retrieve-animal-type", (req, res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -265,29 +313,58 @@ app.post("/api/diagnosis/update-animal-type",(req,res)=>{
     }
 
     const animal=new AnimalType(req.body.id,req.body.animal_name.toUpperCase(),req.body.animal_category)
-
-    dao.updateAnimalType(animal).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        if(err.code==='ER_DUP_ENTRY'){
-            res.status(200).send({
-                success:false,
-                error:'DUPLICATE-ENTRY'
+    dao.getAnimalTypeId(new AnimalType(req.body.id)).then(result=>{
+        dao.getAnimalCategoryID(new AnimalCategory(req.body.animal_category)).then(result=>{
+            dao.updateAnimalType(animal).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                if(err.code==='ER_DUP_ENTRY'){
+                    res.status(200).send({
+                        success:false,
+                        error:'DUPLICATE-ENTRY'
+                    })
+                    res.end()
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                }
             })
-            res.end()
-        }else{
+        }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
             })
+        })
+
+    }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
         }
+        console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
     })
 })
-
 
 app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
     if(typeof req.query.id === 'undefined'){
@@ -299,19 +376,33 @@ app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
     }
 
     const animalType=new AnimalType(req.query.id,null,null)
-    dao.deleteAnimalType(animalType).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getAnimalTypeId(new AnimalType(req.query.id)).then(result=>{
+        dao.deleteAnimalType(animalType).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.log(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
-        console.log(err)
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(err)
         res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
-
 })
 
 
@@ -336,6 +427,13 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
                 result: result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success: false,
@@ -393,25 +491,40 @@ app.post("/api/diagnosis/update-disease",(req,res)=>{
 
     const disease=new Disease(req.body.id,req.body.disease_name.toUpperCase())
 
-    dao.updateDisease(disease).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getDiseaseId(new Disease(req.body.id)).then(result=>{
+        dao.updateDisease(disease).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(200).send({
+                    success:false,
+                    error:'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
         })
     }).catch(err=>{
-        if(err.code==='ER_DUP_ENTRY'){
-            res.status(200).send({
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
                 success:false,
-                error:'DUPLICATE-ENTRY'
+                error:NO_SUCH_CONTENT
             })
-            res.end()
-        }else{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+            return
         }
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
     })
 })
 
@@ -426,20 +539,34 @@ app.delete("/api/diagnosis/delete-disease", (req,res)=>{
     }
 
     const disease=new Disease(req.query.id,null,null,null)
-    dao.deleteDisease(disease).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getDiseaseId(new Disease(req.query.id)).then(result=>{
+        dao.deleteDisease(disease).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
-        console.log(err)
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(err)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
     })
 })
-
 
 app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
     if(typeof req.query.id==='undefined'){
@@ -464,6 +591,13 @@ app.get("/api/diagnosis/retrieve-symptom", (req, res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.log(err)
             res.status(500).send({
                 success:false,
@@ -492,7 +626,7 @@ app.post("/api/diagnosis/add-symptom", (req, res)=>{
         })
     }).catch(err=>{
 
-        if(err.code==='WR_DUPLICATE_ENTRY'){
+        if(err.code==='ER_DUP_ENTRY'){
             res.status(500).send({
                 success:false,
                 error:'DUPLICATE-ENTRY'
@@ -521,16 +655,38 @@ app.post("/api/diagnosis/update-symptom",(req,res)=>{
 
     const symptom=new Symptoms(req.body.id,req.body.symptom_name.toUpperCase())
 
-    dao.updateSymptom(symptom).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getSymptomId(new Symptoms(req.body.id)).then(result=>{
+        dao.updateSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:'DUPLICATE-ENTRY'
+                })
+                return
+            }
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
-        console.log(err)
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(err)
         res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
@@ -545,19 +701,33 @@ app.delete("/api/diagnosis/delete-symptom",(req,res)=>{
     }
 
     const symptom=new Symptoms(req.query.id,null)
-    dao.deleteSymptom(symptom).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getSymptomId(new Symptoms(req.query.id)).then(result=>{
+        dao.deleteSymptom(symptom).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(err)
         res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
-
 })
 
 app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
@@ -583,6 +753,12 @@ app.get("/api/diagnosis/retrieve-medicine", (req,res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -642,12 +818,27 @@ app.post("/api/diagnosis/update-medicine",(req,res)=>{
 
     const medicine=new Medicine(req.body.id,req.body.medicine_name.toUpperCase(),req.body.side_effect.toUpperCase(),req.body.dosage_info.toUpperCase())
 
-    dao.updateMedicine(medicine).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getMedicineId(new Medicine(req.body.id)).then(result=>{
+        dao.updateMedicine(medicine).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(err)
         res.status(500).send({
             success:false,
@@ -667,19 +858,33 @@ app.delete("/api/diagnosis/delete-medicine",(req,res)=>{
 
     const medicine=new Medicine(req.query.id,null,null)
 
-    dao.deleteMedicine(medicine).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getMedicineId(new Medicine(req.query.id)).then(result=>{
+        dao.deleteMedicine(medicine).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(err)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
     })
-
 })
 
 app.get("/api/diagnosis/retrieve-anatomy",(req,res)=>{
@@ -704,6 +909,13 @@ app.get("/api/diagnosis/retrieve-anatomy",(req,res)=>{
                 result: result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -759,16 +971,31 @@ app.post("/api/diagnosis/update-anatomy", (req,res)=>{
 
     const anatomy= new Anatomy(req.body.id, req.body.part_name.toUpperCase(), req.body.animal_type_id)
 
-    dao.updateAnatomy(anatomy).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getAnatomyId(new Anatomy(req.body.id)).then(result=>{
+        dao.updateAnatomy(anatomy).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(err)
         res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
@@ -783,13 +1010,29 @@ app.delete("/api/diagnosis/delete-anatomy",(req,res)=>{
     }
 
     const anatomy=new Anatomy(req.query.id,null,null)
-    dao.deleteAnatomy(anatomy).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+
+    dao.getAnatomyId(new Anatomy(req.query.id)).then(result=>{
+        dao.deleteAnatomy(anatomy).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     }).catch(err=>{
-        console.log(err)
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(err)
         res.status(500).send({
             success: false,
             error: SOMETHING_WENT_WRONG

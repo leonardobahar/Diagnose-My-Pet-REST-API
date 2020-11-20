@@ -104,16 +104,47 @@ export class Dao{
 					return
 				}
 
-				let animals = []
-				for	(let i=0; i<res.length; i++){
-					animals.push(new AnimalType(
-						res[i].id,
-						res[i].animal_name,
-						new AnimalCategory(res[i].animal_category_id,res[i].category_name)
-					))
+				else if(res.length>0){
+					let animals = []
+					for	(let i=0; i<res.length; i++){
+						animals.push(new AnimalType(
+							res[i].id,
+							res[i].animal_name,
+							new AnimalCategory(res[i].animal_category_id,res[i].category_name)
+						))
+					}
+
+					resolve(animals)
 				}
 
-				resolve(animals)
+				else {
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	getAnimalTypeId(animalType){
+		return new Promise((resolve,reject)=>{
+			if (!animalType instanceof AnimalType) {
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT id FROM animal_type WHERE id=?"
+			this.mysqlConn.query(query,animalType.id,(err,res)=>{
+				if(err){
+					reject (err)
+					return
+				}
+
+				else if(res.length>0){
+					resolve(res[0].id)
+				}
+
+				else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -132,7 +163,7 @@ export class Dao{
 					return
 				}
 
-				animalType.animal_name = res.animal_name
+				animalType.id=res.insertId
 				resolve(animalType)
 			})
 		})
@@ -212,22 +243,41 @@ export class Dao{
 					if (err){
 						reject(err)
 						return
-					}
+					}else if(res.length>0){
+						let animals = []
+						for	(let i=0; i<res.length; i++){
+							animals.push(new AnimalType(
+								res[i].id,
+								res[i].animal_name,
+								new AnimalCategory(res[i].id, res[i].category_name)
+							))
+						}
 
-					let animals = []
-					for	(let i=0; i<res.length; i++){
-						animals.push(new AnimalType(
-							res[i].id,
-							res[i].animal_name,
-							new AnimalCategory(res[i].animal_category_id, res[i].category_name)
-						))
+						resolve(animals)
+					}else{
+						reject(NO_SUCH_CONTENT)
 					}
-
-					resolve({
-						category_name: category_name,
-						animal_types: animals
-					})
 				})
+			})
+		})
+	}
+
+	getAnimalCategoryID(category){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT id FROM animal_category WHERE id=?"
+			this.mysqlConn.query(query, category.id, (err,res)=>{
+				if(err){
+					reject (err)
+					return
+				}
+
+				else if(res.length>0){
+					resolve(res[0].id)
+				}
+
+				else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -242,7 +292,7 @@ export class Dao{
 						return
 					}
 
-					animalCategory.category_name = res.category_name
+					animalCategory.id=res.insertId
 					resolve(animalCategory)
 				})
 			}else{
@@ -264,7 +314,6 @@ export class Dao{
 					return
 				}
 
-				animalCategory.id=res.insertId
 				resolve(animalCategory)
 			})
 		})
@@ -277,7 +326,7 @@ export class Dao{
 			}
 
 			const query = "DELETE FROM animal_category WHERE id = ?"
-			this.mysqlConn.query(query, [animalCategory.id], (err,res)=>{
+			this.mysqlConn.query(query, animalCategory.id, (err,res)=>{
 				if(err){
 					reject(err)
 					return
@@ -332,6 +381,24 @@ export class Dao{
 		})
 	}
 
+	getDiseaseId(disease){
+		return new Promise((resolve,reject)=>{
+			if(disease instanceof Disease){
+				const query="SELECT id FROM disease WHERE id=? "
+				this.mysqlConn.query(query, disease.id, (err,res)=>{
+					if(err){
+						reject(err)
+						return
+					}else if(res.length>0){
+						resolve(res[0].id)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				})
+			}
+		})
+	}
+
 	registerDisease(disease){
 		return new Promise((resolve, reject) => {
 			if (disease instanceof Disease){
@@ -364,7 +431,6 @@ export class Dao{
 					return
 				}
 
-				disease.id=res.insertId
 				resolve(disease)
 			})
 		})
@@ -420,19 +486,36 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
-				}
+				}else if(result.length>0){
+					let medicines=[]
+					for(let i=0; i<result.length; i++){
+						medicines.push(new Medicine(
+							result[i].id,
+							result[i].medicine_name,
+							result[i].side_effect,
+							result[i].dosage_info
+						))
+					}
 
-				let medicines=[]
-				for(let i=0; i<result.length; i++){
-					medicines.push(new Medicine(
-						result[i].id,
-						result[i].medicine_name,
-						result[i].side_effect,
-						result[i].dosage_info
-					))
+					resolve(medicines)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
+			})
+		})
+	}
 
-				resolve(medicines)
+	getMedicineId(medicine){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT id FROM medicine WHERE id=?"
+			this.mysqlConn.query(query,medicine.id,(error,result)=>{
+				if(error){
+					reject(error)
+				}else if (result.length>0){
+					resolve(result[0].id)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -522,7 +605,7 @@ export class Dao{
 			this.mysqlConn.query(query,[symptom.id],(error,result)=>{
 				if (error){
 					reject(error)
-				}else{
+				}else if(result.length>0){
 					let symptoms = []
 					for (let i=0; i<result.length; i++){
 						symptoms.push(new Symptoms(
@@ -532,8 +615,28 @@ export class Dao{
 					}
 
 					resolve(symptoms)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
 			})
+		})
+	}
+
+	getSymptomId(symptom){
+		return new Promise((resolve,reject)=>{
+			if(symptom instanceof Symptoms){
+				const query="SELECT id FROM symptoms WHERE id=?"
+				this.mysqlConn.query(query,symptom.id,(err,res)=>{
+					if(err){
+						reject(err)
+						return
+					}else if(res.length>0){
+						resolve(res[0].id)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				})
+			}
 		})
 	}
 
@@ -569,7 +672,6 @@ export class Dao{
 					return
 				}
 
-				symptom.id=res.insertId
 				resolve(symptom)
 			})
 		})
@@ -623,17 +725,34 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
+				}else if(result.length>0){
+					let parts=[]
+					for(let i=0; i<result.length; i++){
+						parts.push(new Anatomy(
+							result[i].id,
+							result[i].part_name,
+							new AnimalType(result[i].animal_type_id,result[i].animal_name,result[i].animal_category)
+						))
+					}
+					resolve(parts)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
+			})
+		})
+	}
 
-				let parts=[]
-				for(let i=0; i<result.length; i++){
-					parts.push(new Anatomy(
-						result[i].id,
-						result[i].part_name,
-						new AnimalType(result[i].animal_type_id,result[i].animal_name,result[i].animal_category)
-					))
+	getAnatomyId(anatomy){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT id FROM anatomy WHERE id=?"
+			this.mysqlConn.query(query, anatomy.id, (error,result)=>{
+				if(error){
+					reject(error)
+				}else if(result.length>0){
+					resolve(result[0].id)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
-				resolve(parts)
 			})
 		})
 	}
@@ -704,7 +823,7 @@ export class Dao{
 	bindMedicineToSymptom(medicine, symptom){
 		return new Promise((resolve,reject)=>{
 			if(symptom instanceof Symptoms &&
-			   medicine instanceof Medicine){
+				medicine instanceof Medicine){
 				const checkQuery="SELECT id FROM medicine_cure_symptoms WHERE medicine_id = ? AND symptoms_id = ?"
 				this.mysqlConn.query(checkQuery, [medicine.id, symptom.id], (error,result)=>{
 					if(result.length>1){
@@ -849,7 +968,7 @@ export class Dao{
 			if (symptom instanceof Symptoms &&
 				disease instanceof Disease &&
 				animal instanceof AnimalType &&
-			    anatomy instanceof Anatomy){
+				anatomy instanceof Anatomy){
 				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ? AND anatomy_id = ?"
 				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
 					if (res.length > 1){
@@ -940,22 +1059,24 @@ export class Dao{
 				if (err){
 					reject(err)
 					return
+				}else if(res.length>0){
+					const symptoms = res.map(rowDataPacket => {
+						return{
+							disease_id: rowDataPacket.disease_id,
+							disease_name: rowDataPacket.disease_name,
+							bind_id : rowDataPacket.id,
+							animal_id: rowDataPacket.animal_id,
+							animal_name: rowDataPacket.animal_name,
+							symptoms_id: rowDataPacket.symptoms_id,
+							symptom_name : rowDataPacket.symptom_name,
+							anatomy_id: rowDataPacket.anatomy_id,
+							part_name: rowDataPacket.part_name
+						}
+					})
+					resolve(symptoms)
+				}else{
+					reject(NO_SUCH_CONTENT)
 				}
-
-				const symptoms = res.map(rowDataPacket => {
-					return{
-						disease_id: rowDataPacket.disease_id,
-						disease_name: rowDataPacket.disease_name,
-						bind_id : rowDataPacket.id,
-						animal_id: rowDataPacket.animal_id,
-						animal_name: rowDataPacket.animal_name,
-						symptoms_id: rowDataPacket.symptoms_id,
-						symptom_name : rowDataPacket.symptom_name,
-						anatomy_id: rowDataPacket.anatomy_id,
-						part_name: rowDataPacket.part_name
-					}
-				})
-				resolve(symptoms)
 			})
 		})
 	}

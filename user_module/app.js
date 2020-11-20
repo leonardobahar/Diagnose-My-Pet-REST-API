@@ -4,6 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
+import bcrypt from 'bcrypt';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
@@ -105,8 +106,7 @@ app.post("/api/user/register-user", (req, res)=>{
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
-            req.body.password,
-            "CUSTOMER")
+            req.body.password)
 
         dao.registerCustomer(user).then(result=>{
             res.status(200).send({
@@ -129,6 +129,37 @@ app.post("/api/user/register-user", (req, res)=>{
             }
         })
     }
+})
+
+app.post("/api/user/user-login",(req,res)=>{
+    if(typeof req.body.user_name==='undefined' ||
+       typeof req.body.password==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user=new User(null,req.body.user_name,req.body.password,null,null,null,null,null)
+    dao.loginCustomer(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            message:'Log in Successful'
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    message:'Wrong User Name/Password'
+                })
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    })
 })
 
 app.post("/api/user/update-user",(req,res)=>{
@@ -189,6 +220,10 @@ app.delete("/api/user/delete-user",(req,res)=>{
             })
         })
     }
+})
+
+app.post("/api/user/user-login",(req,res)=>{
+
 })
 
 app.get("/api/user/retrieve-patient",(req,res)=>{
@@ -859,6 +894,13 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
