@@ -4,7 +4,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import bcrypt from 'bcrypt';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
@@ -141,23 +140,26 @@ app.post("/api/user/user-login",(req,res)=>{
         return
     }
 
-    const user=new User(null,req.body.user_name,req.body.password,null,null,null,null,null)
-    dao.loginCustomer(user).then(result=>{
+    const user=new User(null,req.body.user_name,null,null,null,req.body.password,null,null)
+    dao.loginCustomer(user).then(result=> {
+        console.log(result)
         res.status(200).send({
-            success:true,
-            message:'Log in Successful'
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    message:'Wrong User Name/Password'
-                })
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
+            success: true,
+            authentication_approval: true,
+            message: 'Log in Successful'
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(200).send({
+                success:true,
+                authentication_approval: false,
+                message:'Invalid User Name/Password'
             })
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })

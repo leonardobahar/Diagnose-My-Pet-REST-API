@@ -1,6 +1,7 @@
 import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
 import bcrypt from 'bcrypt'
+import moment from 'moment'
 import {
 	ADMIN_VALIDATED,
 	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
@@ -139,36 +140,39 @@ export class Dao{
 			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, 'CUSTOMER')"
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt.value], (err, res)=>{
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt], (err, res)=>{
 				if (err){
 					reject(err)
 					return
 				}
 
 				user.id = res.insertId
-				resolve(user,hash)
+				resolve(user)
 			})
 		})
 	}
 
 	loginCustomer(user){
-		return new Promise(async (resolve,reject)=>{
+		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
-			const query="SELECT user_name, password FROM users WHERE user_name=? AND password=?"
-			const salt = await bcrypt.genSalt(5)
-			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query,[user.user_name, hash], (error,result)=>{
-				const bcryptedPassword = bcrypt.compareSync(user.password,hash)
+			const query="SELECT user_name, salt, password FROM users WHERE user_name=?"
+			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
 				if(error){
 					reject(error)
 					return
-				}else if(bcryptedPassword){
-					resolve(user,hash)
-					console.log("Logged in")
+				}else if(result.length > 0){
+					const salt = result[0].salt
+					const hashedClientInput = bcrypt.hashSync(user.password, salt)
+					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
+					if (bcryptedPassword){
+						resolve(bcryptedPassword)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
@@ -180,6 +184,7 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
 
 			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, password=?, role=? WHERE id=?"
@@ -195,10 +200,30 @@ export class Dao{
 		})
 	}
 
+	changeCustomerPassword(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="UPDATE users SET password=? WHERE user_name=?"
+			this.mysqlConn.query(query, user.user_name,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(result)
+			})
+		})
+	}
+
 	deleteCustomer(user){
 		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
 
 			const query="DELETE FROM users WHERE id=?"
@@ -294,6 +319,7 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			if(!patient instanceof Patient){
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
 
 			else{
@@ -315,6 +341,7 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			if(!patient instanceof Patient){
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
 
 			const query="DELETE FROM patients WHERE id=?"
