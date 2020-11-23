@@ -4,6 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
+import jsonwebtoken from 'jsonwebtoken';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
@@ -176,29 +177,55 @@ app.post("/api/user/update-user",(req,res)=>{
             success: false,
             error: WRONG_BODY_FORMAT
         })
-    }else{
-        const salt = "GAREM"
-        const user=new User(req.body.id,
-            req.body.user_name,
-            req.body.mobile,
-            req.body.email,
-            req.body.birthdate,
-            req.body.password,
-            salt,
-            req.body.role)
-
-        dao.updateCustomer(user).then(result=>{
-            res.status(200).send({
-                success:true
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
-        })
+        return
     }
+    const salt = "GAREM"
+    const user=new User(req.body.id,
+        req.body.user_name,
+        req.body.mobile,
+        req.body.email,
+        req.body.birthdate,
+        req.body.password,
+        salt,
+        req.body.role)
+
+    dao.updateCustomer(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        console.log(err)
+        res.status(500).send({
+            success: false,
+            result: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/change-password",(req,res)=>{
+    if(typeof req.body.user_name==='undefined' ||
+       typeof req.body.password==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user = new User(null,req.body.user_name,null,null,null,req.body.password,null,null)
+    dao.changeCustomerPassword(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.delete("/api/user/delete-user",(req,res)=>{
@@ -207,21 +234,20 @@ app.delete("/api/user/delete-user",(req,res)=>{
             success:false,
             result:SOMETHING_WENT_WRONG
         })
+        return
     }
-    else{
-        const user=new User(req.body.id,null,null,null,null,null,null,null)
-        dao.deleteCustomer(user).then(result=>{
-            res.status(200).send({
-                success:true
-            })
-        }).catch(err=>{
-            console.log(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
+    const user=new User(req.body.id,null,null,null,null,null,null,null)
+    dao.deleteCustomer(user).then(result=>{
+        res.status(200).send({
+            success:true
         })
-    }
+    }).catch(err=>{
+        console.log(err)
+        res.status(500).send({
+            success: false,
+            result: SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.post("/api/user/user-login",(req,res)=>{

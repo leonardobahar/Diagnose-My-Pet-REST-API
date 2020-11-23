@@ -2,6 +2,7 @@ import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
 import bcrypt from 'bcrypt'
 import moment from 'moment'
+import format from 'date-fns/format'
 import {
 	ADMIN_VALIDATED,
 	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
@@ -201,20 +202,22 @@ export class Dao{
 	}
 
 	changeCustomerPassword(user){
-		return new Promise((resolve,reject)=>{
+		return new Promise(async(resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
-			const query="UPDATE users SET password=? WHERE user_name=?"
-			this.mysqlConn.query(query, user.user_name,(error,result)=>{
+			const salt = await bcrypt.genSalt(5)
+			const hash = await bcrypt.hash(user.password,salt)
+			const query="UPDATE users SET password=?, salt=? WHERE user_name=?"
+			this.mysqlConn.query(query, [hash, salt,user.user_name],(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				resolve(result)
+				resolve(user)
 			})
 		})
 	}
@@ -902,9 +905,7 @@ export class Dao{
 					appointment.id=result.insertId
 					resolve(appointment)
 				})
-			}
-
-			else {
+			} else {
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})

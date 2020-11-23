@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import jsonwebtoken from 'jsonwebtoken';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY,
