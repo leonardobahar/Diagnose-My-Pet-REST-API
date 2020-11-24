@@ -1125,9 +1125,9 @@ app.get("/api/diagnosis/retrieve-medicine-of-symptoms",(req,res)=>{
 })
 
 app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
-    if(typeof req.body.medicine_id === 'undefined' ||
-        typeof req.body.disease_id_array === 'undefined' ||
-        typeof req.body.treatment_plan_name === 'undefined'){
+    if(typeof req.body.treatment_plan_name === 'undefined' ||
+        typeof req.body.disease_id === 'undefined' ||
+        typeof req.body.medicine_id_array === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT

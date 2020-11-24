@@ -896,6 +896,7 @@ export class Dao{
 					reject(error)
 				}
 
+				console.log(medicine_id_array.length)
 				const treatmentPlanId = result.insertId
 				for (let i=0; i<medicine_id_array.length; i++){
 					await this.insertTreatmentPlanDetails(treatmentPlanId, medicine_id_array[i].medicine_id).catch(err=>{

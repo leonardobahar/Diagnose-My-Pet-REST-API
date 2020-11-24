@@ -2,7 +2,6 @@ import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
 import bcrypt from 'bcrypt'
 import moment from 'moment'
-import format from 'date-fns/format'
 import {
 	ADMIN_VALIDATED,
 	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
