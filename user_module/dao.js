@@ -137,10 +137,10 @@ export class Dao{
 				return
 			}
 
-			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, 'CUSTOMER')"
+			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, ?)"
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt], (err, res)=>{
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt, 'CUSTOMER'], (err, res)=>{
 				if (err){
 					reject(err)
 					return
@@ -159,8 +159,8 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT user_name, salt, password FROM users WHERE user_name=?"
-			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
+			const query=  user.user_name != null ? `SELECT user_name, email, salt, password FROM users WHERE user_name= '${user.user_name}'` : `SELECT user_name, email, salt, password FROM users WHERE email ='${user.email}'`
+			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -169,7 +169,7 @@ export class Dao{
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
-						resolve(bcryptedPassword)
+						resolve(result[0].email)
 					}else{
 						reject(NO_SUCH_CONTENT)
 					}

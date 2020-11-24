@@ -4,7 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import jsonwebtoken from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
@@ -48,12 +48,36 @@ app.use((err, req, res, next)=>{
     }
 });
 
+// ENVIRONMENT CONFIGURATION VARIABLES
 const PORT = process.env.USER_PORT
 const host = process.env.MY_SQL_HOST
 const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
+
+
+// JWT UTILITY FUNCTIONS
+
+// username is in the form { email: "" }
+const generateAccessToken = (email) => {
+    // expires after half and hour (1800 seconds = 30 minutes)
+    return jwt.sign(email, process.env.TOKEN_SECRET, { expiresIn: '2 days' });
+}
+
+const authenticateToken = (req, res, next)=>{
+    // Gather the jwt access token from the request header
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401) // if there isn't any token
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        console.log(err)
+        if (err) return res.sendStatus(403)
+        req.user = user
+        next() // pass the execution off to whatever request the client intended
+    })
+}
 
 app.get("/api/user/retrieve-users", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
@@ -101,6 +125,14 @@ app.post("/api/user/register-user", (req, res)=>{
         })
         return
     }else{
+        if (/[a-zA-Z0-9_.-]/g.test(req.body.user_name) === false){
+            res.status(400).send({
+                success: false,
+                error: "Username contains some restricted symbols"
+            })
+            return
+        }
+
         const user = new User(null,
             req.body.user_name,
             req.body.mobile,
@@ -132,7 +164,7 @@ app.post("/api/user/register-user", (req, res)=>{
 })
 
 app.post("/api/user/user-login",(req,res)=>{
-    if(typeof req.body.user_name==='undefined' ||
+    if(typeof req.body.user_identifier==='undefined' ||
        typeof req.body.password==='undefined'){
         res.status(400).send({
             success:false,
@@ -141,12 +173,22 @@ app.post("/api/user/user-login",(req,res)=>{
         return
     }
 
-    const user=new User(null,req.body.user_name,null,null,null,req.body.password,null,null)
+    let user;
+    const regex = (req.body.user_identifier).includes("@");
+    console.log(regex)
+    if (regex){
+        user = new User(null,null,null,req.body.user_identifier,null,req.body.password,null,null)
+    }else{
+        user=new User(null,req.body.user_identifier,null,null,null,req.body.password,null,null)
+    }
+
     dao.loginCustomer(user).then(result=> {
-        console.log(result)
         res.status(200).send({
             success: true,
             authentication_approval: true,
+            authentication_token: generateAccessToken({
+                email: result
+            }),
             message: 'Log in Successful'
         })
     }).catch(error=>{
@@ -156,12 +198,13 @@ app.post("/api/user/user-login",(req,res)=>{
                 authentication_approval: false,
                 message:'Invalid User Name/Password'
             })
+        }else{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
     })
 })
 
