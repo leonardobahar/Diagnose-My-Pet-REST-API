@@ -950,7 +950,7 @@ app.post("/api/user/add-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id, req.body.patient_id)
+    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, null, req.body.user_id, req.body.patient_id)
     dao.addAppointment(appointment).then(result=>{
         res.status(200).send({
             success:true,
@@ -978,7 +978,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time,req.body.user_id,req.body.patient_id)
+    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, null,req.body.user_id,req.body.patient_id)
     dao.updateAppointment(appointment).then(result=>{
         res.status(200).send({
             success:true,
@@ -986,6 +986,78 @@ app.post("/api/user/update-appointment", (req,res)=>{
         })
     }).catch(err=>{
         console.error(err)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/approve-appointment",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.body.id,null,null,null,null,null)
+    dao.approveAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/decline-appointment",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.body.id,null,null,null,null,null)
+    dao.declineAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/finish-appointment",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const appointment=new Appointment(req.body.id,null,null,null,null,null)
+    dao.finishAppointment(appointment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG

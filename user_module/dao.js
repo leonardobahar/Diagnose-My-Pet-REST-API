@@ -688,9 +688,7 @@ export class Dao{
 
 					resolve(SUCCESS)
 				})
-			}
-
-			else{
+			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -757,13 +755,9 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
-				}
-
-				else if(result.length>0){
+				} else if(result.length>0){
 					resolve(result[0].file_name)
-				}
-
-				else {
+				} else {
 					reject(NO_SUCH_CONTENT)
 				}
 			})
@@ -783,9 +777,7 @@ export class Dao{
 					attachment.id=result.insertId
 					resolve(attachment)
 				})
-			}
-
-			else {
+			} else {
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -804,9 +796,7 @@ export class Dao{
 					attachment.id=result.insertId
 					resolve(attachment)
 				})
-			}
-
-			else{
+			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -825,9 +815,7 @@ export class Dao{
 					attachment.id=result.insertId
 					resolve(attachment)
 				})
-			}
-
-			else{
+			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -835,7 +823,7 @@ export class Dao{
 
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, u.user_name, a.patient_id, p.patient_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id "
 			this.mysqlConn.query(query, (error,result)=>{
@@ -849,6 +837,7 @@ export class Dao{
 						id:rowDataPacket.id,
 						appointment_name:rowDataPacket.appointment_name,
 						appointment_time:rowDataPacket.appointment_time,
+						appointment_status:rowDataPacket.appointment_status,
 						user_id:rowDataPacket.user_id,
 						user_name:rowDataPacket.user_name,
 						patient_id:rowDataPacket.patient_id,
@@ -862,7 +851,7 @@ export class Dao{
 
 	retrieveOneAppointment(appointment){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"WHERE a.id=?"
@@ -876,6 +865,7 @@ export class Dao{
 							id:rowDataPacket.id,
 							appointment_name:rowDataPacket.appointment_name,
 							appointment_time:rowDataPacket.appointment_time,
+							appointment_status:rowDataPacket.appointment_status,
 							user_id:rowDataPacket.user_id,
 							user_name:rowDataPacket.user_name,
 							patient_id:rowDataPacket.patient_id,
@@ -890,10 +880,43 @@ export class Dao{
 		})
 	}
 
+	retrieveAppointmentByStatus(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_time, a.user_id, u.user_name, a.patient_id, p.patient_name " +
+					"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
+					"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
+					"WHERE a.appointment_status=?"
+				this.mysqlConn.query(query, appointment.appointment_status, (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}else if(result.length>0){
+						const attachment=result.map(rowDataPacket=>{
+							return{
+								id:rowDataPacket.id,
+								appointment_name:rowDataPacket.appointment_name,
+								appointment_time:rowDataPacket.appointment_time,
+								appointment_status:rowDataPacket.appointment_status,
+								user_id:rowDataPacket.user_id,
+								user_name:rowDataPacket.user_name,
+								patient_id:rowDataPacket.patient_id,
+								pet_name:rowDataPacket.patient_name
+							}
+						})
+						resolve(attachment)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				})
+			}
+		})
+	}
+
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `user_id`, `patient_id`) VALUES(?, ?, ?, ?)"
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `appointment_status`, `user_id`, `patient_id`) VALUES(?, ?, 'PENDING', ?, ?)"
 				const appointmentTime =  moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
 				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.user_id, appointment.patient_id],(error,result)=>{
 					if(error){
@@ -923,9 +946,61 @@ export class Dao{
 					appointment.id=result.insertId
 					resolve(appointment)
 				})
+			} else {
+				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
 
-			else {
+	approveAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="UPDATE appointment SET appointment_status='APPROVED' WHERE id=?"
+				this.mysqlConn.query(query,appointment.id,(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(appointment)
+				})
+			}else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	declineAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="UPDATE appointment SET appointment_status='DECLINED' WHERE id=?"
+				this.mysqlConn.query(query,appointment.id,(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(appointment)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	finishAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="UPDATE appointment SET appointment_status='FINISHED' WHERE id=?"
+				this.mysqlConn.query(query,appointment.id,(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(appointment)
+				})
+			}else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -944,9 +1019,7 @@ export class Dao{
 					appointment.id=result.insertId
 					resolve(appointment)
 				})
-			}
-
-			else{
+			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
