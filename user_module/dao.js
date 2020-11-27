@@ -210,7 +210,7 @@ export class Dao{
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
 			const query="UPDATE users SET password=?, salt=? WHERE user_name=?"
-			this.mysqlConn.query(query, [hash, salt,user.user_name],(error,result)=>{
+			this.mysqlConn.query(query, [hash, salt, user.user_name],(error,result)=>{
 				if(error){
 					reject(error)
 					return
