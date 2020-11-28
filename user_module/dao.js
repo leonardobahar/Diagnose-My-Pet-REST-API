@@ -880,6 +880,24 @@ export class Dao{
 		})
 	}
 
+	getAppointmentId(appointment){
+		return new Promise((resolve,reject)=>{
+			if(appointment instanceof Appointment){
+				const query="SELECT id FROM appointment WHERE id=?"
+				this.mysqlConn.query(query, appointment.id, (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}else if(result.length>0){
+						resolve(result[0].id)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				})
+			}
+		})
+	}
+
 	retrieveAppointmentByStatus(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
@@ -962,7 +980,7 @@ export class Dao{
 						return
 					}
 
-					resolve(appointment)
+					resolve(SUCCESS)
 				})
 			}else {
 				reject(MISMATCH_OBJ_TYPE)
@@ -980,7 +998,7 @@ export class Dao{
 						return
 					}
 
-					resolve(appointment)
+					resolve(SUCCESS)
 				})
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
@@ -998,7 +1016,7 @@ export class Dao{
 						return
 					}
 
-					resolve(appointment)
+					resolve(SUCCESS)
 				})
 			}else{
 				reject(MISMATCH_OBJ_TYPE)

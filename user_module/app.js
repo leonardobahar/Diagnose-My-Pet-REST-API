@@ -1003,12 +1003,27 @@ app.post("/api/user/approve-appointment",(req,res)=>{
     }
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.approveAppointment(appointment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getAppointmentId(appointment).then(result=>{
+        dao.approveAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(error)
         res.status(500).send({
             success:false,
@@ -1027,12 +1042,27 @@ app.post("/api/user/decline-appointment",(req,res)=>{
     }
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.declineAppointment(appointment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getAppointmentId(appointment).then(result=>{
+        dao.declineAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(error)
         res.status(500).send({
             success:false,
@@ -1051,12 +1081,27 @@ app.post("/api/user/finish-appointment",(req,res)=>{
     }
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.finishAppointment(appointment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.getAppointmentId(appointment).then(result=>{
+        dao.finishAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(error)
         res.status(500).send({
             success:false,
