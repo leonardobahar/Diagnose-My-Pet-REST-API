@@ -126,3 +126,46 @@ app.post("/api/ecommerce/add-customer", (req,res)=>{
         })
     })
 })
+
+app.post("/api/ecommerce/update-ecommerce",(req,res)=>{
+    if(typeof req.body.customer_name==='undefined' ||
+       typeof req.body.address==='undefined' ||
+       typeof req.body.phone_number==='undefined' ||
+       typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const customer=new Customer(req.body.id,req.body.customer_name,req.body.address,req.body.phone_number)
+    dao.retreiveOneCustomer(new Customer(req.body.id)).then(result=>{
+        dao.updateCustomer(customer).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})

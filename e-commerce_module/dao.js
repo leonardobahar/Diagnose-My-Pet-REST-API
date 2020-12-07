@@ -134,4 +134,23 @@ export class Dao {
             })
         })
     }
+
+    updateCustomer(customer){
+        return new Promise((resolve,reject)=>{
+            if(!customer instanceof Customer){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE customer SET c_name=?, c_address=?, c_phone_number=? WHERE c_id_customer=? "
+            this.mysqlConn.query(query, [customer.customer_name, customer.address, customer.phone_number, customer.id], (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(result)
+            })
+        })
+    }
 }
