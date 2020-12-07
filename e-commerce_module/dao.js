@@ -84,4 +84,36 @@ export class Dao {
             })
         })
     }
+
+    retreiveOneCustomer(customer){
+        return new Promise((resolve,reject)=>{
+            if(!customer instanceof Customer){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM customer WHERE id=?"
+            this.mysqlConn.query(query, customer.id, (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let customers=[]
+                    for(let i=0; i<result.length; i++){
+                        customers.push(new Customer(
+                            result[i].id,
+                            result[i].name,
+                            result[i].address,
+                            result[i].phone_number
+                        ))
+                    }
+                    resolve(customers)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+
 }

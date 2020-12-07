@@ -13,6 +13,7 @@ import {
     WRONG_BODY_FORMAT,
     NO_SUCH_CONTENT
 } from "../strings";
+import {Customer} from "../model";
 
 const app = express()
 app.use(bodyParser.urlencoded({extended: true}))
@@ -62,6 +63,35 @@ app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
                 result:result
             })
         }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const customer=new Customer(req.query.id,null,null,null)
+
+        dao.retreiveOneCustomer(customer).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(error)
             res.status(500).send({
                 success:false,
