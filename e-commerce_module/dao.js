@@ -115,5 +115,23 @@ export class Dao {
         })
     }
 
+    addCustomer(customer){
+        return new Promise((resolve,reject)=>{
+            if(!customer instanceof Customer){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
 
+            const query="INSERT INTO `customer`(`c_name`,`c_address`,`c_phone_number`) VALUES(?, ?, ?) "
+            this.mysqlConn.query(query, [customer.customer_name, customer.address, customer.phone_number], (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                customer.id=result.insertId
+                resolve(customer)
+            })
+        })
+    }
 }

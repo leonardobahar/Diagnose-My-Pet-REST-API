@@ -100,3 +100,29 @@ app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
         })
     }
 })
+
+app.post("/api/ecommerce/add-customer", (req,res)=>{
+    if(typeof req.body.customer_name==='undefined' ||
+       typeof req.body.address==='undefined' ||
+       typeof req.body.phone_number==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const customer=new Customer(null,req.body.customer_name,req.body.address,req.body.phone_number)
+    dao.addCustomer(customer).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
