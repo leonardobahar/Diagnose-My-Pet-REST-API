@@ -142,3 +142,51 @@ CREATE TABLE IF NOT EXISTS`diagnose_my_pet`.`medical_record_treatment_plan` (
     FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `customer` (
+  `c_id_customer` INT(7) PRIMARY KEY AUTO_INCREMENT,
+  `c_name` VARCHAR(255) NOT NULL,
+  `c_address` TEXT NOT NULL,
+  `c_phone_number` VARCHAR(255) NOT NULL);
+
+CREATE TABLE IF NOT EXISTS `product` (
+  `p_id_product` INT(7) PRIMARY KEY AUTO_INCREMENT,
+  `p_name` VARCHAR(255) NOT NULL,
+  `p_price` INT(7) NOT NULL,
+  `p_quantity` INT(7) NOT NULL);
+
+CREATE TABLE IF NOT EXISTS `transaction`(
+    `t_id_transaction` INT(7) PRIMARY KEY AUTO_INCREMENT,
+    `t_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `t_total_price` INT(7) NOT NULL,
+    `t_status` VARCHAR(255) NOT NULL,
+    `t_id_customer` INT(7),
+    `t_id_shipment` INT(7),
+    `t_id_payment` INT(7),
+    FOREIGN KEY (`t_id_customer`) REFERENCES customer(`c_id_customer`) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `transaction_detail`(
+    `td_id_transaction_detail` INT(7) PRIMARY KEY AUTO_INCREMENT,
+    `td_product_quantity` INT(7) NOT NULL,
+    `td_id_product` INT(7),
+    `td_id_transaction` INT(7),
+    FOREIGN KEY (`td_id_product`) REFERENCES product(`p_id_product`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`td_id_transaction`) REFERENCES transaction(`t_id_transaction`) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `shipment`(
+    `s_id_shipment` INT(7) PRIMARY KEY AUTO_INCREMENT,
+    `s_method` VARCHAR(255) NOT NULL,
+    `s_price` INT(7) NOT NULL,
+    `s_duration` INT(7) NOT NULL,
+    `s_address` TEXT NOT NULL,
+    `s_receiver_name` VARCHAR(255) NOT NULL,
+    `s_id_transaction` INT(7),
+    FOREIGN KEY (`s_id_transaction`) REFERENCES transaction(`t_id_transaction`) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS `payment`(
+    `pm_id_payment` INT(7) PRIMARY KEY AUTO_INCREMENT,
+    `pm_method` VARCHAR(255) NOT NULL,
+    `pm_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `pm_status` VARCHAR(255) NOT NULL,
+    `pm_id_transaction` INT(7),
+    FOREIGN KEY (`pm_id_transaction`) REFERENCES transaction(`t_id_transaction`) ON DELETE CASCADE ON UPDATE CASCADE);

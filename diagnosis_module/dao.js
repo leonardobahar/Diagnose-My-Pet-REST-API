@@ -233,11 +233,12 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			const query = "SELECT category_name FROM animal_category WHERE id = ?"
 			this.mysqlConn.query(query, [animalCategory.id], (err, res)=>{
-				if (res.length === 0){
+				/*if (res.length === 0){
 					resolve([])
 					return
-				}
-				const category_name = res[0].category_name
+				}*/
+
+				//const category_name = res[0].category_name
 				const query="SELECT at.id, at.animal_name, at.animal_category_id, ac.category_name FROM animal_type at LEFT OUTER JOIN animal_category ac ON at.animal_category_id = ac.id WHERE at.animal_category_id=?"
 				this.mysqlConn.query(query, [animalCategory.id], (err, res)=>{
 					if (err){

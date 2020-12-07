@@ -6,6 +6,7 @@
   "scripts": {
     "start-user": "nodemon --exec babel-node ./user_module/app.js",
     "start-diagnosis": "nodemon --exec babel-node ./diagnosis_module/app.js",
+    "start-ecommerce": "nodemon --exec babel-node ./e-commerce_module/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

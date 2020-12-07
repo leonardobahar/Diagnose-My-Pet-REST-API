@@ -53,3 +53,20 @@ app.get("/",(req,res) => res.render('diagnose'))
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
+
+app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveCustomer().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})

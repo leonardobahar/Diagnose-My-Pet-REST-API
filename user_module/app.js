@@ -64,7 +64,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
                 result: result
             })
         }).catch(err=>{
-            console.log(err)
+            console.error(err)
             res.status(500).send({
                 success: false,
                 error: SOMETHING_WENT_WRONG
@@ -248,10 +248,6 @@ app.delete("/api/user/delete-user",(req,res)=>{
             result: SOMETHING_WENT_WRONG
         })
     })
-})
-
-app.post("/api/user/user-login",(req,res)=>{
-
 })
 
 app.get("/api/user/retrieve-patient",(req,res)=>{

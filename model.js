@@ -120,3 +120,64 @@ export class User{
 		this.role = role
 	}
 }
+
+export class Customer{
+	constructor(id, customer_name, address, phone_number) {
+		this.id=id
+		this.customer_name=customer_name
+		this.address=address
+		this.phone_number=phone_number
+	}
+}
+
+export class Product{
+	constructor(id, product_name, price, quantity) {
+		this.id=id
+		this.product_name=product_name
+		this.price=price
+		this.quantity=quantity
+	}
+}
+
+export class Transaction{
+	constructor(id, date, total_price, status, id_customer, id_shipment, id_payment) {
+		this.id=id
+		this.date=date
+		this.total_price=total_price
+		this.status=status
+		this.id_customer=id_customer
+		this.id_shipment=id_shipment
+		this.id_payment=id_payment
+	}
+}
+
+export class Transaction_detail{
+	constructor(id, product_quantity, id_product, id_transaction) {
+		this.id=id
+		this.product_quantity=product_quantity
+		this.id_product=id_product
+		this.id_transaction=id_transaction
+	}
+}
+
+export class Shipment{
+	constructor(id, method, price, duration, address, receiver_name, id_transaction) {
+		this.id=id
+		this.method=method
+		this.price=price
+		this.duration=duration
+		this.address=address
+		this.receiver_name=receiver_name
+		this.id_transaction=id_transaction
+	}
+}
+
+export class Payment{
+	constructor(id, method, date, status, id_transaction) {
+		this.id=id
+		this.method=method
+		this.date=date
+		this.status=status
+		this.id_transaction=id_transaction
+	}
+}
