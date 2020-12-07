@@ -153,4 +153,23 @@ export class Dao {
             })
         })
     }
+
+    deleteCustomer(customer){
+        return new Promise((resolve,reject)=>{
+            if(!customer instanceof Customer){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="DELETE FROM customer WHERE id=? "
+            this.mysqlConn.query(query,customer.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }

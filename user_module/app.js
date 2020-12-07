@@ -143,7 +143,6 @@ app.post("/api/user/user-login",(req,res)=>{
 
     const user=new User(null,req.body.user_name,null,null,null,req.body.password,null,null)
     dao.loginCustomer(user).then(result=> {
-        console.log(result)
         res.status(200).send({
             success: true,
             authentication_approval: true,
@@ -152,7 +151,7 @@ app.post("/api/user/user-login",(req,res)=>{
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
             res.status(200).send({
-                success:true,
+                success:false,
                 authentication_approval: false,
                 message:'Invalid User Name/Password'
             })

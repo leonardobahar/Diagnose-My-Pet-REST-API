@@ -30,6 +30,13 @@ CREATE TABLE IF NOT EXISTS `medicine`(
 	dosage_info TEXT DEFAULT NULL
 );
 
+CREATE TABLE IF NOT EXISTS `anatomy`(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+	part_name VARCHAR(20) NOT NULL,
+    animal_type_id INT(11) NOT NULL,
+	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS `disease_symptoms_animal`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	disease_id INT(11),
@@ -85,13 +92,6 @@ CREATE TABLE IF NOT EXISTS `medical_records_symptoms`(
 	symptoms_id INT(11) NOT NULL,
 	FOREIGN KEY (medical_records_id) REFERENCES medical_records(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS `anatomy`(
-	id INT(11) PRIMARY KEY AUTO_INCREMENT,
-	part_name VARCHAR(20) NOT NULL,
-    animal_type_id INT(11) NOT NULL,
-	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medicine_cure_symptoms`(
