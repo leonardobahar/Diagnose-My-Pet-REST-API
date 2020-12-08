@@ -15,6 +15,8 @@ import {
 } from "../strings";
 import {Customer} from "../model";
 
+dotenv.config();
+
 const app = express()
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json())
@@ -44,16 +46,6 @@ const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
-const ejs=require('ejs')
-
-//EJS
-app.set('view engine', 'ejs')
-app.use(express.static('./Uploads'))
-app.get("/",(req,res) => res.render('diagnose'))
-
-app.listen(PORT, ()=>{
-    console.info(`Server serving port ${PORT}`)
-})
 
 app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
     if(typeof req.query.id==='undefined'){
@@ -103,8 +95,8 @@ app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
 
 app.post("/api/ecommerce/add-customer", (req,res)=>{
     if(typeof req.body.customer_name==='undefined' ||
-       typeof req.body.address==='undefined' ||
-       typeof req.body.phone_number==='undefined'){
+        typeof req.body.address==='undefined' ||
+        typeof req.body.phone_number==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -129,9 +121,9 @@ app.post("/api/ecommerce/add-customer", (req,res)=>{
 
 app.post("/api/ecommerce/update-ecommerce",(req,res)=>{
     if(typeof req.body.customer_name==='undefined' ||
-       typeof req.body.address==='undefined' ||
-       typeof req.body.phone_number==='undefined' ||
-       typeof req.body.id==='undefined'){
+        typeof req.body.address==='undefined' ||
+        typeof req.body.phone_number==='undefined' ||
+        typeof req.body.id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -207,4 +199,8 @@ app.delete("/api/ecommerce/delete-customer",(req,res)=>{
             result:result
         })
     })
+})
+
+app.listen(PORT, ()=>{
+    console.info(`Server serving port ${PORT}`)
 })
