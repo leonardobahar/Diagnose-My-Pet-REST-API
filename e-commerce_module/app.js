@@ -257,6 +257,20 @@ app.post("/api/ecommerce/add-product",(req,res)=>{
         })
         return
     }
+
+    const product=new Product(null,req.body.product_name,req.body.price,req.body.quantity)
+    dao.addProduct(product).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.listen(PORT, ()=>{
