@@ -262,4 +262,23 @@ export class Dao {
             })
         })
     }
+
+    deleteProduct(product){
+        return new Promise((resolve,reject)=>{
+            if(!product instanceof Product){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="DELETE FROM product WHERE p_id_product=?"
+            this.mysqlConn.query(query, product.id, (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }

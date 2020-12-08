@@ -315,6 +315,43 @@ app.post("/api/ecommerce/update-product", (req,res)=>{
     })
 })
 
+app.delete("/api/ecommerce/delete-product",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+    dao.retrieveOneProduct(new Product(req.query.id)).then(result=>{
+        dao.deleteProduct(new Product(req.query.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
