@@ -273,6 +273,48 @@ app.post("/api/ecommerce/add-product",(req,res)=>{
     })
 })
 
+app.post("/api/ecommerce/update-product", (req,res)=>{
+    if(typeof req.body.product_name==='undefined' ||
+       typeof req.body.price==='undefined' ||
+       typeof req.body.quantity==='undefined' ||
+       typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const product=new Product(req.body.id,req.body.product_name,req.body.price,req.body.quantity)
+    dao.retrieveOneProduct(new Product(req.body.id)).then(result=>{
+        dao.updateProduct(product).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })

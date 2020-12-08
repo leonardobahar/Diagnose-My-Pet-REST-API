@@ -243,4 +243,23 @@ export class Dao {
             })
         })
     }
+
+    updateProduct(product){
+        return new Promise((resolve,reject)=>{
+            if(!product instanceof Product){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE product SET p_name=?, p_price=?, p_quantity=? WHERE p_id_product=? "
+            this.mysqlConn.query(query,[product.product_name, product.price, product.quantity, product.id], (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(product)
+            })
+        })
+    }
 }
