@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Customer, Product} from "../model";
+import {Customer, Product, Transaction} from "../model";
 
 export class Dao {
     constructor(host, user, password, dbname) {
@@ -235,8 +235,12 @@ export class Dao {
                 return
             }
 
-            const query="INSET INTO `product`(`p_name`, `p_price`, `p_quantity`) VALUES(?, ?, ?)"
-            this.mysqlConn.query(query,[product.product_name,product.price,product.quality], (error,result)=>{
+            const query="INSERT INTO `product`(`p_name`, `p_price`, `p_quantity`) VALUES(?, ?, ?)"
+            this.mysqlConn.query(query,[product.product_name,product.price,product.quantity], (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
 
                 product.id=result.insertId
                 resolve(product)
@@ -278,6 +282,60 @@ export class Dao {
                 }
 
                 resolve(SUCCESS)
+            })
+        })
+    }
+
+    retrieveTransaction(){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT * FROM transaction "
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let transactions=[]
+                    for(let i=0; i<result.length; i++){
+                        transactions.push(new Transaction(
+                            result[i].t_id_transaction,
+                            result[i].t_date,
+                            result[i].t_total_price,
+                            result[i].t_status,
+                            result[i].t_id_customer,
+                            result[i].t_id_payment
+                        ))
+                    }
+                    resolve(transactions)
+                }else {
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    retrieveOneTransactionByCustomerId(transaction){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT * FROM transaction WHERE t_id_customer=?"
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let transactions=[]
+                    for(let i=0; i<result.length; i++){
+                        transactions.push(new Transaction(
+                            result[i].t_id_transaction,
+                            result[i].t_date,
+                            result[i].t_total_price,
+                            result[i].t_status,
+                            result[i].t_id_customer,
+                            result[i].t_id_payment
+                        ))
+                    }
+                    resolve(transactions)
+                }else {
+                    reject(NO_SUCH_CONTENT)
+                }
             })
         })
     }

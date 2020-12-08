@@ -13,7 +13,7 @@ import {
     WRONG_BODY_FORMAT,
     NO_SUCH_CONTENT
 } from "../strings";
-import {Customer, Product} from "../model";
+import {Customer, Product, Transaction} from "../model";
 
 dotenv.config();
 
@@ -350,6 +350,51 @@ app.delete("/api/ecommerce/delete-product",(req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
+})
+
+app.get("/api/ecommerce/retrieve-transaction",(req,res)=>{
+    if(typeof req.query.customer_id==='undefined'){
+        dao.retrieveTransaction().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:true,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const transaction=new Transaction(null,null,null,null,req.query.customer_id,null,null)
+        dao.retrieveOneTransactionByCustomerId(transaction).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:true,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
 })
 
 app.listen(PORT, ()=>{
