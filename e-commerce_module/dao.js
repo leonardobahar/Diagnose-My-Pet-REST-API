@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Customer} from "../model";
+import {Customer, Product} from "../model";
 
 export class Dao {
     constructor(host, user, password, dbname) {
@@ -61,7 +61,7 @@ export class Dao {
     }
 
     retrieveCustomer(){
-        return Promise((resolve,reject)=>{
+        return new Promise((resolve,reject)=>{
             const query="SELECT * FROM customer "
             this.mysqlConn.query(query,(error,result)=>{
                 if(error){
@@ -71,10 +71,10 @@ export class Dao {
                     let customers=[]
                     for(let i=0; i<result.length; i++){
                         customers.push(new Customer(
-                            result[i].id,
-                            result[i].name,
-                            result[i].address,
-                            result[i].phone_number
+                            result[i].c_id_customer,
+                            result[i].c_name,
+                            result[i].c_address,
+                            result[i].c_phone_number
                         ))
                     }
                     resolve(customers)
@@ -92,7 +92,7 @@ export class Dao {
                 return
             }
 
-            const query="SELECT * FROM customer WHERE id=?"
+            const query="SELECT * FROM customer WHERE c_id_customer=?"
             this.mysqlConn.query(query, customer.id, (error,result)=>{
                 if(error){
                     reject(error)
@@ -101,10 +101,10 @@ export class Dao {
                     let customers=[]
                     for(let i=0; i<result.length; i++){
                         customers.push(new Customer(
-                            result[i].id,
-                            result[i].name,
-                            result[i].address,
-                            result[i].phone_number
+                            result[i].c_id_customer,
+                            result[i].c_name,
+                            result[i].c_address,
+                            result[i].c_phone_number
                         ))
                     }
                     resolve(customers)
@@ -149,7 +149,7 @@ export class Dao {
                     return
                 }
 
-                resolve(result)
+                resolve(customer)
             })
         })
     }
@@ -161,7 +161,7 @@ export class Dao {
                 return
             }
 
-            const query="DELETE FROM customer WHERE id=? "
+            const query="DELETE FROM customer WHERE c_id_customer=? "
             this.mysqlConn.query(query,customer.id,(error,result)=>{
                 if(error){
                     reject(error)
@@ -169,6 +169,77 @@ export class Dao {
                 }
 
                 resolve(SUCCESS)
+            })
+        })
+    }
+
+    retrieveProduct(){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT * FROM product"
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let products=[]
+                    for(let i=0; i<result.length; i++){
+                        products.push(new Product(
+                            result[i].p_id_product,
+                            result[i].p_name,
+                            result[i].p_price,
+                            result[i].p_quantity
+                        ))
+                    }
+                    resolve(products)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    retrieveOneProduct(product){
+        return new Promise((resolve,reject)=>{
+            if(!product instanceof Product){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM product WHERE p_id_product=?"
+            this.mysqlConn.query(query, product.id, (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let products=[]
+                    for(let i=0; i<result.length; i++){
+                        products.push(new Product(
+                            result[i].p_id_product,
+                            result[i].p_name,
+                            result[i].p_price,
+                            result[i].p_quantity
+                        ))
+                    }
+                    resolve(products)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    addProduct(product){
+        return new Promise((resolve,reject)=>{
+            if(!product instanceof Product){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="INSET INTO `product`(`p_name`, `p_price`, `p_quantity`) VALUES(?, ?, ?)"
+            this.mysqlConn.query(query,[product.product_name,product.price,product.quality], (error,result)=>{
+
+                product.id=result.insertId
+                resolve(product)
             })
         })
     }

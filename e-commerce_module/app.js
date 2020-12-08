@@ -13,7 +13,7 @@ import {
     WRONG_BODY_FORMAT,
     NO_SUCH_CONTENT
 } from "../strings";
-import {Customer} from "../model";
+import {Customer, Product} from "../model";
 
 dotenv.config();
 
@@ -47,7 +47,7 @@ const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : proce
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 
-app.get("/api/ecommerce/retrieve-customers",(req,res)=>{
+app.get("/api/ecommerce/retrieve-customer",(req,res)=>{
     if(typeof req.query.id==='undefined'){
         dao.retrieveCustomer().then(result=>{
             res.status(200).send({
@@ -119,7 +119,7 @@ app.post("/api/ecommerce/add-customer", (req,res)=>{
     })
 })
 
-app.post("/api/ecommerce/update-ecommerce",(req,res)=>{
+app.post("/api/ecommerce/update-customer",(req,res)=>{
     if(typeof req.body.customer_name==='undefined' ||
         typeof req.body.address==='undefined' ||
         typeof req.body.phone_number==='undefined' ||
@@ -199,6 +199,64 @@ app.delete("/api/ecommerce/delete-customer",(req,res)=>{
             result:result
         })
     })
+})
+
+app.get("/api/ecommerce/retrieve-product",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveProduct().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        dao.retrieveOneProduct(new Product(req.query.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.post("/api/ecommerce/add-product",(req,res)=>{
+    if(typeof req.body.product_name==='undefined' ||
+       typeof req.body.price==='undefined' ||
+       typeof req.body.quantity==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
 })
 
 app.listen(PORT, ()=>{
