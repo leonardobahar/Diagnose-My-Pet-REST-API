@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Customer, Product, Transaction, Transaction_detail} from "../model";
+import {Customer, Product, Shipment, Transaction, Transaction_detail} from "../model";
 
 export class Dao {
     constructor(host, user, password, dbname) {
@@ -481,7 +481,7 @@ export class Dao {
                             quantity:rowDataPacket.td_product_quantity,
                             product_id:rowDataPacket.td_id_product,
                             product_name:rowDataPacket.p_name,
-                            price:p_price
+                            price:rowDataPacket.p_price
                         }
                     })
                     resolve(details)
@@ -526,6 +526,67 @@ export class Dao {
                 }
 
                 resolve(SUCCESS)
+            })
+        })
+    }
+
+    retrieveShipment(){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT * FROM shipment "
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error) {
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let shipments=[]
+                    for(let i=0; i<result.length; i++){
+                        shipments.push(new Shipment(
+                            result[i].s_id_shipment,
+                            result[i].s_method,
+                            result[i].s_price,
+                            result[i].s_duration,
+                            result[i].s_address,
+                            result[i].s_receiver_name,
+                            result[i].s_id_transaction
+                        ))
+                    }
+                    resolve(shipments)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    retrieveOneShipment(shipment){
+        return new Promise((resolve,reject)=>{
+            if(!shipment instanceof Shipment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM shipment WHERE s_id_transaction=? "
+            this.mysqlConn.query(query,shipment.id_transaction,(error,result)=>{
+                if(error) {
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let shipments=[]
+                    for(let i=0; i<result.length; i++){
+                        shipments.push(new Shipment(
+                            result[i].s_id_shipment,
+                            result[i].s_method,
+                            result[i].s_price,
+                            result[i].s_duration,
+                            result[i].s_address,
+                            result[i].s_receiver_name,
+                            result[i].s_id_transaction
+                        ))
+                    }
+                    resolve(shipments)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
             })
         })
     }
