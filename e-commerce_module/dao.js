@@ -339,4 +339,54 @@ export class Dao {
             })
         })
     }
+
+    retrieveOneTransaction(id_transaction){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT t_id_transaction FROM transaction WHERE t_id_transaction=? "
+            this.mysqlConn.query(query,id_transaction,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    resolve(id_transaction)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    addTransaction(total_price,customer,shipment,payment){
+        return new Promise((resolve,reject)=>{
+            const query="INSERT INTO `transaction`(`t_date`, `t_total_price`, `t_status`, `t_id_customer`, `t_id_shipment`, `t_id_payment`) VALUES(NOW(), ?, 'Pending', ?, ?, ?)"
+            this.mysqlConn.query(query,[total_price,customer,shipment,payment],(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
+
+    approveTransaction(transaction){
+        return new Promise((resolve,reject)=>{
+            if(!transaction instanceof Transaction){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE transaction SET t_status='Approved' WHERE t_id_transaction=?"
+            this.mysqlConn.query(query,transaction.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                transaction.status=result.t_status
+                resolve(transaction.status)
+            })
+        })
+    }
 }
