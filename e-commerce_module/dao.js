@@ -356,16 +356,21 @@ export class Dao {
         })
     }
 
-    addTransaction(total_price,customer,shipment,payment){
+    addTransaction(transaction){
         return new Promise((resolve,reject)=>{
+            if(!transaction instanceof Transaction){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
             const query="INSERT INTO `transaction`(`t_date`, `t_total_price`, `t_status`, `t_id_customer`, `t_id_shipment`, `t_id_payment`) VALUES(NOW(), ?, 'Pending', ?, ?, ?)"
-            this.mysqlConn.query(query,[total_price,customer,shipment,payment],(error,result)=>{
+            this.mysqlConn.query(query,[transaction.total_price,transaction.id_customer,transaction.id_shipment,transaction.id_payment],(error,result)=>{
                 if(error){
                     reject(error)
                     return
                 }
 
-                resolve(SUCCESS)
+                transaction.id=result.insertId
+                resolve(transaction)
             })
         })
     }
@@ -458,6 +463,10 @@ export class Dao {
 
     retrieveOneTransactionDetail(transactionDetail){
         return new Promise((resolve,reject)=>{
+            if(!transactionDetail instanceof Transaction_detail){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
             const query="SELECT td.td_id_detail, td.td_product_quantity, td.td_id_product, p.p_name, p.p_price "+
                 "FROM transaction_detail td LEFT OUTER JOIN product p ON td.td_id_product=p.p_id_product "+
                 "WHERE td.td_id_detail=? "
@@ -482,4 +491,25 @@ export class Dao {
             })
         })
     }
+
+    addTransactionDetail(transactionDetail){
+        return new Promise((resolve,reject)=>{
+            if(!transactionDetail instanceof Transaction_detail){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+            const query="INSERT INTO `transaction_detail`(`td_product_quantity`, `td_id_product`, `td_id_transaction`) VALUES(?, ?, ?)"
+            this.mysqlConn.query(query,[transactionDetail.product_quantity,transactionDetail.id_product,transactionDetail.id_transaction],(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                transactionDetail.id=result.insertId
+                resolve(transactionDetail)
+            })
+        })
+    }
+
+
 }
