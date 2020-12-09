@@ -590,4 +590,25 @@ export class Dao {
             })
         })
     }
+
+    addShipment(shipment){
+        return new Promise((resolve,reject)=>{
+            if(!shipment instanceof Shipment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="INSERT INTO `shipment`(`s_method`,`s_price`,`s_duration`,`s_address`,`s_receiver_name`,`s_id_transaction`) "+
+                "VALUES(?,?,?,?,?,?)"
+            this.mysqlConn.query(query,[shipment.method,shipment.price,shipment.duration,shipment.address,shipment.receiver_name,shipment.id_transaction],(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                shipment.id=result.insertId
+                resolve(shipment)
+            })
+        })
+    }
 }
