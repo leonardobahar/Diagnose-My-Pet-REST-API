@@ -611,4 +611,23 @@ export class Dao {
             })
         })
     }
+
+    deleteShipment(shipment){
+        return new Promise((resolve,reject)=>{
+            if(!shipment instanceof Shipment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="DELETE FROM shipment WHERE s_id_shipment=?"
+            this.mysqlConn.query(query,shipment.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }
