@@ -432,7 +432,8 @@ export class Dao {
 
     retrieveTransactionDetail(){
         return new Promise((resolve,reject)=>{
-            const query="SELECT td.td_id_detail, td.td_product_quantity, td.td_id_product, p.p_name, p.p_price "
+            const query="SELECT td.td_id_detail, td.td_product_quantity, td.td_id_product, p.p_name, p.p_price "+
+                "FROM transaction_detail td LEFT OUTER JOIN product p ON td.td_id_product=p.p_id_product "
             this.mysqlConn.query(query,(error,result)=>{
                 if(error){
                     reject(error)
@@ -447,6 +448,33 @@ export class Dao {
                             price:p_price
                         }
                    })
+                    resolve(details)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    retrieveOneTransactionDetail(transactionDetail){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT td.td_id_detail, td.td_product_quantity, td.td_id_product, p.p_name, p.p_price "+
+                "FROM transaction_detail td LEFT OUTER JOIN product p ON td.td_id_product=p.p_id_product "+
+                "WHERE td.td_id_detail=? "
+            this.mysqlConn.query(query,transactionDetail.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    const details = result.map(rowDataPacket=>{
+                        return{
+                            id:rowDataPacket.td_id_detail,
+                            quantity:rowDataPacket.td_product_quantity,
+                            product_id:rowDataPacket.td_id_product,
+                            product_name:rowDataPacket.p_name,
+                            price:p_price
+                        }
+                    })
                     resolve(details)
                 }else{
                     reject(NO_SUCH_CONTENT)
