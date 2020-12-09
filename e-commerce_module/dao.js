@@ -389,4 +389,25 @@ export class Dao {
             })
         })
     }
+
+    declineTransaction(transaction){
+        return new Promise((resolve,reject)=>{
+            if(!transaction instanceof Transaction){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE transaction SET t_status='Declined' WHERE t_id_transaction=?"
+            this.mysqlConn.query(query,transaction.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                transaction.status=result.t_status
+                resolve(transaction.status)
+            })
+        })
+
+    }
 }
