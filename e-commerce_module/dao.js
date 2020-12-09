@@ -511,5 +511,22 @@ export class Dao {
         })
     }
 
+    deleteTransactionDetail(transactionDetail){
+        return new Promise((resolve,reject)=>{
+            if(!transactionDetail instanceof Transaction_detail){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
 
+            const query="DELETE FROM transaction_detail WHERE td_id_transaction_detail=? "
+            this.mysqlConn.query(query,transactionDetail.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }
