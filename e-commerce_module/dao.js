@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Customer, Product, Transaction} from "../model";
+import {Customer, Product, Transaction, Transaction_detail} from "../model";
 
 export class Dao {
     constructor(host, user, password, dbname) {
@@ -426,6 +426,31 @@ export class Dao {
                 }
 
                 resolve(SUCCESS)
+            })
+        })
+    }
+
+    retrieveTransactionDetail(){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT td.td_id_detail, td.td_product_quantity, td.td_id_product, p.p_name, p.p_price "
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                   const details = result.map(rowDataPacket=>{
+                        return{
+                            id:rowDataPacket.td_id_detail,
+                            quantity:rowDataPacket.td_product_quantity,
+                            product_id:rowDataPacket.td_id_product,
+                            product_name:rowDataPacket.p_name,
+                            price:p_price
+                        }
+                   })
+                    resolve(details)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
             })
         })
     }
