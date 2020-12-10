@@ -727,5 +727,22 @@ export class Dao {
         })
     }
 
+    approvePayment(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
 
+            const query="UPDATE payment SET pm_status='Approved' WHERE pm_id_payment=? "
+            this.mysqlConn.query(query, payment.id, (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }
