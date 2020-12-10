@@ -580,6 +580,50 @@ app.delete("/api/ecommerce/delete-transaction",(req,res)=>{
     })
 })
 
+app.get("/api/ecommerce/retrieve-shipment",(req,res)=>{
+    if(typeof req.query.shipment_id==='undefined'){
+        dao.retrieveShipment().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        dao.retrieveOneShipment(new Shipment(req.query.shipment_id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
