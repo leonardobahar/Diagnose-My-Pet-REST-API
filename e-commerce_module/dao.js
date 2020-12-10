@@ -362,8 +362,8 @@ export class Dao {
                 reject(MISMATCH_OBJ_TYPE)
                 return
             }
-            const query="INSERT INTO `transaction`(`t_date`, `t_total_price`, `t_status`, `t_id_customer`, `t_id_shipment`, `t_id_payment`) VALUES(NOW(), ?, 'Pending', ?, ?, ?)"
-            this.mysqlConn.query(query,[transaction.total_price,transaction.id_customer,transaction.id_shipment,transaction.id_payment],(error,result)=>{
+            const query="INSERT INTO `transaction`(`t_date`, `t_total_price`, `t_status`, `t_id_customer`) VALUES(NOW(), ?, 'Pending', ?)"
+            this.mysqlConn.query(query,[transaction.total_price,transaction.id_customer],(error,result)=>{
                 if(error){
                     reject(error)
                     return
@@ -371,6 +371,20 @@ export class Dao {
 
                 transaction.id=result.insertId
                 resolve(transaction)
+            })
+        })
+    }
+
+    addTransactionShipmentNPaymentId(shipment_id,payment_id,transaction_id){
+        return new Promise((resolve,reject)=>{
+            const query="INSERT INTO `transaction`(`t_id_shipment`,`t_id_payment`) WHERE t_id_transaction=? "
+            this.mysqlConn.query(query,[shipment_id,payment_id,transaction_id],(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
             })
         })
     }

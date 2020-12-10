@@ -397,7 +397,24 @@ app.get("/api/ecommerce/retrieve-transaction",(req,res)=>{
     }
 })
 
+app.post("/api/ecommerce/add-transaction",(req,res)=>{
+    if(typeof req.body.price==='undefined' ||
+       typeof req.body.customer_id==='undefined' ||
+       typeof req.body.quantity==='undefined' ||
+       typeof req.body.product_id==='undefined' ||
+       typeof req.body.shipment_method==='undefined' ||
+       typeof req.body.shipment_price==='undefined' ||
+       typeof req.body.address==='undefined' ||
+       typeof req.body.receiver_name==='undefined' ||
+       typeof req.body.payment_method==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
 
+})
 
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
