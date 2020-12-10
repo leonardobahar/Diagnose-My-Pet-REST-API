@@ -13,7 +13,7 @@ import {
     WRONG_BODY_FORMAT,
     NO_SUCH_CONTENT
 } from "../strings";
-import {Customer, Product, Transaction} from "../model";
+import {Customer, Payment, Product, Shipment, Transaction, Transaction_detail} from "../model";
 
 dotenv.config();
 
@@ -414,6 +414,53 @@ app.post("/api/ecommerce/add-transaction",(req,res)=>{
         return
     }
 
+    dao.addTransaction(new Transaction(null,null,req.body.price,null,req.body.customer_id,null,null)).then(result=>{
+        const transactionId=result.t_id_transaction
+        dao.addTransactionDetail(new Transaction_detail(null,req.body.quantity,req.body.product_id,transactionId)).then(result=>{
+            dao.addShipment(new Shipment(null,req.body.product_id,req.body.shipment_price,null,req.body.address,req.body.receiver_name,transactionId)).then(result=>{
+                const shipmentId=result.s_id_shipment
+                dao.addPayment(new Payment(null,req.body.payment_method,null,null,transactionId)).then(result=>{
+                    const paymentId=result.pm_id_payment
+                    dao.addTransactionShipmentNPaymentId(shipmentId,paymentId,transactionId).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(error=>{
+                        console.error(error)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    })
+                }).catch(error=>{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+          success:false,
+          error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.listen(PORT, ()=>{

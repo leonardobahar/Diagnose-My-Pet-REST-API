@@ -613,8 +613,8 @@ export class Dao {
             }
 
             const query="INSERT INTO `shipment`(`s_method`,`s_price`,`s_duration`,`s_address`,`s_receiver_name`,`s_id_transaction`) "+
-                "VALUES(?,?,?,?,?,?)"
-            this.mysqlConn.query(query,[shipment.method,shipment.price,shipment.duration,shipment.address,shipment.receiver_name,shipment.id_transaction],(error,result)=>{
+                "VALUES(?,?,'2 weeks',?,?,?)"
+            this.mysqlConn.query(query,[shipment.method,shipment.price,shipment.address,shipment.receiver_name,shipment.id_transaction],(error,result)=>{
                 if(error){
                     reject(error)
                     return
