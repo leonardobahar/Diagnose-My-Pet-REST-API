@@ -706,4 +706,26 @@ export class Dao {
             })
         })
     }
+
+    addPayment(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="INSERT INTO `payment`(`pm_method`, `pm_date`, `pm_status`, `pm_id_transaction`)"
+            this.mysqlConn.query(query,[payment.method, payment.date, payment.status, payment.id_transaction],(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                payment.id=result.insertId
+                resolve(payment)
+            })
+        })
+    }
+
+
 }
