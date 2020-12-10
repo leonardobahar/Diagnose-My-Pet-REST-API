@@ -745,4 +745,42 @@ export class Dao {
             })
         })
     }
+
+    declinePayment(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE payment SET pm_status='Declined' WHERE pm_id_payment=? "
+            this.mysqlConn.query(query,payment.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
+
+    deletePayment(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="DELETE FROM payment WHERE pm_id_payment=? "
+            this.mysqlConn.query(query,payment.id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(SUCCESS)
+            })
+        })
+    }
 }
