@@ -9,7 +9,7 @@ import {
     ONLY_WITH_VENDORS, ORDER_PROCESSING,
     SOMETHING_WENT_WRONG, SUCCESS, VALID, WRONG_BODY_FORMAT
 } from "../strings";
-import {Customer, Product, Shipment, Transaction, Transaction_detail} from "../model";
+import {Customer, Payment, Product, Shipment, Transaction, Transaction_detail} from "../model";
 
 export class Dao {
     constructor(host, user, password, dbname) {
@@ -650,5 +650,60 @@ export class Dao {
         })
     }
 
+    retrievePayment(){
+        return new Promise((resolve,reject)=>{
+            const query="SELECT * FROM payment "
+            this.mysqlConn.query(query,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let payments=[]
+                    for(let i=0; i<result.length; i++){
+                        payments.push(new Payment(
+                            result[i].pm_id_payment,
+                            result[i].pm_method,
+                            result[i].pm_date,
+                            result[i].pm_status,
+                            result[i].pm_id_transaction
+                        ))
+                    }
+                    resolve(payments)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
 
+    retrieveOnePayment(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment) {
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM payment WHERE pm_id_transaction=? "
+            this.mysqlConn.query(query,payment.id_transaction,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let payments=[]
+                    for(let i=0; i<result.length; i++){
+                        payments.push(new Payment(
+                            result[i].pm_id_payment,
+                            result[i].pm_method,
+                            result[i].pm_date,
+                            result[i].pm_status,
+                            result[i].pm_id_transaction
+                        ))
+                    }
+                    resolve(payments)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
 }
