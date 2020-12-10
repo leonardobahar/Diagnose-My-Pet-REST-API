@@ -666,6 +666,38 @@ app.post("/api/ecommerce/approve-payment",(req,res)=>{
     })
 })
 
+app.post("/api/ecommerce/decline-payment",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOnePayment(new Payment(req.body.id)).then(result=>{
+        dao.declinePayment(new Payment(req.body.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
