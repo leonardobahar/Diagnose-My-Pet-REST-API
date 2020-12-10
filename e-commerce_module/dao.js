@@ -612,6 +612,25 @@ export class Dao {
         })
     }
 
+    updateShipment(shipment){
+        return new Promise((resolve,reject)=>{
+            if(!shipment instanceof Shipment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="UPDATE shipment SET s_method=?, s_price=?, s_address=?, s_receiver_name=? WHERE s_id_shipment=? "
+            this.mysqlConn.query(query,[shipment.method, shipment.price, shipment.address, shipment.receiver_name, shipment.id], (error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }
+
+                resolve(shipment)
+            })
+        })
+    }
+
     deleteShipment(shipment){
         return new Promise((resolve,reject)=>{
             if(!shipment instanceof Shipment){
@@ -630,4 +649,6 @@ export class Dao {
             })
         })
     }
+
+
 }
