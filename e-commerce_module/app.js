@@ -352,6 +352,7 @@ app.delete("/api/ecommerce/delete-product",(req,res)=>{
     })
 })
 
+//New feature still in progress
 app.get("/api/ecommerce/retrieve-transaction",(req,res)=>{
     if(typeof req.query.customer_id==='undefined'){
         dao.retrieveTransaction().then(result=>{
@@ -531,6 +532,46 @@ app.post("/api/ecommerce/decline-transaction",(req,res)=>{
             })
             return
         }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.delete("/api/ecommerce/delete-transaction",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneTransaction(new Transaction(req.query.id)).then(result=>{
+
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+
+    dao.deleteTransaction(new Transaction(req.query.id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
         console.error(error)
         res.status(500).send({
             success:false,
