@@ -474,7 +474,7 @@ app.post("/api/ecommerce/approve-transaction",(req,res)=>{
     }
 
     dao.retrieveOneTransaction(req.body.id).then(result=>{
-        dao.approveTransaction(new Transaction_detail(req.body.id)).then(result=>{
+        dao.approveTransaction(new Transaction(req.body.id)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -629,7 +629,7 @@ app.post("/api/ecommerce/add-shipment",(req,res)=>{
 })
 
 app.post("/api/ecommerce/approve-payment",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.payment_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -637,8 +637,8 @@ app.post("/api/ecommerce/approve-payment",(req,res)=>{
         return
     }
 
-    dao.retrieveOnePayment(new Payment(req.body.id)).then(result=>{
-        dao.approvePayment(new Payment(req.body.id)).then(result=>{
+    dao.retrieveOnePayment(new Payment(req.body.payment_id)).then(result=>{
+        dao.approvePayment(new Payment(req.body.payment_id)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -667,7 +667,7 @@ app.post("/api/ecommerce/approve-payment",(req,res)=>{
 })
 
 app.post("/api/ecommerce/decline-payment",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.payment_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -675,8 +675,8 @@ app.post("/api/ecommerce/decline-payment",(req,res)=>{
         return
     }
 
-    dao.retrieveOnePayment(new Payment(req.body.id)).then(result=>{
-        dao.declinePayment(new Payment(req.body.id)).then(result=>{
+    dao.retrieveOnePayment(new Payment(req.body.payment_id)).then(result=>{
+        dao.declinePayment(new Payment(req.body.payment_id)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -697,8 +697,6 @@ app.post("/api/ecommerce/decline-payment",(req,res)=>{
         })
     })
 })
-
-
 
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)

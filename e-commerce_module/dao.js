@@ -17,7 +17,6 @@ export class Dao {
         this._user = user
         this._password = password
         this._dbname = dbname
-
         this._initSqlStmt = fs.readFileSync("./diagnosemypet.sql").toString()
 
         const handleConnection = () => {
@@ -288,23 +287,46 @@ export class Dao {
 
     retrieveTransaction(){
         return new Promise((resolve,reject)=>{
-            const query="SELECT * FROM transaction "
+            const query="SELECT t.t_id_transaction, td.td_product_quantity, td.td_id_product, " +
+                "p.p_name, p.p_price, " +
+                "t.t_date, t.t_total_price, t.t_status, t.t_id_customer, " +
+                "c.c_name, c.c_address, c.c_phone_number, " +
+                "t.t_id_shipment, s.s_method, s.s_price, s.s_duration, s.s_address, s.s_receiver_name, " +
+                "t.t_id_payment, pm.pm_method, pm.pm_date, pm.pm_status " +
+                "FROM transaction t LEFT OUTER JOIN transaction_detail td ON td.td_id_transaction=t.t_id_transaction " +
+                "LEFT OUTER JOIN product p ON td.td_id_product=p.p_id_product " +
+                "LEFT OUTER JOIN customer c ON c.c_id_customer=t.t_id_customer " +
+                "LEFT OUTER JOIN shipment s ON s.s_id_shipment=t.t_id_shipment " +
+                "LEFT OUTER JOIN payment pm ON pm_id_payment=t.t_id_payment "
             this.mysqlConn.query(query,(error,result)=>{
                 if(error){
                     reject(error)
                     return
                 }else if(result.length>0){
-                    let transactions=[]
-                    for(let i=0; i<result.length; i++){
-                        transactions.push(new Transaction(
-                            result[i].t_id_transaction,
-                            result[i].t_date,
-                            result[i].t_total_price,
-                            result[i].t_status,
-                            result[i].t_id_customer,
-                            result[i].t_id_payment
-                        ))
-                    }
+                    const transactions=result.map(rowDataPacket=>{
+                        return{
+                            id:rowDataPacket.t_id_transaction,
+                            product_id:rowDataPacket.td_id_product,
+                            product_name:rowDataPacket.p_name,
+                            product_price:rowDataPacket.p_price,
+                            product_quantity:rowDataPacket.td_product_quantity,
+                            transaction_date:rowDataPacket.t_date,
+                            total_price:rowDataPacket.t_total_price,
+                            status:rowDataPacket.t_status,
+                            customer_id:rowDataPacket.t_id_customer,
+                            customer_name:rowDataPacket.c_name,
+                            customer_address:rowDataPacket.c_address,
+                            customer_phone_number:rowDataPacket.c_phone_number,
+                            shipment_id:rowDataPacket.t_id_shipment,
+                            shipment_method:rowDataPacket.s_method,
+                            shipment_price:rowDataPacket.s_price,
+                            shipment_duration:rowDataPacket.s_duration + "weeks",
+                            shipment_address:rowDataPacket.s_address,
+                            receiver_name:rowDataPacket.s_receiver_name,
+                            payment_method:rowDataPacket.pm_method,
+                            payment_date:rowDataPacket.pm_status
+                        }
+                    })
                     resolve(transactions)
                 }else {
                     reject(NO_SUCH_CONTENT)
@@ -315,23 +337,46 @@ export class Dao {
 
     retrieveOneTransactionByCustomerId(transaction){
         return new Promise((resolve,reject)=>{
-            const query="SELECT * FROM transaction WHERE t_id_customer=?"
-            this.mysqlConn.query(query,(error,result)=>{
+            const query="SELECT t.t_id_transaction, td.td_product_quantity, td.td_id_product, " +
+                "p.p_name, p.p_price, " +
+                "t.t_date, t.t_total_price, t.t_status, t.t_id_customer, " +
+                "c.c_name, c.c_address, c.c_phone_number, " +
+                "t.t_id_shipment, s.s_method, s.s_price, s.s_duration, s.s_address, s.s_receiver_name, " +
+                "t.t_id_payment, pm.pm_method, pm.pm_date, pm.pm_status " +
+                "FROM transaction t LEFT OUTER JOIN transaction_detail td ON td.td_id_transaction=t.t_id_transaction " +
+                "LEFT OUTER JOIN product p ON td.td_id_product=p.p_id_product " +
+                "LEFT OUTER JOIN customer c ON c.c_id_customer=t.t_id_customer " +
+                "LEFT OUTER JOIN shipment s ON s.s_id_shipment=t.t_id_shipment " +
+                "LEFT OUTER JOIN payment pm ON pm_id_payment=t.t_id_payment "
+            this.mysqlConn.query(query,transaction.customer_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return
                 }else if(result.length>0){
-                    let transactions=[]
-                    for(let i=0; i<result.length; i++){
-                        transactions.push(new Transaction(
-                            result[i].t_id_transaction,
-                            result[i].t_date,
-                            result[i].t_total_price,
-                            result[i].t_status,
-                            result[i].t_id_customer,
-                            result[i].t_id_payment
-                        ))
-                    }
+                    const transactions=result.map(rowDataPacket=>{
+                        return{
+                            id:rowDataPacket.t_id_transaction,
+                            product_id:rowDataPacket.td_id_product,
+                            product_name:rowDataPacket.p_name,
+                            product_price:rowDataPacket.p_price,
+                            product_quantity:rowDataPacket.td_product_quantity,
+                            transaction_date:rowDataPacket.t_date,
+                            total_price:rowDataPacket.t_total_price,
+                            status:rowDataPacket.t_status,
+                            customer_id:rowDataPacket.t_id_customer,
+                            customer_name:rowDataPacket.c_name,
+                            customer_address:rowDataPacket.c_address,
+                            customer_phone_number:rowDataPacket.c_phone_number,
+                            shipment_id:rowDataPacket.t_id_shipment,
+                            shipment_method:rowDataPacket.s_method,
+                            shipment_price:rowDataPacket.s_price,
+                            shipment_duration:rowDataPacket.s_duration + "weeks",
+                            shipment_address:rowDataPacket.s_address,
+                            receiver_name:rowDataPacket.s_receiver_name,
+                            payment_method:rowDataPacket.pm_method,
+                            payment_date:rowDataPacket.pm_status
+                        }
+                    })
                     resolve(transactions)
                 }else {
                     reject(NO_SUCH_CONTENT)
@@ -397,7 +442,7 @@ export class Dao {
             }
 
             const query="UPDATE transaction SET t_status='Approved' WHERE t_id_transaction=?"
-            this.mysqlConn.query(query,transaction.id,(error,result)=>{
+            this.mysqlConn.query(query,transaction.transaction_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return
@@ -417,7 +462,7 @@ export class Dao {
             }
 
             const query="UPDATE transaction SET t_status='Declined' WHERE t_id_transaction=?"
-            this.mysqlConn.query(query,transaction.id,(error,result)=>{
+            this.mysqlConn.query(query,transaction.transaction_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return
