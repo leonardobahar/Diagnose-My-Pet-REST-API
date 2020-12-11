@@ -766,6 +766,37 @@ export class Dao {
         })
     }
 
+    retrieveOnePaymentByPaymentId(payment){
+        return new Promise((resolve,reject)=>{
+            if(!payment instanceof Payment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM payment WHERE pm_id_payment=? "
+            this.mysqlConn.query(query,payment.payment_id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let payments=[]
+                    for(let i=0; i<result.length; i++){
+                        payments.push(new Payment(
+                            result[i].pm_id_payment,
+                            result[i].pm_method,
+                            result[i].pm_date,
+                            result[i].pm_status,
+                            result[i].pm_id_transaction
+                        ))
+                    }
+                    resolve(payments)
+                }else{
+                    reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
     addPayment(payment){
         return new Promise((resolve,reject)=>{
             if(!payment instanceof Payment){
@@ -795,7 +826,7 @@ export class Dao {
             }
 
             const query="UPDATE payment SET pm_status='Approved' WHERE pm_id_payment=? "
-            this.mysqlConn.query(query, payment.id, (error,result)=>{
+            this.mysqlConn.query(query, payment.payment_id, (error,result)=>{
                 if(error){
                     reject(error)
                     return
@@ -814,7 +845,7 @@ export class Dao {
             }
 
             const query="UPDATE payment SET pm_status='Declined' WHERE pm_id_payment=? "
-            this.mysqlConn.query(query,payment.id,(error,result)=>{
+            this.mysqlConn.query(query,payment.payment_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return

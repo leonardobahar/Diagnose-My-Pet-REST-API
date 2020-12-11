@@ -637,7 +637,7 @@ app.post("/api/ecommerce/approve-payment",(req,res)=>{
         return
     }
 
-    dao.retrieveOnePayment(new Payment(req.body.payment_id)).then(result=>{
+    dao.retrieveOnePaymentByPaymentId(new Payment(req.body.payment_id)).then(result=>{
         dao.approvePayment(new Payment(req.body.payment_id)).then(result=>{
             res.status(200).send({
                 success:true,
@@ -675,7 +675,7 @@ app.post("/api/ecommerce/decline-payment",(req,res)=>{
         return
     }
 
-    dao.retrieveOnePayment(new Payment(req.body.payment_id)).then(result=>{
+    dao.retrieveOnePaymentByPaymentId(new Payment(req.body.payment_id)).then(result=>{
         dao.declinePayment(new Payment(req.body.payment_id)).then(result=>{
             res.status(200).send({
                 success:true,
