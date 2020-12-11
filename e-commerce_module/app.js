@@ -416,12 +416,12 @@ app.post("/api/ecommerce/add-transaction",(req,res)=>{
     }
 
     dao.addTransaction(new Transaction(null,null,req.body.price,null,req.body.customer_id,null,null)).then(result=>{
-        const transactionId=result.t_id_transaction
+        const transactionId=result.transaction_id
         dao.addTransactionDetail(new Transaction_detail(null,req.body.quantity,req.body.product_id,transactionId)).then(result=>{
             dao.addShipment(new Shipment(null,req.body.product_id,req.body.shipment_price,null,req.body.address,req.body.receiver_name,transactionId)).then(result=>{
-                const shipmentId=result.s_id_shipment
+                const shipmentId=result.shipment_id
                 dao.addPayment(new Payment(null,req.body.payment_method,null,null,transactionId)).then(result=>{
-                    const paymentId=result.pm_id_payment
+                    const paymentId=result.payment_id
                     dao.addTransactionShipmentNPaymentId(shipmentId,paymentId,transactionId).then(result=>{
                         res.status(200).send({
                             success:true,
@@ -697,6 +697,8 @@ app.post("/api/ecommerce/decline-payment",(req,res)=>{
         })
     })
 })
+
+
 
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)

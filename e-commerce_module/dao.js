@@ -369,7 +369,7 @@ export class Dao {
                     return
                 }
 
-                transaction.id=result.insertId
+                transaction.transaction_id=result.insertId
                 resolve(transaction)
             })
         })
@@ -377,7 +377,7 @@ export class Dao {
 
     addTransactionShipmentNPaymentId(shipment_id,payment_id,transaction_id){
         return new Promise((resolve,reject)=>{
-            const query="INSERT INTO `transaction`(`t_id_shipment`,`t_id_payment`) WHERE t_id_transaction=? "
+            const query="UPDATE transaction SET t_id_shipment=?, t_id_payment=? WHERE t_id_transaction=? "
             this.mysqlConn.query(query,[shipment_id,payment_id,transaction_id],(error,result)=>{
                 if(error){
                     reject(error)
@@ -519,7 +519,7 @@ export class Dao {
                     return
                 }
 
-                transactionDetail.id=result.insertId
+                transactionDetail.transaction_detail_id=result.insertId
                 resolve(transactionDetail)
             })
         })
@@ -620,7 +620,7 @@ export class Dao {
                     return
                 }
 
-                shipment.id=result.insertId
+                shipment.shipment_id=result.insertId
                 resolve(shipment)
             })
         })
@@ -728,14 +728,15 @@ export class Dao {
                 return
             }
 
-            const query="INSERT INTO `payment`(`pm_method`, `pm_date`, `pm_status`, `pm_id_transaction`)"
-            this.mysqlConn.query(query,[payment.method, payment.date, payment.status, payment.id_transaction],(error,result)=>{
+            const query="INSERT INTO `payment`(`pm_method`, `pm_date`, `pm_status`, `pm_id_transaction`) "+
+                "VALUES(?, NOW(), 'Pending', ?)"
+            this.mysqlConn.query(query,[payment.method, payment.id_transaction],(error,result)=>{
                 if(error){
                     reject(error)
                     return
                 }
 
-                payment.id=result.insertId
+                payment.payment_id=result.insertId
                 resolve(payment)
             })
         })

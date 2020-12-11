@@ -140,8 +140,8 @@ export class Product{
 }
 
 export class Transaction{
-	constructor(id, date, total_price, status, id_customer, id_shipment, id_payment) {
-		this.id=id
+	constructor(transaction_id, date, total_price, status, id_customer, id_shipment, id_payment) {
+		this.transaction_id=transaction_id
 		this.date=date
 		this.total_price=total_price
 		this.status=status
@@ -152,8 +152,8 @@ export class Transaction{
 }
 
 export class Transaction_detail{
-	constructor(id, product_quantity, id_product, id_transaction) {
-		this.id=id
+	constructor(transaction_detail_id, product_quantity, id_product, id_transaction) {
+		this.transaction_detail_id=transaction_detail_id
 		this.product_quantity=product_quantity
 		this.id_product=id_product
 		this.id_transaction=id_transaction
@@ -161,8 +161,8 @@ export class Transaction_detail{
 }
 
 export class Shipment{
-	constructor(id, method, price, duration, address, receiver_name, id_transaction) {
-		this.id=id
+	constructor(shipment_id, method, price, duration, address, receiver_name, id_transaction) {
+		this.shipment_id=shipment_id
 		this.method=method
 		this.price=price
 		this.duration=duration
@@ -173,11 +173,11 @@ export class Shipment{
 }
 
 export class Payment{
-	constructor(id, method, date, status, id_transaction) {
-		this.id=id
+	constructor(payment_id, method, date, status, id_transaction) {
+		this.payment_id=payment_id
 		this.method=method
-		this.date=date
 		this.status=status
+		this.date=date
 		this.id_transaction=id_transaction
 	}
 }
