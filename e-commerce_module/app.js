@@ -650,6 +650,33 @@ app.post("/api/ecommerce/add-shipment",(req,res)=>{
     })
 })
 
+app.post("/api/ecommerce/update-shipment",(req,res)=>{
+    if(typeof req.body.method==='undefined' ||
+        typeof req.body.price==='undefined' ||
+        typeof req.body.address==='undefined' ||
+        typeof req.body.receiver_name==='undefined' ||
+        typeof req.body.transaction_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.updateShipment(new Shipment(null,req.body.method,req.body.price,null,req.body.address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/ecommerce/approve-payment",(req,res)=>{
     if(typeof req.body.payment_id==='undefined'){
         res.status(400).send({
