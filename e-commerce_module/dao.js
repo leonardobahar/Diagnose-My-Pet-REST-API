@@ -835,8 +835,7 @@ export class Dao {
                     return
                 }
 
-                payment.payment_id=result.insertId
-                resolve(payment)
+                resolve(SUCCESS)
             })
         })
     }
