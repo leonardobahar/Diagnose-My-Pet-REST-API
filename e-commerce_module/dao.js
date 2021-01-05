@@ -726,7 +726,7 @@ export class Dao {
             }
 
             const query="DELETE FROM shipment WHERE s_id_shipment=?"
-            this.mysqlConn.query(query,shipment.id,(error,result)=>{
+            this.mysqlConn.query(query,shipment.shipment_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return
@@ -763,15 +763,10 @@ export class Dao {
         })
     }
 
-    retrieveOnePayment(payment){
+    retrieveOnePayment(id_transaction){
         return new Promise((resolve,reject)=>{
-            if(!payment instanceof Payment) {
-                reject(MISMATCH_OBJ_TYPE)
-                return
-            }
-
             const query="SELECT * FROM payment WHERE pm_id_transaction=? "
-            this.mysqlConn.query(query,payment.id_transaction,(error,result)=>{
+            this.mysqlConn.query(query,id_transaction,(error,result)=>{
                 if(error){
                     reject(error)
                     return
