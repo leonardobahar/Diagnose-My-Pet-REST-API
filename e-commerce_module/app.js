@@ -679,7 +679,7 @@ app.post("/api/ecommerce/update-shipment",(req,res)=>{
         return
     }
 
-    dao.retrieveOneShipment(new Shipment(req.body.shipment_id)).then(result=>{
+    dao.retrieveOneShipmentByShipmentID(new Shipment(req.body.shipment_id)).then(result=>{
         dao.updateShipment(new Shipment(null,req.body.shipment_method,req.body.shipment_price,null,req.body.shipment_address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
             res.status(200).send({
                 success:true,

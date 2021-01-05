@@ -670,6 +670,8 @@ export class Dao {
                             result[i].s_id_transaction
                         ))
                     }
+                }else{
+                    reject(NO_SUCH_CONTENT)
                 }
             })
         })
