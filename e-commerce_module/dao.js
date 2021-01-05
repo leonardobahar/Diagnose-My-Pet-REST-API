@@ -670,6 +670,7 @@ export class Dao {
                             result[i].s_id_transaction
                         ))
                     }
+                    resolve(shipments)
                 }else{
                     reject(NO_SUCH_CONTENT)
                 }
@@ -706,7 +707,7 @@ export class Dao {
             }
 
             const query="UPDATE shipment SET s_method=?, s_price=?, s_address=?, s_receiver_name=? WHERE s_id_shipment=? "
-            this.mysqlConn.query(query,[shipment.method, shipment.price, shipment.address, shipment.receiver_name, shipment.id], (error,result)=>{
+            this.mysqlConn.query(query,[shipment.method, shipment.price, shipment.address, shipment.receiver_name, shipment.shipment_id], (error,result)=>{
                 if(error){
                     reject(error)
                     return

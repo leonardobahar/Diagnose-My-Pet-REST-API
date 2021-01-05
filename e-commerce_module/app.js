@@ -670,8 +670,7 @@ app.post("/api/ecommerce/update-shipment",(req,res)=>{
         typeof req.body.shipment_method==='undefined' ||
         typeof req.body.shipment_price==='undefined' ||
         typeof req.body.shipment_address==='undefined' ||
-        typeof req.body.receiver_name==='undefined' ||
-        typeof req.body.transaction_id==='undefined'){
+        typeof req.body.receiver_name==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -680,7 +679,8 @@ app.post("/api/ecommerce/update-shipment",(req,res)=>{
     }
 
     dao.retrieveOneShipmentByShipmentID(new Shipment(req.body.shipment_id)).then(result=>{
-        dao.updateShipment(new Shipment(null,req.body.shipment_method,req.body.shipment_price,null,req.body.shipment_address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
+        console.log('test')
+        dao.updateShipment(new Shipment(req.body.shipment_id,req.body.shipment_method,req.body.shipment_price,null,req.body.shipment_address,req.body.receiver_name,null)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
