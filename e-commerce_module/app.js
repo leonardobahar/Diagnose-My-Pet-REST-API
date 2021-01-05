@@ -580,7 +580,7 @@ app.delete("/api/ecommerce/delete-transaction",(req,res)=>{
 })
 
 app.get("/api/ecommerce/retrieve-shipment",(req,res)=>{
-    if(typeof req.query.shipment_id==='undefined'){
+    if(typeof req.query.transaction_id==='undefined'){
         dao.retrieveShipment().then(result=>{
             res.status(200).send({
                 success:true,
@@ -601,7 +601,7 @@ app.get("/api/ecommerce/retrieve-shipment",(req,res)=>{
             })
         })
     }else{
-        dao.retrieveOneShipment(new Shipment(req.query.shipment_id)).then(result=>{
+        dao.retrieveOneShipment(req.query.transaction_id).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -624,9 +624,9 @@ app.get("/api/ecommerce/retrieve-shipment",(req,res)=>{
 })
 
 app.post("/api/ecommerce/add-shipment",(req,res)=>{
-    if(typeof req.body.method==='undefined' ||
-       typeof req.body.price==='undefined' ||
-       typeof req.body.address==='undefined' ||
+    if(typeof req.body.shipment_method==='undefined' ||
+       typeof req.body.shipment_price==='undefined' ||
+       typeof req.body.shipment_address==='undefined' ||
        typeof req.body.receiver_name==='undefined' ||
        typeof req.body.transaction_id==='undefined'){
         res.status(400).send({
@@ -637,7 +637,7 @@ app.post("/api/ecommerce/add-shipment",(req,res)=>{
     }
 
     dao.retrieveOneTransaction(req.body.transaction_id).then(result=>{
-        dao.addShipment(new Shipment(null,req.body.method,req.body.price,null,req.body.address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
+        dao.addShipment(new Shipment(null,req.body.shipment_method,req.body.shipment_price,null,req.body.shipment_address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -667,9 +667,9 @@ app.post("/api/ecommerce/add-shipment",(req,res)=>{
 
 app.post("/api/ecommerce/update-shipment",(req,res)=>{
     if(typeof req.body.shipment_id==='undefined' ||
-        typeof req.body.method==='undefined' ||
-        typeof req.body.price==='undefined' ||
-        typeof req.body.address==='undefined' ||
+        typeof req.body.shipment_method==='undefined' ||
+        typeof req.body.shipment_price==='undefined' ||
+        typeof req.body.shipment_address==='undefined' ||
         typeof req.body.receiver_name==='undefined' ||
         typeof req.body.transaction_id==='undefined'){
         res.status(400).send({
@@ -680,7 +680,7 @@ app.post("/api/ecommerce/update-shipment",(req,res)=>{
     }
 
     dao.retrieveOneShipment(new Shipment(req.body.shipment_id)).then(result=>{
-        dao.updateShipment(new Shipment(null,req.body.method,req.body.price,null,req.body.address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
+        dao.updateShipment(new Shipment(null,req.body.shipment_method,req.body.shipment_price,null,req.body.shipment_address,req.body.receiver_name,req.body.transaction_id)).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result

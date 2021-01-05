@@ -617,15 +617,11 @@ export class Dao {
         })
     }
 
-    retrieveOneShipment(shipment){
+    retrieveOneShipment(id_transaction){
         return new Promise((resolve,reject)=>{
-            if(!shipment instanceof Shipment){
-                reject(MISMATCH_OBJ_TYPE)
-                return
-            }
 
             const query="SELECT * FROM shipment WHERE s_id_transaction=? "
-            this.mysqlConn.query(query,shipment.id_transaction,(error,result)=>{
+            this.mysqlConn.query(query,id_transaction,(error,result)=>{
                 if(error) {
                     reject(error)
                     return
