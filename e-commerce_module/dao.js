@@ -619,7 +619,6 @@ export class Dao {
 
     retrieveOneShipment(id_transaction){
         return new Promise((resolve,reject)=>{
-
             const query="SELECT * FROM shipment WHERE s_id_transaction=? "
             this.mysqlConn.query(query,id_transaction,(error,result)=>{
                 if(error) {
@@ -641,6 +640,36 @@ export class Dao {
                     resolve(shipments)
                 }else{
                     reject(NO_SUCH_CONTENT)
+                }
+            })
+        })
+    }
+
+    retrieveOneShipmentByShipmentID(shipment){
+        return new Promise((resolve,reject)=>{
+            if(!shipment instanceof Shipment){
+                reject(MISMATCH_OBJ_TYPE)
+                return
+            }
+
+            const query="SELECT * FROM shipment WHERE s_id_shipment=? "
+            this.mysqlConn.query(query,shipment.shipment_id,(error,result)=>{
+                if(error){
+                    reject(error)
+                    return
+                }else if(result.length>0){
+                    let shipments=[]
+                    for(let i=0; i<result.length; i++){
+                        shipments.push(new Shipment(
+                            result[i].s_id_shipment,
+                            result[i].s_method,
+                            result[i].s_price,
+                            result[i].s_duration,
+                            result[i].s_address,
+                            result[i].s_receiver_name,
+                            result[i].s_id_transaction
+                        ))
+                    }
                 }
             })
         })
