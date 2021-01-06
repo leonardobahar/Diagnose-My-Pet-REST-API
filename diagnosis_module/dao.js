@@ -910,27 +910,25 @@ export class Dao{
 
 	retrieveMedicineForDisease(disease){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT tp.id, tp.medicine_id, m.medicine_name, tp.disease_id, d.disease_name " +
-				"FROM treatment_plan tp LEFT OUTER JOIN medicine m ON tp.medicine_id=m.id " +
-				"LEFT OUTER JOIN disease d ON tp.disease_id=d.id " +
-				"WHERE tp.disease_id = ?"
+			const query="SELECT tp.id, tp.plan_name, tp.disease_id, d.disease_name, tp.medicine_ids " +
+				"FROM treatment_plan tp LEFT OUTER JOIN disease d ON tp.disease_id=d.id " +
+				"WHERE tp.disease_id=? "
 			this.mysqlConn.query(query, disease.id, (error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				const medicine = result.map(rowDataPacket =>{
+				const medicines=result.map(rowDataPacket=>{
 					return{
-						bind_id:rowDataPacket.id,
-						medicine_id:rowDataPacket.medicine_id,
-						medicine_name:rowDataPacket.medicine_name,
+						id:rowDataPacket.id,
+						plan_name:rowDataPacket.plan_name,
 						disease_id:rowDataPacket.disease_id,
-						disease_name:rowDataPacket.disease_name
+						disease_name:rowDataPacket.disease_name,
+						medicine_ids:rowDataPacket.medicine_ids
 					}
 				})
-
-				resolve(medicine)
+				resolve(medicines)
 			})
 		})
 	}
