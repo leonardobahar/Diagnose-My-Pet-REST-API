@@ -72,10 +72,11 @@ export class MedicalRecordTreatmentPlan{
 }
 
 export class TreatmentPlan{
-	constructor(id, medicine_id, disease_id) {
+	constructor(id, plan_name, disease_id, medicine_ids) {
 		this.id=id
-		this.medicine_id=medicine_id
+		this.plan_name=plan_name
 		this.disease_id=disease_id
+		this.medicine_ids=medicine_ids
 	}
 }
 

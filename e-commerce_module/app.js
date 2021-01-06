@@ -942,6 +942,20 @@ app.post("/api/ecommerce/decline-payment",(req,res)=>{
     })
 })
 
+app.delete('/api/ecommerce/delete-payment',(req,res)=>{
+    if(typeof req.query.payment_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOnePaymentByPaymentId(new Payment(req.query.payment_id)).then(result=>{
+
+    })
+})
+
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })

@@ -17,7 +17,7 @@ import {
 	MedicalRecords,
 	Medicine,
 	Patient,
-	Symptoms,
+	Symptoms, TreatmentPlan,
 	User
 } from "../model";
 
@@ -889,37 +889,21 @@ export class Dao{
 		})
 	}
 
-	bindTreatmentToDisease(plan_name, medicine_id_array, disease_id){
+	bindTreatmentToDisease(treatmentPlan){
 		return new Promise((resolve,reject)=>{
-			const query="INSERT INTO `treatment_plan`(`plan_name`, `disease_id`) VALUES(?, ?)"
-			this.mysqlConn.query(query,[plan_name, disease_id], async(error,result)=>{
+			if(!treatmentPlan instanceof TreatmentPlan){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="INSERT INTO `treatment_plan`(`plan_name`, `disease_id`, `medicine_ids`) VALUES(?, ?, ?)"
+			this.mysqlConn.query(query,[treatmentPlan.plan_name,treatmentPlan.disease_id,treatmentPlan.medicine_ids],(error,result)=>{
 				if(error){
 					reject(error)
 				}
 
-				console.log(medicine_id_array.length)
-				const treatmentPlanId = result.insertId
-				for (let i=0; i<medicine_id_array.length; i++){
-					await this.insertTreatmentPlanDetails(treatmentPlanId, medicine_id_array[i].medicine_id).catch(err=>{
-						reject(err)
-					})
-				}
-
-				resolve(SUCCESS)
-			})
-
-		})
-	}
-
-	insertTreatmentPlanDetails(treatment_plan_id, medicine_id){
-		return new Promise((resolve, reject)=>{
-			const query = "INSERT INTO `treatment_plan_details`(`treatment_plan_id`, `medicine_id`) VALUES(?,?)"
-			this.mysqlConn.query(query, [treatment_plan_id, medicine_id], (error, result)=>{
-				if(error){
-					reject(error)
-				}
-
-				resolve(SUCCESS)
+				treatmentPlan.id=result.insertId
+				resolve(treatmentPlan)
 			})
 		})
 	}
