@@ -905,7 +905,7 @@ export class Dao {
             }
 
             const query="DELETE FROM payment WHERE pm_id_payment=? "
-            this.mysqlConn.query(query,payment.id,(error,result)=>{
+            this.mysqlConn.query(query,payment.payment_id,(error,result)=>{
                 if(error){
                     reject(error)
                     return
