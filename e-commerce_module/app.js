@@ -952,7 +952,32 @@ app.delete('/api/ecommerce/delete-payment',(req,res)=>{
     }
 
     dao.retrieveOnePaymentByPaymentId(new Payment(req.query.payment_id)).then(result=>{
+        dao.deletePayment(new Payment(req.query.payment_id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+            return
+        }
 
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
     })
 })
 
