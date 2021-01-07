@@ -14,7 +14,7 @@ import {
 import {
 	AnimalCategory,
 	AnimalType,
-	Appointment,
+	Appointment, Doctor,
 	MedicalRecordAttachment,
 	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
 	Patient, Symptoms, TreatmentPlan,
@@ -272,6 +272,11 @@ export class Dao{
 
 	retrieveOneDoctor(doctor){
 		return new Promise((resolve,reject)=>{
+			if(!doctor instanceof Doctor){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
 			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
 				"FROM doctor d LEFT OUTER JOIN user u ON u.id=d.id" +
 				"WHERE d.id=? "
@@ -297,6 +302,26 @@ export class Dao{
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
+			})
+		})
+	}
+
+	registerDoctor(doctor){
+		return new Promise((resolve,reject)=>{
+			if(!doctor instanceof Doctor){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="INSERT INTO `doctor`(`doctor_name`, `user_id`) VALUES(?, ?) "
+			this.mysqlConn.query(query,[doctor.doctor_name,doctor.user_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				doctor.id=result.insertId
+				resolve(doctor)
 			})
 		})
 	}
@@ -371,8 +396,7 @@ export class Dao{
 					patient.id=res.insertId
 					resolve(patient)
 				})
-			}
-			else{
+			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -383,9 +407,7 @@ export class Dao{
 			if(!patient instanceof Patient){
 				reject(MISMATCH_OBJ_TYPE)
 				return
-			}
-
-			else{
+			} else{
 				const query="UPDATE patients SET patient_name=?, animal_type_id=?, birthdate=?, pet_owner_id=? WHERE id=?"
 				this.mysqlConn.query(query, [patient.patient_name, patient.animal_type, patient.birthdate, patient.pet_owner, patient.id], (err, res)=>{
 					if(err){
