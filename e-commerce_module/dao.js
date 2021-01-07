@@ -66,20 +66,18 @@ export class Dao {
                 if(error){
                     reject(error)
                     return
-                }else if(result.length>0){
-                    let customers=[]
-                    for(let i=0; i<result.length; i++){
-                        customers.push(new Customer(
-                            result[i].c_id_customer,
-                            result[i].c_name,
-                            result[i].c_address,
-                            result[i].c_phone_number
-                        ))
-                    }
-                    resolve(customers)
-                }else{
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                let customers=[]
+                for(let i=0; i<result.length; i++){
+                    customers.push(new Customer(
+                        result[i].c_id_customer,
+                        result[i].c_name,
+                        result[i].c_address,
+                        result[i].c_phone_number
+                    ))
+                }
+                resolve(customers)
             })
         })
     }
@@ -179,20 +177,18 @@ export class Dao {
                 if(error){
                     reject(error)
                     return
-                }else if(result.length>0){
-                    let products=[]
-                    for(let i=0; i<result.length; i++){
-                        products.push(new Product(
-                            result[i].p_id_product,
-                            result[i].p_name,
-                            result[i].p_price,
-                            result[i].p_quantity
-                        ))
-                    }
-                    resolve(products)
-                }else{
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                let products=[]
+                for(let i=0; i<result.length; i++){
+                    products.push(new Product(
+                        result[i].p_id_product,
+                        result[i].p_name,
+                        result[i].p_price,
+                        result[i].p_quantity
+                    ))
+                }
+                resolve(products)
             })
         })
     }
@@ -302,35 +298,33 @@ export class Dao {
                 if(error){
                     reject(error)
                     return
-                }else if(result.length>0){
-                    const transactions=result.map(rowDataPacket=>{
-                        return{
-                            id:rowDataPacket.t_id_transaction,
-                            product_id:rowDataPacket.td_id_product,
-                            product_name:rowDataPacket.p_name,
-                            product_price:rowDataPacket.p_price,
-                            product_quantity:rowDataPacket.td_product_quantity,
-                            transaction_date:rowDataPacket.t_date,
-                            total_price:rowDataPacket.t_total_price,
-                            status:rowDataPacket.t_status,
-                            customer_id:rowDataPacket.t_id_customer,
-                            customer_name:rowDataPacket.c_name,
-                            customer_address:rowDataPacket.c_address,
-                            customer_phone_number:rowDataPacket.c_phone_number,
-                            shipment_id:rowDataPacket.t_id_shipment,
-                            shipment_method:rowDataPacket.s_method,
-                            shipment_price:rowDataPacket.s_price,
-                            shipment_duration:rowDataPacket.s_duration + "weeks",
-                            shipment_address:rowDataPacket.s_address,
-                            receiver_name:rowDataPacket.s_receiver_name,
-                            payment_method:rowDataPacket.pm_method,
-                            payment_date:rowDataPacket.pm_status
-                        }
-                    })
-                    resolve(transactions)
-                }else {
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                const transactions=result.map(rowDataPacket=>{
+                    return{
+                        id:rowDataPacket.t_id_transaction,
+                        product_id:rowDataPacket.td_id_product,
+                        product_name:rowDataPacket.p_name,
+                        product_price:rowDataPacket.p_price,
+                        product_quantity:rowDataPacket.td_product_quantity,
+                        transaction_date:rowDataPacket.t_date,
+                        total_price:rowDataPacket.t_total_price,
+                        status:rowDataPacket.t_status,
+                        customer_id:rowDataPacket.t_id_customer,
+                        customer_name:rowDataPacket.c_name,
+                        customer_address:rowDataPacket.c_address,
+                        customer_phone_number:rowDataPacket.c_phone_number,
+                        shipment_id:rowDataPacket.t_id_shipment,
+                        shipment_method:rowDataPacket.s_method,
+                        shipment_price:rowDataPacket.s_price,
+                        shipment_duration:rowDataPacket.s_duration + "weeks",
+                        shipment_address:rowDataPacket.s_address,
+                        receiver_name:rowDataPacket.s_receiver_name,
+                        payment_method:rowDataPacket.pm_method,
+                        payment_date:rowDataPacket.pm_status
+                    }
+                })
+                resolve(transactions)
             })
         })
     }
@@ -502,20 +496,18 @@ export class Dao {
                 if(error){
                     reject(error)
                     return
-                }else if(result.length>0){
-                   const details = result.map(rowDataPacket=>{
-                        return{
-                            id:rowDataPacket.td_id_detail,
-                            quantity:rowDataPacket.td_product_quantity,
-                            product_id:rowDataPacket.td_id_product,
-                            product_name:rowDataPacket.p_name,
-                            price:p_price
-                        }
-                   })
-                    resolve(details)
-                }else{
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                const details = result.map(rowDataPacket=>{
+                    return{
+                        id:rowDataPacket.td_id_detail,
+                        quantity:rowDataPacket.td_product_quantity,
+                        product_id:rowDataPacket.td_id_product,
+                        product_name:rowDataPacket.p_name,
+                        price:p_price
+                    }
+                })
+                resolve(details)
             })
         })
     }
@@ -596,23 +588,21 @@ export class Dao {
                 if(error) {
                     reject(error)
                     return
-                }else if(result.length>0){
-                    let shipments=[]
-                    for(let i=0; i<result.length; i++){
-                        shipments.push(new Shipment(
-                            result[i].s_id_shipment,
-                            result[i].s_method,
-                            result[i].s_price,
-                            result[i].s_duration,
-                            result[i].s_address,
-                            result[i].s_receiver_name,
-                            result[i].s_id_transaction
-                        ))
-                    }
-                    resolve(shipments)
-                }else{
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                let shipments=[]
+                for(let i=0; i<result.length; i++){
+                    shipments.push(new Shipment(
+                        result[i].s_id_shipment,
+                        result[i].s_method,
+                        result[i].s_price,
+                        result[i].s_duration,
+                        result[i].s_address,
+                        result[i].s_receiver_name,
+                        result[i].s_id_transaction
+                    ))
+                }
+                resolve(shipments)
             })
         })
     }

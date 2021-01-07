@@ -270,6 +270,8 @@ export class Dao{
 		})
 	}
 
+
+
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
 			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
