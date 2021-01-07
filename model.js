@@ -131,6 +131,14 @@ export class Customer{
 	}
 }
 
+export class Doctor{
+	constructor(id, doctor_name, user_id){
+		this.id=id
+		this.doctor_name=doctor_name
+		this.user_id=user_id
+	}
+}
+
 export class Product{
 	constructor(id, product_name, price, quantity) {
 		this.id=id
