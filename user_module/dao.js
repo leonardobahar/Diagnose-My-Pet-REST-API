@@ -270,7 +270,36 @@ export class Dao{
 		})
 	}
 
-
+	retrieveOneDoctor(doctor){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
+				"FROM doctor d LEFT OUTER JOIN user u ON u.id=d.id" +
+				"WHERE d.id=? "
+			this.mysqlConn.query(query,doctor.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}else if(result.length>0){
+					const doctors=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							doctor_name:rowDataPacket.doctor_name,
+							user_id:rowDataPacket.user_id,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							password:rowDataPacket.password,
+							salt:rowDataPacket.salt,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(doctors)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
 
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
@@ -309,20 +338,22 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
+				}else if(result.length>0){
+					const patients=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							patient_name:rowDataPacket.patient_name,
+							animal_type_id:rowDataPacket.animal_type_id,
+							animal_name:rowDataPacket.animal_name,
+							birthdate:rowDataPacket.birthdate,
+							pet_owner_id:rowDataPacket.pet_owner_id,
+							pet_owner_name:rowDataPacket.user_name
+						}
+					})
+					resolve(patients)
+				}else {
+					reject(NO_SUCH_CONTENT)
 				}
-
-				const patients=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						patient_name:rowDataPacket.patient_name,
-						animal_type_id:rowDataPacket.animal_type_id,
-						animal_name:rowDataPacket.animal_name,
-						birthdate:rowDataPacket.birthdate,
-						pet_owner_id:rowDataPacket.pet_owner_id,
-						pet_owner_name:rowDataPacket.user_name
-					}
-				})
-				resolve(patients)
 			})
 		})
 	}
