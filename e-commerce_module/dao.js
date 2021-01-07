@@ -744,21 +744,19 @@ export class Dao {
                 if(error){
                     reject(error)
                     return
-                }else if(result.length>0){
-                    let payments=[]
-                    for(let i=0; i<result.length; i++){
-                        payments.push(new Payment(
-                            result[i].pm_id_payment,
-                            result[i].pm_method,
-                            result[i].pm_date,
-                            result[i].pm_status,
-                            result[i].pm_id_transaction
-                        ))
-                    }
-                    resolve(payments)
-                }else{
-                    reject(NO_SUCH_CONTENT)
                 }
+
+                let payments=[]
+                for(let i=0; i<result.length; i++){
+                    payments.push(new Payment(
+                        result[i].pm_id_payment,
+                        result[i].pm_method,
+                        result[i].pm_date,
+                        result[i].pm_status,
+                        result[i].pm_id_transaction
+                    ))
+                }
+                resolve(payments)
             })
         })
     }

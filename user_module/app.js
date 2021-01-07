@@ -80,7 +80,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
                 result:result
             })
         }).catch(err=>{
-            console.log(err)
+            console.error(err)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
@@ -121,7 +121,7 @@ app.post("/api/user/register-user", (req, res)=>{
                 })
                 res.end()
             }else{
-                console.log(err)
+                console.error(err)
                 res.status(500).send({
                     success: false,
                     error: SOMETHING_WENT_WRONG
@@ -194,7 +194,7 @@ app.post("/api/user/update-user",(req,res)=>{
             result:result
         })
     }).catch(err=>{
-        console.log(err)
+        console.error(err)
         res.status(500).send({
             success: false,
             result: SOMETHING_WENT_WRONG
@@ -241,7 +241,7 @@ app.delete("/api/user/delete-user",(req,res)=>{
             success:true
         })
     }).catch(err=>{
-        console.log(err)
+        console.error(err)
         res.status(500).send({
             success: false,
             result: SOMETHING_WENT_WRONG
@@ -362,7 +362,7 @@ app.delete("/api/user/delete-patient",(req,res)=>{
             result:SUCCESS
         })
     }).catch(err=>{
-        console.log(err)
+        console.error(err)
         res.status(500).send({
             success: false,
             error: SOMETHING_WENT_WRONG
@@ -398,7 +398,7 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
                 error: ERROR_FOREIGN_KEY
             })
         }else{
-            console.log(err)
+            console.error(err)
             res.status(500).send({
                 success: false,
                 error: SOMETHING_WENT_WRONG

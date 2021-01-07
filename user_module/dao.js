@@ -244,7 +244,29 @@ export class Dao{
 
 	retrieveDoctor(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT "
+			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
+				"FROM doctor d LEFT OUTER JOIN user u ON u.id=d.id "
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const doctors=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						doctor_name:rowDataPacket.doctor_name,
+						user_id:rowDataPacket.user_id,
+						mobile:rowDataPacket.mobile,
+						email:rowDataPacket.email,
+						birthdate:rowDataPacket.birthdate,
+						password:rowDataPacket.password,
+						salt:rowDataPacket.salt,
+						role:rowDataPacket.role
+					}
+				})
+				resolve(doctors)
+			})
 		})
 	}
 
