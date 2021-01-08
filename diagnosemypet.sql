@@ -113,15 +113,8 @@ CREATE TABLE IF NOT EXISTS `treatment_plan`(
     id INT(11) PRIMARY KEY AUTO_INCREMENT,
     plan_name VARCHAR(255) UNIQUE NOT NULL,
     disease_id INT(11) NOT NULL,
+    medicine_ids longtext,
     FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS `treatment_plan_details`(
-    id INT(11) PRIMARY KEY AUTO_INCREMENT,
-    treatment_plan_id INT(11),
-    medicine_id INT(11) NOT NULL,
-    FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (treatment_plan_id) REFERENCES treatment_plan(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `appointment`(

@@ -82,7 +82,7 @@ export class Dao {
         })
     }
 
-    retreiveOneCustomer(customer){
+    retrieveOneCustomer(customer){
         return new Promise((resolve,reject)=>{
             if(!customer instanceof Customer){
                 reject(MISMATCH_OBJ_TYPE)

@@ -71,7 +71,7 @@ app.get("/api/ecommerce/retrieve-customer",(req,res)=>{
     }else{
         const customer=new Customer(req.query.id,null,null,null)
 
-        dao.retreiveOneCustomer(customer).then(result=>{
+        dao.retrieveOneCustomer(customer).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
