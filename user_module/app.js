@@ -292,7 +292,7 @@ app.get("/api/user/retrieve-doctor",(req,res)=>{
 app.post("/api/user/register-doctor",(req,res)=>{
     if (typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
-        typeof req.body.email === 'undefiend' ||
+        typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.password === 'undefined'){
         res.status(400).send({
@@ -339,6 +339,45 @@ app.post("/api/user/register-doctor",(req,res)=>{
             }
         })
     }
+})
+
+app.delete("/api/user/delete-doctor",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneDoctor(new Doctor(req.query.id)).then(result=>{
+        dao.deleteDoctor(new Doctor(req.query.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.get("/api/user/retrieve-patient",(req,res)=>{
