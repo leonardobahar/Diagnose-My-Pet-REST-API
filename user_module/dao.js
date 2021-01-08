@@ -245,7 +245,7 @@ export class Dao{
 	retrieveDoctor(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
-				"FROM doctor d LEFT OUTER JOIN user u ON u.id=d.id "
+				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.user_id "
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
