@@ -14,7 +14,7 @@ import {
 import {
     AnimalCategory,
     AnimalType, Appointment,
-    Disease,
+    Disease, Doctor,
     MedicalRecordAttachment,
     MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
     Patient,
@@ -247,6 +247,44 @@ app.delete("/api/user/delete-user",(req,res)=>{
         res.status(500).send({
             success: false,
             result: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/user/retrieve-doctor",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveDoctor().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+        return
+    }
+
+    dao.retrieveOneDoctor(new Doctor(req.query.id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
