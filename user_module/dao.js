@@ -306,22 +306,22 @@ export class Dao{
 		})
 	}
 
-	registerDoctor(user){
+	registerDoctor(doctor){
 		return new Promise((resolve,reject)=>{
-			if(!user instanceof User){
+			if(!doctor instanceof Doctor){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
 			const query="INSERT INTO `doctor`(`doctor_name`, `user_id`) VALUES(?, ?) "
-			this.mysqlConn.query(query,async(error,result)=>{
+			this.mysqlConn.query(query,[doctor.doctor_name,doctor.user_id],async(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-
-
+				doctor.id=result.insertId
+				resolve(doctor)
 			})
 		})
 	}
