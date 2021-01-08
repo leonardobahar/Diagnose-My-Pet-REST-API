@@ -289,6 +289,58 @@ app.get("/api/user/retrieve-doctor",(req,res)=>{
     })
 })
 
+app.post("/api/user/register-doctor",(req,res)=>{
+    if (typeof req.body.user_name === 'undefined' ||
+        typeof req.body.mobile === 'undefined' ||
+        typeof req.body.email === 'undefiend' ||
+        typeof req.body.birthdate === 'undefined' ||
+        typeof req.body.password === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }else{
+        const user = new User(null,
+            req.body.user_name,
+            req.body.mobile,
+            req.body.email,
+            req.body.birthdate,
+            req.body.password,
+            null,
+            'CUSTOMER')
+
+        dao.registerCustomer(user).then(customerResult=>{
+            dao.registerDoctor(new Doctor(null,req.body.user_name,customerResult.id)).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
 app.get("/api/user/retrieve-patient",(req,res)=>{
     if(typeof req.query.id==='undefined'){
         dao.retrievePatient().then(result=>{
