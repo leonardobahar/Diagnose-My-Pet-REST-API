@@ -308,9 +308,9 @@ app.post("/api/user/register-doctor",(req,res)=>{
             req.body.birthdate,
             req.body.password,
             null,
-            'CUSTOMER')
+            'DOCTOR')
 
-        dao.registerCustomer(user).then(customerResult=>{
+        dao.registerUser(user).then(customerResult=>{
             dao.registerDoctor(new Doctor(null,req.body.user_name,customerResult.id)).then(result=>{
                 res.status(200).send({
                     success:true,

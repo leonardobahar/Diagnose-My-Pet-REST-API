@@ -130,7 +130,7 @@ export class Dao{
 		})
 	}
 
-	registerCustomer(user){
+	registerUser(user){
 		return new Promise(async (resolve, reject) => {
 			if (!user instanceof User) {
 				reject(MISMATCH_OBJ_TYPE)
