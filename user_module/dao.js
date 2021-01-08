@@ -326,6 +326,25 @@ export class Dao{
 		})
 	}
 
+	deleteDoctor(doctor){
+		return new Promise((resolve,reject)=>{
+			if(!doctor instanceof Doctor){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="DELETE FROM doctor WHERE id=? "
+			this.mysqlConn.query(query,doctor.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(doctor)
+			})
+		})
+	}
+
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
 			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
@@ -436,7 +455,6 @@ export class Dao{
 					return
 				}
 
-				patient.id=res.insertId
 				resolve(patient)
 			})
 		})
@@ -567,7 +585,6 @@ export class Dao{
 						return
 					}
 
-					record.id=result.insertId
 					resolve(record)
 				})
 			}
@@ -895,7 +912,6 @@ export class Dao{
 						return
 					}
 
-					attachment.id=result.insertId
 					resolve(attachment)
 				})
 			} else{
@@ -1117,7 +1133,6 @@ export class Dao{
 						return
 					}
 
-					appointment.id=result.insertId
 					resolve(appointment)
 				})
 			} else{
