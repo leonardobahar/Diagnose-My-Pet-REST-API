@@ -106,7 +106,9 @@ app.post("/api/user/register-user", (req, res)=>{
             req.body.mobile,
             req.body.email,
             req.body.birthdate,
-            req.body.password)
+            req.body.password,
+            null,
+            'CUSTOMER')
 
         dao.registerCustomer(user).then(result=>{
             res.status(200).send({

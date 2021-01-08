@@ -137,10 +137,10 @@ export class Dao{
 				return
 			}
 
-			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, 'CUSTOMER')"
+			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, ?)"
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt], (err, res)=>{
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt, user.role], (err, res)=>{
 				if (err){
 					reject(err)
 					return
@@ -306,22 +306,22 @@ export class Dao{
 		})
 	}
 
-	registerDoctor(doctor){
+	registerDoctor(user){
 		return new Promise((resolve,reject)=>{
-			if(!doctor instanceof Doctor){
+			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
 			const query="INSERT INTO `doctor`(`doctor_name`, `user_id`) VALUES(?, ?) "
-			this.mysqlConn.query(query,[doctor.doctor_name,doctor.user_id],(error,result)=>{
+			this.mysqlConn.query(query,async(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				doctor.id=result.insertId
-				resolve(doctor)
+
+
 			})
 		})
 	}
