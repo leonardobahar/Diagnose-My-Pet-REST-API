@@ -1073,22 +1073,52 @@ app.post("/api/user/add-appointment", (req,res)=>{
             success:false,
             error:WRONG_BODY_FORMAT
         })
-        return
-    }
+    } else if(typeof req.body.doctor_appointment==='undefined' &&
+       typeof req.body.doctor_id==='undefined'){
+        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, null, req.body.user_id,0, req.body.patient_id,null)
+        dao.addAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, null, req.body.user_id, req.body.doctor_appointment, req.body.patient_id, req.body.doctor_id)
+        dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+            dao.addAppointment(appointment).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
 
-    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, null, req.body.user_id, req.body.patient_id)
-    dao.addAppointment(appointment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
+    }
 })
 
 app.post("/api/user/update-appointment", (req,res)=>{
