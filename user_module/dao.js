@@ -922,9 +922,10 @@ export class Dao{
 
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, u.user_name, a.patient_id, p.patient_name " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, a.doctor_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
-				"LEFT OUTER JOIN patients p ON a.patient_id=p.id "
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
+				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id "
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
@@ -940,7 +941,10 @@ export class Dao{
 						user_id:rowDataPacket.user_id,
 						user_name:rowDataPacket.user_name,
 						patient_id:rowDataPacket.patient_id,
-						pet_name:rowDataPacket.patient_name
+						pet_name:rowDataPacket.patient_name,
+						doctor_appointment:rowDataPacket.doctor_appointment,
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name
 					}
 				})
 				resolve(attachment)
