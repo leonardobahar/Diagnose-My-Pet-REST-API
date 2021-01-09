@@ -119,15 +119,15 @@ CREATE TABLE IF NOT EXISTS `treatment_plan`(
 
 CREATE TABLE IF NOT EXISTS `appointment`(
     id INT(7) PRIMARY KEY AUTO_INCREMENT,
-    appointment_name varchar(20),
+    appointment_name varchar(255),
     appointment_time timestamp,
     user_id INT(11) NOT NULL,
     doctor_appointment tinyint(1),
     patient_id INT(11) NOT NULL,
     doctor_id INT(11) DEFAULT NULL,
+    appointment_status varchar(255),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_record_attachment`(

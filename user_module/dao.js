@@ -278,7 +278,7 @@ export class Dao{
 			}
 
 			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
-				"FROM doctor d LEFT OUTER JOIN user u ON u.id=d.id" +
+				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.id " +
 				"WHERE d.id=? "
 			this.mysqlConn.query(query,doctor.id,(error,result)=>{
 				if(error){
@@ -1045,9 +1045,9 @@ export class Dao{
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `appointment_status`, `user_id`, `doctor_appointment`, `patient_id`, `doctor_id`) VALUES(?, ?, 'PENDING', ?, ?, ?, ?)"
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `user_id`, `appointment_status`, `doctor_appointment`, `patient_id`, `doctor_id`) VALUES(?, ?, ?, ?, ?, ?, ?)"
 				const appointmentTime =  moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.user_id, appointment.doctor_appointment, appointment.patient_id, appointment.doctor_id],(error,result)=>{
+				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.user_id,appointment.appointment_status, appointment.doctor_appointment, appointment.patient_id, appointment.doctor_id],(error,result)=>{
 					if(error){
 						reject(error)
 						return
@@ -1065,9 +1065,10 @@ export class Dao{
 	updateAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
-				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, user_id=?, doctor_appointment=?, patient_id=?, doctor_id=? WHERE id=?"
+				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, appointment_status=?, user_id=?, doctor_appointment=?, patient_id=?, doctor_id=? WHERE id=?"
 				this.mysqlConn.query(query, [appointment.appointment_name.toUpperCase(),
 					appointment.appointment_time,
+					appointment.appointment_status,
 					appointment.user_id,
 					appointment.doctor_appointment,
 					appointment.patient_id,

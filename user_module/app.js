@@ -1075,9 +1075,9 @@ app.post("/api/user/add-appointment", (req,res)=>{
         })
     } else if(typeof req.body.doctor_appointment==='undefined' &&
        typeof req.body.doctor_id==='undefined'){
-        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, 'PENDING', req.body.user_id,0, req.body.patient_id,null)
+        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time,  req.body.user_id,0, req.body.patient_id,null, 'PENDING',)
 
-        dao.registerUser(new User(req.body.user_id)).then(result=>{
+        dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
             dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
                 dao.addAppointment(appointment).then(result=>{
                     res.status(200).send({
@@ -1122,8 +1122,8 @@ app.post("/api/user/add-appointment", (req,res)=>{
             })
         })
     }else{
-        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, 'PENDING', req.body.user_id, req.body.doctor_appointment, req.body.patient_id, req.body.doctor_id)
-        dao.registerUser(new User(req.body.user_id)).then(result=>{
+        const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id, 1, req.body.patient_id, req.body.doctor_id, 'PENDING')
+        dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
             dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
                 dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                     dao.addAppointment(appointment).then(result=>{
@@ -1199,7 +1199,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }else if(typeof req.body.doctor_appointment==='undefined' &&
              typeof req.body.doctor_id==='undefined'){
-        const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, 'RESCHEDULED',req.body.user_id,0,req.body.patient_id,null)
+        const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, req.body.user_id,0,req.body.patient_id,null, 'RESCHEDULED')
 
         dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
             dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
@@ -1274,7 +1274,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
             })
         })
     }else {
-        const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, 'RESCHEDULED',req.body.user_id,req.body.doctor_appointment,req.body.patient_id,req.body.doctor_id)
+        const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time,req.body.user_id,req.body.doctor_appointment,req.body.patient_id,req.body.doctor_id,'RESCHEDULED')
 
         dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
             dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
