@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     appointment_name varchar(255),
     appointment_time timestamp,
     user_id INT(11) NOT NULL,
-    doctor_appointment tinyint(1),
+    is_real_appointment tinyint(1),
     patient_id INT(11) NOT NULL,
     doctor_id INT(11) ,
     appointment_status varchar(255),

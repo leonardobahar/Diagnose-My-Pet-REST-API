@@ -922,9 +922,11 @@ export class Dao{
 
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, a.doctor_appointment, u.user_name, a.patient_id, p.patient_name " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
-				"LEFT OUTER JOIN patients p ON a.patient_id=p.id "
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
+				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id "
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
@@ -939,9 +941,11 @@ export class Dao{
 						appointment_status:rowDataPacket.appointment_status,
 						user_id:rowDataPacket.user_id,
 						user_name:rowDataPacket.user_name,
+						is_real_appointment:rowDataPacket.is_real_appointment,
 						patient_id:rowDataPacket.patient_id,
 						pet_name:rowDataPacket.patient_name,
-						doctor_appointment:rowDataPacket.doctor_appointment
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name
 					}
 				})
 				resolve(attachment)
@@ -951,10 +955,12 @@ export class Dao{
 
 	retrieveOneAppointment(appointment){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, a.doctor_appointment, u.user_name, a.patient_id, p.patient_name " +
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
-				"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
-				"WHERE a.id=?"
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
+				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
+				"WHERE a.id=? "
 			this.mysqlConn.query(query, appointment.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -968,9 +974,11 @@ export class Dao{
 							appointment_status:rowDataPacket.appointment_status,
 							user_id:rowDataPacket.user_id,
 							user_name:rowDataPacket.user_name,
+							is_real_appointment:rowDataPacket.is_real_appointment,
 							patient_id:rowDataPacket.patient_id,
 							pet_name:rowDataPacket.patient_name,
-							doctor_appointment:rowDataPacket.doctor_appointment
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name
 						}
 					})
 					resolve(attachment)
@@ -1002,7 +1010,7 @@ export class Dao{
 	retrieveAppointmentByStatus(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
-				const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, a.doctor_appointment, u.user_name, a.patient_id, p.patient_name " +
+				const query="SELECT a.id, a.appointment_name, a.appointment_time, a.appointment_status, a.user_id, a.is_real_appointment, u.user_name, a.patient_id, p.patient_name " +
 					"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 					"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
 					"WHERE a.appointment_status=?"
@@ -1021,7 +1029,7 @@ export class Dao{
 								user_name:rowDataPacket.user_name,
 								patient_id:rowDataPacket.patient_id,
 								pet_name:rowDataPacket.patient_name,
-								doctor_appointment:rowDataPacket.doctor_appointment
+								is_real_appointment:rowDataPacket.is_real_appointment
 							}
 						})
 						resolve(attachment)
@@ -1036,9 +1044,9 @@ export class Dao{
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `user_id`, `appointment_status`, `doctor_appointment`, `patient_id`, `doctor_id`) VALUES(?, ?, ?, ?, ?, ?, ?)"
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `user_id`, `appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`) VALUES(?, ?, ?, ?, ?, ?, ?)"
 				const appointmentTime =  moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.user_id,appointment.appointment_status, appointment.doctor_appointment, appointment.patient_id, appointment.doctor_id],(error,result)=>{
+				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.user_id,appointment.appointment_status, appointment.is_real_appointment, appointment.patient_id, appointment.doctor_id],(error,result)=>{
 					if(error){
 						reject(error)
 						return
@@ -1056,12 +1064,12 @@ export class Dao{
 	updateAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
-				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, appointment_status=?, user_id=?, doctor_appointment=?, patient_id=?, doctor_id=? WHERE id=?"
+				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, appointment_status=?, user_id=?, is_real_appointment=?, patient_id=?, doctor_id=? WHERE id=?"
 				this.mysqlConn.query(query, [appointment.appointment_name.toUpperCase(),
 					appointment.appointment_time,
 					appointment.appointment_status,
 					appointment.user_id,
-					appointment.doctor_appointment,
+					appointment.is_real_appointment,
 					appointment.patient_id,
 					appointment.doctor_id,
 					appointment.id], (error,result)=>{
