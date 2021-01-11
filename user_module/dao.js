@@ -1085,8 +1085,8 @@ export class Dao{
 				return
 			}
 
-			const query="UPDATE appointment SET appointment_time=? WHERE id=? "
-			this.mysqlConn.query(query,[appointment.appointment_time,appointment.id],(error,result)=>{
+			const query="UPDATE appointment SET appointment_time=?, appointment_status=?  WHERE id=? "
+			this.mysqlConn.query(query,[appointment.appointment_time,appointment.appointment_status,appointment.id],(error,result)=>{
 				if(error){
 					reject(error)
 					return

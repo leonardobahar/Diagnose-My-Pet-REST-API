@@ -1247,7 +1247,8 @@ app.post("/api/user/reschedule-appointment",(req,res)=>{
         return
     }
 
-    const appointment=new Appointment(req.body.id,null,req.body.appointment_time)
+    const appointment=new Appointment(req.body.id,null,req.body.appointment_time,null,null,
+        null,null,'RESCHEDULED')
     dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
         dao.rescheduleAppointment(appointment).then(result=>{
             res.status(200).send({
