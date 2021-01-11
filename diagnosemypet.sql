@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     appointment_status varchar(255),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (doctor_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_record_attachment`(

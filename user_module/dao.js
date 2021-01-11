@@ -1056,20 +1056,20 @@ export class Dao{
 	updateAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
-				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, appointment_status=?, user_id=?, doctor_appointment=?, patient_id=? WHERE id=?"
+				const query="UPDATE appointment SET appointment_name=?, appointment_time=?, appointment_status=?, user_id=?, doctor_appointment=?, patient_id=?, doctor_id=? WHERE id=?"
 				this.mysqlConn.query(query, [appointment.appointment_name.toUpperCase(),
 					appointment.appointment_time,
 					appointment.appointment_status,
 					appointment.user_id,
 					appointment.doctor_appointment,
 					appointment.patient_id,
+					appointment.doctor_id,
 					appointment.id], (error,result)=>{
 					if(error){
 						reject(error)
 						return
 					}
 
-					appointment.id=result.insertId
 					resolve(appointment)
 				})
 			} else {

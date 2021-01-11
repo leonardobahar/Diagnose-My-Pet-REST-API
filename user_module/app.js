@@ -1147,7 +1147,9 @@ app.post("/api/user/update-appointment", (req,res)=>{
         typeof req.body.appointment_name==='undefined' ||
         typeof req.body.appointment_time==='undefined' ||
         typeof req.body.user_id==='undefined' ||
-        typeof req.body.patient_id==='undefined'){
+        typeof req.body.doctor_appointment==='undefined' ||
+        typeof req.body.patient_id==='undefined' ||
+        typeof req.body.doctor_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1155,18 +1157,34 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, req.body.user_id,0,req.body.patient_id, 'RESCHEDULED')
+    const appointment=new Appointment(req.body.id,req.body.appointment_name,req.body.appointment_time, req.body.user_id,req.body.doctor_appointment,req.body.patient_id, req.body.doctor_id,'UPDATED')
 
     dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
         dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
             dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
-                dao.updateAppointment(appointment).then(result=>{
-                    res.status(200).send({
-                        success:true,
-                        result:result
+                dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                    dao.updateAppointment(appointment).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
                     })
-                }).catch(err=>{
-                    console.error(err)
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+
+                    console.error(error)
                     res.status(500).send({
                         success:false,
                         error:SOMETHING_WENT_WRONG
@@ -1181,7 +1199,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                     return
                 }
 
-                console.error(err)
+                console.error(error)
                 res.status(500).send({
                     success:false,
                     error:SOMETHING_WENT_WRONG
@@ -1196,7 +1214,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 return
             }
 
-            console.error(err)
+            console.error(error)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
