@@ -1078,7 +1078,7 @@ app.post("/api/user/add-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id,req.body.doctor_appointment, req.body.patient_id,req.body.doctor_id,'PENDING')
+    const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.user_id,req.body.doctor_appointment, req.body.patient_id, req.body.doctor_id,'PENDING')
 
     dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
         dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
