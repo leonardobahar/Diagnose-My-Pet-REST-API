@@ -1078,6 +1078,25 @@ export class Dao{
 		})
 	}
 
+	rescheduleAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(!appointment instanceof Appointment){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="UPDATE appointment SET appointment_time=? WHERE id=? "
+			this.mysqlConn.query(query,[appointment.appointment_time,appointment.id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	approveAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){

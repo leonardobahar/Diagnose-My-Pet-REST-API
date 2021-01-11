@@ -102,9 +102,7 @@ export class Dao{
 				if (err){
 					reject(err)
 					return
-				}
-
-				else if(res.length>0){
+				} else if(res.length>0){
 					let animals = []
 					for	(let i=0; i<res.length; i++){
 						animals.push(new AnimalType(
@@ -115,9 +113,7 @@ export class Dao{
 					}
 
 					resolve(animals)
-				}
-
-				else {
+				} else {
 					reject(NO_SUCH_CONTENT)
 				}
 			})
