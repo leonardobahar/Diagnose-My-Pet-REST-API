@@ -1237,7 +1237,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
     })
 })
 
-app.post("/api/user/reschedule",(req,res)=>{
+app.post("/api/user/reschedule-appointment",(req,res)=>{
     if(typeof req.body.id==='undefined' ||
        typeof req.body.appointment_time==='undefined'){
         res.status(400).send({
