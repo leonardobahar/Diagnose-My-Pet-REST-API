@@ -99,10 +99,11 @@ export class Patient{
 }
 
 export class Appointment{
-	constructor(id, appointment_name, appointment_time, user_id, is_real_appointment, patient_id, doctor_id, appointment_status) {
+	constructor(id, appointment_name, appointment_time, duration, user_id, is_real_appointment, patient_id, doctor_id, appointment_status) {
 		this.id=id
 		this.appointment_name=appointment_name
 		this.appointment_time=appointment_time
+		this.duration=duration
 		this.user_id=user_id
 		this.is_real_appointment=is_real_appointment
 		this.patient_id=patient_id

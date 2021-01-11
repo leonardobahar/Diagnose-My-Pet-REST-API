@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     id INT(7) PRIMARY KEY AUTO_INCREMENT,
     appointment_name varchar(255),
     appointment_time timestamp,
+    duration tinyint(11),
     user_id INT(11) NOT NULL,
     is_real_appointment tinyint(1),
     patient_id INT(11) NOT NULL,
