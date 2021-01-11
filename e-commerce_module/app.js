@@ -132,7 +132,7 @@ app.post("/api/ecommerce/update-customer",(req,res)=>{
     }
 
     const customer=new Customer(req.body.id,req.body.customer_name,req.body.address,req.body.phone_number)
-    dao.retreiveOneCustomer(new Customer(req.body.id)).then(result=>{
+    dao.retrieveOneCustomer(new Customer(req.body.id)).then(result=>{
         dao.updateCustomer(customer).then(result=>{
             res.status(200).send({
                 success:true,
