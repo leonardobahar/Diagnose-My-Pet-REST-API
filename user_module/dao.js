@@ -72,28 +72,22 @@ export class Dao{
 
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM users"
+			const query = "SELECT id,user_name,mobile,email,birthdate,role FROM users "
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
 				}else{
-					let customers = []
-					for (let i=0; i<result.length; i++){
-						const user = new User(
-							result[i].id,
-							result[i].user_name,
-							result[i].mobile,
-							result[i].email,
-							result[i].birthdate,
-							result[i].password,
-							result[i].role
-						)
-						//delete user.password
-						delete(user.salt)
-						customers.push(user)
-					}
-
-					resolve(customers)
+					const customer=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							user_name:rowDataPacket.user_name,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(customer)
 				}
 			})
 		})
@@ -101,28 +95,22 @@ export class Dao{
 
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM users WHERE id=?"
+			const query="SELECT id,user_name,mobile,email,birthdate,role FROM users WHERE id=?"
 			this.mysqlConn.query(query,user.id, (error,result)=>{
 				if(error){
 					reject(error)
 				}else if(result.length>0){
-					let customers=[]
-					for(let i=0;i<result.length;i++){
-						const user=new User(
-							result[i].id,
-							result[i].user_name,
-							result[i].mobile,
-							result[i].email,
-							result[i].birthdate,
-							result[i].password,
-							result[i].role
-						)
-						delete(user.salt)
-						customers.push(user)
-
-					}
-
-					resolve(customers)
+					const customer=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							user_name:rowDataPacket.user_name,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(customer)
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
@@ -244,7 +232,7 @@ export class Dao{
 
 	retrieveDoctor(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
+			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.role " +
 				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.user_id "
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
@@ -260,8 +248,6 @@ export class Dao{
 						mobile:rowDataPacket.mobile,
 						email:rowDataPacket.email,
 						birthdate:rowDataPacket.birthdate,
-						password:rowDataPacket.password,
-						salt:rowDataPacket.salt,
 						role:rowDataPacket.role
 					}
 				})
@@ -277,7 +263,7 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.password, u.salt, u.role " +
+			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.role " +
 				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.id " +
 				"WHERE d.id=? "
 			this.mysqlConn.query(query,doctor.id,(error,result)=>{
@@ -293,8 +279,6 @@ export class Dao{
 							mobile:rowDataPacket.mobile,
 							email:rowDataPacket.email,
 							birthdate:rowDataPacket.birthdate,
-							password:rowDataPacket.password,
-							salt:rowDataPacket.salt,
 							role:rowDataPacket.role
 						}
 					})
