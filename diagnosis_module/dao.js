@@ -1,5 +1,6 @@
 import mysqlConn from '../util/mysql-conn.js'
 import fs from 'fs'
+import axios from 'axios';
 import {
 	ADMIN_VALIDATED,
 	ALL, CANCELLED, DUPLICATE_ENTRY, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
@@ -266,13 +267,9 @@ export class Dao{
 				if(err){
 					reject (err)
 					return
-				}
-
-				else if(res.length>0){
+				} else if(res.length>0){
 					resolve(res[0].id)
-				}
-
-				else{
+				} else{
 					reject(NO_SUCH_CONTENT)
 				}
 			})
@@ -302,6 +299,7 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(!animalCategory instanceof AnimalCategory){
 				reject(MISMATCH_OBJ_TYPE)
+				return
 			}
 
 			const query = "UPDATE animal_category SET category_name=? WHERE id=?"

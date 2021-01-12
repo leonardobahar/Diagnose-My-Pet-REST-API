@@ -1067,7 +1067,6 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
 app.post("/api/user/add-appointment", (req,res)=>{
     if(typeof req.body.appointment_name === 'undefined' ||
         typeof req.body.appointment_time === 'undefined' ||
-        typeof req.body.duration === 'undefined' ||
         typeof req.body.user_id === 'undefined' ||
         typeof req.body.is_real_appointment==='undefined' ||
         typeof req.body.patient_id === 'undefined' ||
