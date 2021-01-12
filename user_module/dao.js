@@ -264,7 +264,7 @@ export class Dao{
 			}
 
 			const query="SELECT d.id, d.doctor_name, d.user_id, u.mobile, u.email, u.birthdate, u.role " +
-				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.id " +
+				"FROM doctor d LEFT OUTER JOIN users u ON u.id=d.user_id " +
 				"WHERE d.id=? "
 			this.mysqlConn.query(query,doctor.id,(error,result)=>{
 				if(error){
