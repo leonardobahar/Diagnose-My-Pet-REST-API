@@ -72,7 +72,7 @@ export class Dao{
 
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM users"
+			const query = "SELECT * FROM users WHERE role='CUSTOMER' "
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
@@ -101,7 +101,7 @@ export class Dao{
 
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT * FROM users WHERE id=?"
+			const query="SELECT * FROM users WHERE role='CUSTOMER' id=?"
 			this.mysqlConn.query(query,user.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -925,7 +925,7 @@ export class Dao{
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
 				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
-				"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id "
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
