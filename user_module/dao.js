@@ -1048,6 +1048,20 @@ export class Dao{
 		})
 	}
 
+	addAppointmentDescription(id,description){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE appointment SET description=? WHERE id=? "
+			this.mysqlConn.query(query,[description,id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	updateAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
