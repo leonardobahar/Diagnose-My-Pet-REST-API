@@ -1142,6 +1142,45 @@ app.post("/api/user/add-appointment", (req,res)=>{
     })
 })
 
+app.post("/api/user/add-appointment-description",(req,res)=>{
+    if(typeof req.body.id==='undefined' ||
+        typeof req.body.description==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(result=>{
+        dao.addAppointmentDescription(req.body.id,req.body.description).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/update-appointment", (req,res)=>{
     if(typeof req.body.id==='undefined' ||
         typeof req.body.appointment_name==='undefined' ||
