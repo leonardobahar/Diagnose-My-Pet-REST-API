@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     patient_id INT(11) NOT NULL,
     doctor_id INT(11) ,
     appointment_status varchar(255),
+    description varchar(255),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
