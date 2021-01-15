@@ -92,7 +92,7 @@ app.get("/api/user/retrieve-users", (req, res)=>{
 app.post("/api/user/register-user", (req, res)=>{
     if (typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
-        typeof req.body.email === 'undefiend' ||
+        typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.password === 'undefined'){
         res.status(400).send({
@@ -110,7 +110,7 @@ app.post("/api/user/register-user", (req, res)=>{
             null,
             'CUSTOMER')
 
-        dao.registerCustomer(user).then(result=>{
+        dao.registerUser(user).then(result=>{
             res.status(200).send({
                 success: true,
                 result: result
