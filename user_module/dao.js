@@ -175,14 +175,13 @@ export class Dao{
 				return
 			}
 
-			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, password=?, role=? WHERE id=?"
-			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.password,user.role,user.id], (err,res)=>{
+			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, role=? WHERE id=?"
+			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.role,user.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
 				}
 
-				delete(user.salt)
 				resolve(user)
 			})
 		})
