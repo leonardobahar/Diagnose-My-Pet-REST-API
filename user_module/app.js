@@ -256,7 +256,8 @@ app.delete("/api/user/delete-user",(req,res)=>{
     const user=new User(req.body.id,null,null,null,null,null,null,null)
     dao.deleteCustomer(user).then(result=>{
         res.status(200).send({
-            success:true
+            success:true,
+            result:result
         })
     }).catch(err=>{
         console.error(err)
