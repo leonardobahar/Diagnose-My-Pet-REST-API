@@ -72,7 +72,7 @@ export class Dao{
 
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT id,user_name,mobile,email,birthdate,role FROM users WHERE role='CUSTOMER' "
+			const query = "SELECT id,user_name,mobile,email,birthdate,address,phone_number,role FROM users WHERE role='CUSTOMER' "
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
@@ -84,6 +84,8 @@ export class Dao{
 							mobile:rowDataPacket.mobile,
 							email:rowDataPacket.email,
 							birthdate:rowDataPacket.birthdate,
+							address:rowDataPacket.address,
+							phone_number:rowDataPacket.phone_number,
 							role:rowDataPacket.role
 						}
 					})
@@ -95,7 +97,7 @@ export class Dao{
 
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT id,user_name,mobile,email,birthdate,role FROM users WHERE role='CUSTOMER' AND id=?"
+			const query="SELECT id,user_name,mobile,email,birthdate,address,phone_number,role FROM users WHERE role='CUSTOMER' AND id=?"
 			this.mysqlConn.query(query,user.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -107,6 +109,8 @@ export class Dao{
 							mobile:rowDataPacket.mobile,
 							email:rowDataPacket.email,
 							birthdate:rowDataPacket.birthdate,
+							address:rowDataPacket.address,
+							phone_number:rowDataPacket.phone_number,
 							role:rowDataPacket.role
 						}
 					})
