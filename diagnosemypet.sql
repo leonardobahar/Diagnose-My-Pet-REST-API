@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `transaction`(
     `t_id_customer` INT(7),
     `t_id_shipment` INT(7),
     `t_id_payment` INT(7),
-    FOREIGN KEY (`t_id_customer`) REFERENCES customer(`c_id_customer`) ON DELETE CASCADE ON UPDATE CASCADE);
+    FOREIGN KEY (`t_id_customer`) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS `transaction_detail`(
     `td_id_transaction_detail` INT(7) PRIMARY KEY AUTO_INCREMENT,
