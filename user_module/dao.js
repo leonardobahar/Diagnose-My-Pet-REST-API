@@ -128,7 +128,7 @@ export class Dao{
 			}
 
 			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `address`, `password`, `salt`, `role`) " +
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
 			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.address, hash, salt, user.role], (err, res)=>{
@@ -178,7 +178,7 @@ export class Dao{
 				return
 			}
 
-			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, address=?, WHERE id=?"
+			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, address=? WHERE id=?"
 			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.address, user.id], (err,res)=>{
 				if(err){
 					reject(err)

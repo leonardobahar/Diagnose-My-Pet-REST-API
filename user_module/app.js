@@ -95,7 +95,6 @@ app.post("/api/user/register-user", (req, res)=>{
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
         typeof req.body.address === 'undefined' ||
-        typeof req.body.phone_number === 'undefined' ||
         typeof req.body.password === 'undefined'){
         res.status(400).send({
             success: false,
@@ -190,18 +189,35 @@ app.post("/api/user/update-user",(req,res)=>{
         req.body.birthdate,
         req.body.address)
 
-    dao.updateCustomer(user).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.retrieveOneUser(new User(req.body.id)).then(result=>{
+        dao.updateCustomer(user).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                result: SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+
+        console.error(error)
         res.status(500).send({
-            success: false,
-            result: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
+
 })
 
 app.post("/api/user/change-password",(req,res)=>{
