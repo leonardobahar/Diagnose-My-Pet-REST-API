@@ -129,10 +129,11 @@ export class Dao{
 				return
 			}
 
-			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `password`, `salt`, `role`) VALUES (?, ?, ?, ?, ?, ?, ?)"
+			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `address`, `phone_number`, `password`, `salt`, `role`) " +
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, hash, salt, user.role], (err, res)=>{
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.address, user.phone_number, hash, salt, user.role], (err, res)=>{
 				if (err){
 					reject(err)
 					return
