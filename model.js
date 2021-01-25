@@ -113,12 +113,14 @@ export class Appointment{
 }
 
 export class User{
-	constructor(id, user_name, mobile, email, birthdate, password, salt, role){
+	constructor(id, user_name, mobile, email, birthdate, address, phone_number, password, salt, role){
 		this.id = id
 		this.user_name = user_name
 		this.mobile = mobile
 		this.email = email
 		this.birthdate = birthdate
+		this.address=address
+		this.phone_number=phone_number
 		this.password = password
 		this.salt=salt
 		this.role = role
