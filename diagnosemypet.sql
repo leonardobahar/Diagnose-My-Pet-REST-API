@@ -64,7 +64,6 @@ CREATE TABLE IF NOT EXISTS `users`(
 	email VARCHAR(255) UNIQUE DEFAULT NULL,
 	birthdate DATE DEFAULT NULL,
 	address TEXT UNIQUE,
-	phone_number VARCHAR(255) UNIQUE,
 	password VARCHAR(255),
 	salt VARCHAR(255),
 	role VARCHAR(255)

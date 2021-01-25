@@ -72,7 +72,7 @@ export class Dao{
 
 	retrieveUsers(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT id,user_name,mobile,email,birthdate,address,phone_number,role FROM users WHERE role='CUSTOMER' "
+			const query = "SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' "
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
@@ -85,7 +85,6 @@ export class Dao{
 							email:rowDataPacket.email,
 							birthdate:rowDataPacket.birthdate,
 							address:rowDataPacket.address,
-							phone_number:rowDataPacket.phone_number,
 							role:rowDataPacket.role
 						}
 					})
@@ -97,7 +96,7 @@ export class Dao{
 
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT id,user_name,mobile,email,birthdate,address,phone_number,role FROM users WHERE role='CUSTOMER' AND id=?"
+			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND id=?"
 			this.mysqlConn.query(query,user.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -110,7 +109,6 @@ export class Dao{
 							email:rowDataPacket.email,
 							birthdate:rowDataPacket.birthdate,
 							address:rowDataPacket.address,
-							phone_number:rowDataPacket.phone_number,
 							role:rowDataPacket.role
 						}
 					})
@@ -129,11 +127,11 @@ export class Dao{
 				return
 			}
 
-			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `address`, `phone_number`, `password`, `salt`, `role`) " +
+			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `address`, `password`, `salt`, `role`) " +
 				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.address, user.phone_number, hash, salt, user.role], (err, res)=>{
+			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.address, hash, salt, user.role], (err, res)=>{
 				if (err){
 					reject(err)
 					return
@@ -180,8 +178,8 @@ export class Dao{
 				return
 			}
 
-			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, address=?, phone_number=? WHERE id=?"
-			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.address, user.phone_number, user.id], (err,res)=>{
+			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, address=?, WHERE id=?"
+			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.address, user.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return

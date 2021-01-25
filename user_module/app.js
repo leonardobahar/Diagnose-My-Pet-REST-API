@@ -109,7 +109,6 @@ app.post("/api/user/register-user", (req, res)=>{
             req.body.email,
             req.body.birthdate,
             req.body.address,
-            req.body.phone_number,
             req.body.password,
             null,
             'CUSTOMER')
@@ -147,7 +146,7 @@ app.post("/api/user/user-login",(req,res)=>{
         return
     }
 
-    const user=new User(null,req.body.user_name,null,null,null,req.body.password,null,null)
+    const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
     dao.loginCustomer(user).then(result=> {
         res.status(200).send({
             success: true,
@@ -176,8 +175,7 @@ app.post("/api/user/update-user",(req,res)=>{
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
-        typeof req.body.address === 'undefined' ||
-        typeof req.body.phone_number === 'undefined'){
+        typeof req.body.address === 'undefined'){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
@@ -190,8 +188,7 @@ app.post("/api/user/update-user",(req,res)=>{
         req.body.mobile,
         req.body.email,
         req.body.birthdate,
-        req.body.address,
-        req.body.phone_number)
+        req.body.address)
 
     dao.updateCustomer(user).then(result=>{
         res.status(200).send({
