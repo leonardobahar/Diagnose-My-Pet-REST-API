@@ -176,21 +176,22 @@ app.post("/api/user/update-user",(req,res)=>{
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
-        typeof req.body.password === 'undefined'){
+        typeof req.body.address === 'undefined' ||
+        typeof req.body.phone_number === 'undefined'){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
         })
         return
     }
-    const salt = "GAREM"
+
     const user=new User(req.body.id,
         req.body.user_name,
         req.body.mobile,
         req.body.email,
         req.body.birthdate,
-        req.body.password,
-        salt)
+        req.body.address,
+        req.body.phone_number)
 
     dao.updateCustomer(user).then(result=>{
         res.status(200).send({

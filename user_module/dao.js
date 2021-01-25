@@ -180,8 +180,8 @@ export class Dao{
 				return
 			}
 
-			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=? WHERE id=?"
-			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.id], (err,res)=>{
+			const query = "UPDATE users SET user_name=?, mobile=?, email=?, birthdate=?, address=?, phone_number=? WHERE id=?"
+			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.address, user.phone_number, user.id], (err,res)=>{
 				if(err){
 					reject(err)
 					return
