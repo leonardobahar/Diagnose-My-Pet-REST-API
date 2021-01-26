@@ -1046,7 +1046,8 @@ app.delete("/api/user/delete-medical-record-treatment-plan", (req,res)=>{
 })
 
 app.get("/api/user/retrieve-appointment", (req,res)=>{
-    if(typeof req.query.id==='undefined'){
+    if(typeof req.query.id==='undefined' &&
+       typeof req.query.doctor_id==='undefined'){
         dao.retrieveAppointment().then(result=>{
             res.status(200).send({
                 success:true,
@@ -1060,7 +1061,25 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
             })
         })
     }else if(typeof req.query.doctor_id !== 'undefined'){
-
+        dao.retrieveOneAppointmentByDoctorId(new Doctor(req.query.doctor_id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     } else{
         const appointment=new Appointment(req.query.id,null,null,null,null)
         dao.retrieveOneAppointment(appointment).then(result=>{
