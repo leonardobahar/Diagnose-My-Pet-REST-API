@@ -1144,6 +1144,25 @@ export class Dao{
 		})
 	}
 
+	cancelAppointment(appointment){
+		return new Promise((resolve,reject)=>{
+			if(!appointment instanceof Appointment){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="UPDATE appointment SET appointment_status='CANCELLED' WHERE id=? "
+			this.mysqlConn.query(query,appointment.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	finishAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){

@@ -1480,6 +1480,18 @@ app.post("/api/user/finish-appointment",(req,res)=>{
     })
 })
 
+app.post("/api/user/cancel-appointment", (req,res)=>{
+    if(req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+
+})
+
 app.delete("/api/user/delete-appointment", (req,res)=>{
     if(typeof req.query.id==='undefined'){
         res.status(400).send({
