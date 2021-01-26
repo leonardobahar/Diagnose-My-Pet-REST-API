@@ -1441,18 +1441,28 @@ app.post("/api/user/finish-appointment",(req,res)=>{
     }
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.getAppointmentId(appointment).then(result=>{
-        dao.finishAppointment(appointment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
+    dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
+        if(appointmentResult[0].appointment_status !=='PENDING' &&
+           appointmentResult[0].appointment_status !=='UPDATED' &&
+           appointmentResult[0].appointment_status !=='RESCHEDULED' &&
+           appointmentResult[0].appointment_status !=='DECLINED'){
+            dao.finishAppointment(appointment).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+            return
+        }
+        res.status(204).send({
+            success:false,
+            error:NO_SUCH_CONTENT
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
