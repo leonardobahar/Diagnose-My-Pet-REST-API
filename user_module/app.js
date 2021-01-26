@@ -1349,7 +1349,7 @@ app.post("/api/user/approve-appointment",(req,res)=>{
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
-        if(appointmentResult[0].appointment_status !== 'APPROVED' ||
+        if(appointmentResult[0].appointment_status !== 'APPROVED' &&
            appointmentResult[0].appointment_status !== 'DECLINED'){
             dao.approveAppointment(appointment).then(result=>{
                 res.status(200).send({
@@ -1395,7 +1395,7 @@ app.post("/api/user/decline-appointment",(req,res)=>{
     }
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
-        if(appointmentResult[0].appointment_status !== 'APPROVED' ||
+        if(appointmentResult[0].appointment_status !== 'APPROVED' &&
             appointmentResult[0].appointment_status !== 'DECLINED'){
             dao.declineAppointment(appointment).then(result=>{
                 res.status(200).send({
@@ -1411,7 +1411,6 @@ app.post("/api/user/decline-appointment",(req,res)=>{
             })
             return
         }
-
         res.status(204).send({
             success:false,
             error:NO_SUCH_CONTENT
