@@ -1481,7 +1481,7 @@ app.post("/api/user/finish-appointment",(req,res)=>{
 })
 
 app.post("/api/user/cancel-appointment", (req,res)=>{
-    if(req.body.id==='undefined'){
+    if(typeof req.body.id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1489,7 +1489,41 @@ app.post("/api/user/cancel-appointment", (req,res)=>{
         return
     }
 
-
+    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+        if(appointmentResult[0].appointment_status === 'PENDING' ||
+           appointmentResult[0].appointment_status === 'UPDATED'){
+            dao.cancelAppointment(new Appointment(req.body.id)).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+            return
+        }
+        res.status(204).send({
+            success:false,
+            error:NO_SUCH_CONTENT
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.delete("/api/user/delete-appointment", (req,res)=>{
