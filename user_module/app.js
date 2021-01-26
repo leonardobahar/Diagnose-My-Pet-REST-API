@@ -1059,7 +1059,9 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    }else{
+    }else if(typeof req.query.doctor_id !== 'undefined'){
+
+    } else{
         const appointment=new Appointment(req.query.id,null,null,null,null)
         dao.retrieveOneAppointment(appointment).then(result=>{
             res.status(200).send({

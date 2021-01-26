@@ -919,7 +919,7 @@ export class Dao{
 					return
 				}
 
-				const attachment=result.map(rowDataPacket=>{
+				const schedule=result.map(rowDataPacket=>{
 					return{
 						id:rowDataPacket.id,
 						appointment_name:rowDataPacket.appointment_name,
@@ -935,7 +935,7 @@ export class Dao{
 						doctor_name:rowDataPacket.doctor_name
 					}
 				})
-				resolve(attachment)
+				resolve(schedule)
 			})
 		})
 	}
@@ -953,7 +953,7 @@ export class Dao{
 					reject(error)
 					return
 				}else if(result.length>0){
-					const attachment=result.map(rowDataPacket=>{
+					const schedule=result.map(rowDataPacket=>{
 						return{
 							id:rowDataPacket.id,
 							appointment_name:rowDataPacket.appointment_name,
@@ -969,7 +969,44 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name
 						}
 					})
-					resolve(attachment)
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	retrieveOneAppointmentByDoctorId(doctor){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name " +
+				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
+				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
+				"WHERE a.doctor_id=? "
+			this.mysqlConn.query(query, doctor.id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}else if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							appointment_name:rowDataPacket.appointment_name,
+							appointment_time:rowDataPacket.appointment_time,
+							duration:rowDataPacket.duration,
+							appointment_status:rowDataPacket.appointment_status,
+							user_id:rowDataPacket.user_id,
+							user_name:rowDataPacket.user_name,
+							is_real_appointment:rowDataPacket.is_real_appointment,
+							patient_id:rowDataPacket.patient_id,
+							pet_name:rowDataPacket.patient_name,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name
+						}
+					})
+					resolve(schedule)
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
