@@ -1262,7 +1262,6 @@ app.post("/api/user/add-appointment-description",(req,res)=>{
 app.post("/api/user/update-appointment", (req,res)=>{
     if(typeof req.body.id==='undefined' ||
         typeof req.body.appointment_name==='undefined' ||
-        typeof req.body.appointment_time==='undefined' ||
         typeof req.body.is_real_appointment==='undefined' ||
         typeof req.body.doctor_id==='undefined'){
         res.status(400).send({
@@ -1277,8 +1276,8 @@ app.post("/api/user/update-appointment", (req,res)=>{
 
         const appointment=new Appointment(req.body.id,
             req.body.appointment_name,
-            req.body.appointment_time,
-            req.body.duration,
+            null,
+            null,
             req.body.user_id,
             req.body.is_real_appointment,
             req.body.patient_id,
@@ -1366,8 +1365,8 @@ app.post("/api/user/update-appointment", (req,res)=>{
 
     const appointment=new Appointment(req.body.id,
         req.body.appointment_name,
-        req.body.appointment_time,
-        req.body.duration,
+        null,
+        null,
         null,
         req.body.is_real_appointment,
         null,
