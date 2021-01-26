@@ -1204,7 +1204,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
     if(typeof req.body.id==='undefined' ||
         typeof req.body.appointment_name==='undefined' ||
         typeof req.body.appointment_time==='undefined' ||
-        typeof req.body.duration==='undefined' ||
         typeof req.body.user_id==='undefined' ||
         typeof req.body.is_real_appointment==='undefined' ||
         typeof req.body.patient_id==='undefined' ||
@@ -1349,18 +1348,26 @@ app.post("/api/user/approve-appointment",(req,res)=>{
     }
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.getAppointmentId(appointment).then(result=>{
-        dao.approveAppointment(appointment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
+    dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
+        if(appointmentResult[0].appointment_status !== 'APPROVED' ||
+           appointmentResult[0].appointment_status !== 'DECLINED'){
+            dao.approveAppointment(appointment).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+            return
+        }
+        res.status(204).send({
+            success:false,
+            error:NO_SUCH_CONTENT
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
@@ -1386,20 +1393,28 @@ app.post("/api/user/decline-appointment",(req,res)=>{
         })
         return
     }
-
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.getAppointmentId(appointment).then(result=>{
-        dao.declineAppointment(appointment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
+    dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
+        if(appointmentResult[0].appointment_status !== 'APPROVED' ||
+            appointmentResult[0].appointment_status !== 'DECLINED'){
+            dao.declineAppointment(appointment).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+            return
+        }
+
+        res.status(204).send({
+            success:false,
+            error:NO_SUCH_CONTENT
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
