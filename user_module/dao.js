@@ -1184,7 +1184,7 @@ export class Dao{
 	deleteAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="DELETE FROM appointment WHERE id=?"
+				const query="UPDATE appointment SET appointment_status='DELETED' WHERE id=?"
 				this.mysqlConn.query(query, appointment.id, (error,result)=>{
 					if(error){
 						reject(error)
