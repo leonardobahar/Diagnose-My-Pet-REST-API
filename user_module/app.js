@@ -1350,7 +1350,8 @@ app.post("/api/user/approve-appointment",(req,res)=>{
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
         if(appointmentResult[0].appointment_status !== 'APPROVED' &&
-           appointmentResult[0].appointment_status !== 'DECLINED'){
+           appointmentResult[0].appointment_status !== 'DECLINED' &&
+            appointmentResult[0].appointment_status !== 'FINISHED'){
             dao.approveAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
@@ -1396,7 +1397,8 @@ app.post("/api/user/decline-appointment",(req,res)=>{
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
         if(appointmentResult[0].appointment_status !== 'APPROVED' &&
-            appointmentResult[0].appointment_status !== 'DECLINED'){
+            appointmentResult[0].appointment_status !== 'DECLINED' &&
+            appointmentResult[0].appointment_status !== 'FINISHED'){
             dao.declineAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
@@ -1442,10 +1444,7 @@ app.post("/api/user/finish-appointment",(req,res)=>{
 
     const appointment=new Appointment(req.body.id,null,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
-        if(appointmentResult[0].appointment_status !=='PENDING' &&
-           appointmentResult[0].appointment_status !=='UPDATED' &&
-           appointmentResult[0].appointment_status !=='RESCHEDULED' &&
-           appointmentResult[0].appointment_status !=='DECLINED'){
+        if(appointmentResult[0].appointment_status === 'APPROVED'){
             dao.finishAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
@@ -1490,8 +1489,9 @@ app.post("/api/user/cancel-appointment", (req,res)=>{
     }
 
     dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
-        if(appointmentResult[0].appointment_status === 'PENDING' ||
-           appointmentResult[0].appointment_status === 'UPDATED'){
+        if(appointmentResult[0].appointment_status !== 'APPROVED' &&
+            appointmentResult[0].appointment_status !== 'DECLINED' &&
+            appointmentResult[0].appointment_status !== 'FINISHED'){
             dao.cancelAppointment(new Appointment(req.body.id)).then(result=>{
                 res.status(200).send({
                     success:true,
