@@ -1107,9 +1107,7 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
 app.post("/api/user/add-appointment", (req,res)=>{
     if(typeof req.body.appointment_name === 'undefined' ||
         typeof req.body.appointment_time === 'undefined' ||
-        typeof req.body.user_id === 'undefined' ||
         typeof req.body.is_real_appointment==='undefined' ||
-        typeof req.body.patient_id === 'undefined' ||
         typeof req.body.doctor_id==='undefined'){
         res.status(400).send({
             success:false,
@@ -1120,16 +1118,33 @@ app.post("/api/user/add-appointment", (req,res)=>{
 
     const appointment=new Appointment(null, req.body.appointment_name.toUpperCase(), req.body.appointment_time, req.body.duration, req.body.user_id,req.body.is_real_appointment, req.body.patient_id, req.body.doctor_id,'PENDING')
 
-    dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
-        dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
-            dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                dao.addAppointment(appointment).then(result=>{
-                    res.status(200).send({
-                        success:true,
-                        result:result
+    if(typeof req.body.user_id !== 'undefined' &&
+       typeof req.body.patient_id !== 'undefined'){
+        dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
+            dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
+                dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                    dao.addAppointment(appointment).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
                     })
-                }).catch(err=>{
-                    console.error(err)
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+
+                    console.error(error)
                     res.status(500).send({
                         success:false,
                         error:SOMETHING_WENT_WRONG
@@ -1160,6 +1175,22 @@ app.post("/api/user/add-appointment", (req,res)=>{
             }
 
             console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+        return
+    }
+
+    dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+        dao.addAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
@@ -1225,9 +1256,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
     if(typeof req.body.id==='undefined' ||
         typeof req.body.appointment_name==='undefined' ||
         typeof req.body.appointment_time==='undefined' ||
-        typeof req.body.user_id==='undefined' ||
         typeof req.body.is_real_appointment==='undefined' ||
-        typeof req.body.patient_id==='undefined' ||
         typeof req.body.doctor_id==='undefined'){
         res.status(400).send({
             success:false,
