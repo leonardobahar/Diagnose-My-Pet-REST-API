@@ -150,7 +150,8 @@ app.post("/api/user/user-login",(req,res)=>{
         res.status(200).send({
             success: true,
             authentication_approval: true,
-            message: 'Log in Successful'
+            message: 'Log in Successful',
+            result:result
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){

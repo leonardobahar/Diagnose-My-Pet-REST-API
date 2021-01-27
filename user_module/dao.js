@@ -150,7 +150,7 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT user_name, salt, password FROM users WHERE user_name=?"
+			const query="SELECT id, user_name, email, salt, password FROM users WHERE user_name=?"
 			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
 				if(error){
 					reject(error)
@@ -160,7 +160,14 @@ export class Dao{
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
-						resolve(bcryptedPassword)
+						const user=result.map(rowDatapacket=>{
+							return{
+								user_id:rowDatapacket.id,
+								user_name:rowDatapacket.user_name,
+								email:rowDatapacket.email
+							}
+						})
+						resolve(user)
 					}else{
 						reject(NO_SUCH_CONTENT)
 					}
