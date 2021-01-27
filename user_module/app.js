@@ -401,7 +401,8 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
 })
 
 app.get("/api/user/retrieve-patient",(req,res)=>{
-    if(typeof req.query.id==='undefined'){
+    if(typeof req.query.id==='undefined' &&
+       typeof req.query.owner_id==='undefined'){
         dao.retrievePatient().then(result=>{
             res.status(200).send({
                 success: true,
@@ -414,7 +415,29 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
                 error: SOMETHING_WENT_WRONG
             })
         })
-    }else{
+    }else if(typeof req.query.id==='undefined' &&
+        typeof req.query.owner_id!=='undefined'){
+        dao.retrievePatientsByOwnerId(req.query.owner_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+    else{
         const patient=new Patient(req.query.id,null,null,null)
 
         dao.retrieveOnePatient(patient).then(result=>{
@@ -423,6 +446,13 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -1049,8 +1079,8 @@ app.delete("/api/user/delete-medical-record-treatment-plan", (req,res)=>{
 app.get("/api/user/retrieve-appointment", (req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
-        typeof req.query.date1 =='undefined' &&
-        typeof req.query.date2 =='undefined'){
+        typeof req.query.date1 ==='undefined' &&
+        typeof req.query.date2 ==='undefined'){
         dao.retrieveAppointment().then(result=>{
             res.status(200).send({
                 success:true,
