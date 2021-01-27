@@ -1047,7 +1047,9 @@ app.delete("/api/user/delete-medical-record-treatment-plan", (req,res)=>{
 
 app.get("/api/user/retrieve-appointment", (req,res)=>{
     if(typeof req.query.id==='undefined' &&
-       typeof req.query.doctor_id==='undefined'){
+       typeof req.query.doctor_id==='undefined' &&
+        typeof req.query.date1 =='undefined' &&
+        typeof req.query.date2 =='undefined'){
         dao.retrieveAppointment().then(result=>{
             res.status(200).send({
                 success:true,
