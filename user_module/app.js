@@ -1271,18 +1271,18 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }
 
+    const appointment=new Appointment(req.body.id,
+        req.body.appointment_name,
+        null,
+        null,
+        req.body.user_id,
+        req.body.is_real_appointment,
+        req.body.patient_id,
+        req.body.doctor_id,
+        'UPDATED')
+
     if(typeof req.body.user_id !== 'undefined' &&
         typeof req.body.patient_id !== 'undefined'){
-
-        const appointment=new Appointment(req.body.id,
-            req.body.appointment_name,
-            null,
-            null,
-            req.body.user_id,
-            req.body.is_real_appointment,
-            req.body.patient_id,
-            req.body.doctor_id,
-            'UPDATED')
 
         dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
             dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
@@ -1362,16 +1362,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
         })
         return
     }
-
-    const appointment=new Appointment(req.body.id,
-        req.body.appointment_name,
-        null,
-        null,
-        null,
-        req.body.is_real_appointment,
-        null,
-        req.body.doctor_id,
-        'UPDATED')
 
     dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
         dao.updateAppointment(appointment).then(result=>{
