@@ -961,10 +961,11 @@ export class Dao{
 				}
 
 				const schedule=result.map(rowDataPacket=>{
+					const appointmentTime =  moment(rowDataPacket.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
 					return{
 						id:rowDataPacket.id,
 						appointment_name:rowDataPacket.appointment_name,
-						appointment_time:rowDataPacket.appointment_time,
+						appointment_time:appointmentTime,
 						duration:rowDataPacket.duration,
 						appointment_status:rowDataPacket.appointment_status,
 						user_id:rowDataPacket.user_id,
