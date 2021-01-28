@@ -436,8 +436,7 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    }
-    else{
+    } else{
         const patient=new Patient(req.query.id,null,null,null)
 
         dao.retrieveOnePatient(patient).then(result=>{
