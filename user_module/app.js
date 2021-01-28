@@ -1512,7 +1512,9 @@ app.post("/api/user/reschedule-appointment",(req,res)=>{
 })
 
 app.post("/api/user/approve-appointment",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.id==='undefined' ||
+       typeof req.body.appointment_time==='undefined' ||
+       typeof req.body.duration==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1520,8 +1522,8 @@ app.post("/api/user/approve-appointment",(req,res)=>{
         return
     }
 
-    const appointment=new Appointment(req.body.id,null,null,null,null,null)
-    dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
+    const appointment=new Appointment(req.body.id,null,req.body.appointment_time,req.body.duration,null,null)
+    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
         if(appointmentResult[0].appointment_status !== 'APPROVED' &&
            appointmentResult[0].appointment_status !== 'DECLINED' &&
             appointmentResult[0].appointment_status !== 'FINISHED' &&
