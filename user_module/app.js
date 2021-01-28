@@ -1524,7 +1524,8 @@ app.post("/api/user/approve-appointment",(req,res)=>{
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
         if(appointmentResult[0].appointment_status !== 'APPROVED' &&
            appointmentResult[0].appointment_status !== 'DECLINED' &&
-            appointmentResult[0].appointment_status !== 'FINISHED'){
+            appointmentResult[0].appointment_status !== 'FINISHED' &&
+            appointmentResult[0].appointment_status !== 'DELETED'){
             dao.approveAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
