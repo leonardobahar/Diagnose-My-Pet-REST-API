@@ -1358,7 +1358,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
 
     if(typeof req.body.user_id !== 'undefined' &&
         typeof req.body.patient_id !== 'undefined'){
-
         dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
             dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
                 dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
@@ -1383,7 +1382,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
                             })
                             return
                         }
-
                         console.error(error)
                         res.status(500).send({
                             success:false,
