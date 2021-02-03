@@ -143,6 +143,25 @@ export class Dao{
 		})
 	}
 
+	confirmUserEmail(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="UPDATE users SET email_is_confirmed=1 WHERE id=? "
+			this.mysqlConn.query(query,user.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	loginCustomer(user){
 		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
