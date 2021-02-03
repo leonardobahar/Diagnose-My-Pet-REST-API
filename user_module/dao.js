@@ -1282,7 +1282,6 @@ export class Dao{
 			if(appointment instanceof Appointment){
 				const query="UPDATE appointment SET appointment_time=?, duration=?, appointment_status='APPROVED' WHERE id=?"
 				const appointmentTime=moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-				console.log(appointmentTime)
 				this.mysqlConn.query(query,[appointmentTime,appointment.duration,appointment.id],(error,result)=>{
 					if(error){
 						reject(error)

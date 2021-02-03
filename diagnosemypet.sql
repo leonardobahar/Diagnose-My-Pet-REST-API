@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS `users`(
 	address TEXT UNIQUE,
 	password VARCHAR(255),
 	salt VARCHAR(255),
-	role VARCHAR(255)
+	role VARCHAR(255),
+	email_is_confirmed TINYINT(1) DEFAULT 0;
 );
 
 CREATE TABLE IF NOT EXISTS `doctor`(
