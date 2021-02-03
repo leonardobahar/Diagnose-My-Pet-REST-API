@@ -135,6 +135,44 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
+app.post("/api/user/confirm-user-email",(req,res)=>{
+    if(typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneUser(new User(req.body.id)).then(result=>{
+        dao.confirmUserEmail(new User(req.body.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/user-login",(req,res)=>{
     if(typeof req.body.user_name==='undefined' ||
        typeof req.body.password==='undefined'){
