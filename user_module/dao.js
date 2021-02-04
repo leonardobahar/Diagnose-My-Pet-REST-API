@@ -94,6 +94,27 @@ export class Dao{
 		})
 	}
 
+	retrieveUserId(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT id FROM users WHERE id=? "
+			this.mysqlConn.query(query,user.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}else if(result.length>0){
+					resolve(result[0].id)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND id=?"
