@@ -144,7 +144,7 @@ app.post("/api/user/confirm-user-email",(req,res)=>{
         return
     }
 
-    dao.retrieveOneUser(new User(req.body.id)).then(result=>{
+    dao.retrieveUserId(new User(req.body.id)).then(result=>{
         dao.confirmUserEmail(new User(req.body.id)).then(result=>{
             res.status(200).send({
                 success:true,
