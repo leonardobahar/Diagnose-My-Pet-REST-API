@@ -185,11 +185,19 @@ app.post("/api/user/user-login",(req,res)=>{
 
     const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
     dao.loginCustomer(user).then(loginResult=> {
-        res.status(200).send({
-            success: true,
-            authentication_approval: true,
-            message: 'Log in Successful',
-            result:loginResult
+        dao.userLastSignIn(loginResult[0].user_id).then(result=>{
+            res.status(200).send({
+                success: true,
+                authentication_approval: true,
+                message: 'Log in Successful',
+                result:loginResult
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){

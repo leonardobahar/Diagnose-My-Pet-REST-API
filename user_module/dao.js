@@ -218,11 +218,11 @@ export class Dao{
 		})
 	}
 
-	userLastSignIn(id, date){
+	userLastSignIn(id){
 		return new Promise((resolve,reject)=>{
-			const query="UPDATE users SET last_sign_in= ? " +
+			const query="UPDATE users SET last_sign_in= NOW() " +
 				"WHERE id=? "
-			this.mysqlConn.query(query,[date,id],(error,result)=>{
+			this.mysqlConn.query(query,id,(error,result)=>{
 				if(error){
 					reject(error)
 					return
