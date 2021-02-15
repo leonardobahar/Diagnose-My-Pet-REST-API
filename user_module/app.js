@@ -310,7 +310,6 @@ app.post("/api/user/update-user",(req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
-
 })
 
 app.post("/api/user/change-password",(req,res)=>{
