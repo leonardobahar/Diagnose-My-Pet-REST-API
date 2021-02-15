@@ -101,7 +101,38 @@ app.post("/api/user/register-user", (req, res)=>{
             error: WRONG_BODY_FORMAT
         })
         return
-    }else{
+    }else if(typeof req.body.role !== 'undefined'){
+        const user = new User(null,
+            req.body.user_name,
+            req.body.mobile,
+            req.body.email,
+            req.body.birthdate,
+            req.body.address,
+            req.body.password,
+            null,
+            req.body.role)
+
+        dao.registerUser(user).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    } else{
         const user = new User(null,
             req.body.user_name,
             req.body.mobile,
