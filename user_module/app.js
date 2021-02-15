@@ -184,12 +184,12 @@ app.post("/api/user/user-login",(req,res)=>{
     }
 
     const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
-    dao.loginCustomer(user).then(result=> {
+    dao.loginCustomer(user).then(loginResult=> {
         res.status(200).send({
             success: true,
             authentication_approval: true,
             message: 'Log in Successful',
-            result:result
+            result:loginResult
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
