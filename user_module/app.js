@@ -101,7 +101,7 @@ app.post("/api/user/register-user", (req, res)=>{
             error: WRONG_BODY_FORMAT
         })
         return
-    }else if(typeof req.body.role !== 'undefined'){
+    }else{
         const user = new User(null,
             req.body.user_name,
             req.body.mobile,
@@ -110,7 +110,7 @@ app.post("/api/user/register-user", (req, res)=>{
             req.body.address,
             req.body.password,
             null,
-            req.body.role)
+            'CUSTOMER')
 
         dao.registerUser(user).then(result=>{
             res.status(200).send({
@@ -132,7 +132,22 @@ app.post("/api/user/register-user", (req, res)=>{
                 })
             }
         })
-    } else{
+    }
+})
+
+app.post("/api/user/register-admin",(req,res)=>{
+    if (typeof req.body.user_name === 'undefined' ||
+        typeof req.body.mobile === 'undefined' ||
+        typeof req.body.email === 'undefined' ||
+        typeof req.body.birthdate === 'undefined' ||
+        typeof req.body.address === 'undefined' ||
+        typeof req.body.password === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }else{
         const user = new User(null,
             req.body.user_name,
             req.body.mobile,
@@ -141,7 +156,7 @@ app.post("/api/user/register-user", (req, res)=>{
             req.body.address,
             req.body.password,
             null,
-            'CUSTOMER')
+            'ADMIN')
 
         dao.registerUser(user).then(result=>{
             res.status(200).send({
