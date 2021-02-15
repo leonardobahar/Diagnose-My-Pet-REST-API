@@ -406,7 +406,6 @@ app.delete("/api/diagnosis/delete-animal-type", (req,res)=>{
     })
 })
 
-
 app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
     if (typeof req.query.disease_id==='undefined'){
         dao.retrieveDisease().then(result=>{
