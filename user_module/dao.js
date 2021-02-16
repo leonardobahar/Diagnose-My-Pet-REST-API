@@ -190,7 +190,7 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT id, user_name, email, salt, password FROM users WHERE user_name=?"
+			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE user_name=?"
 			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
 				if(error){
 					reject(error)
@@ -204,7 +204,8 @@ export class Dao{
 							return{
 								user_id:rowDatapacket.id,
 								user_name:rowDatapacket.user_name,
-								email:rowDatapacket.email
+								email:rowDatapacket.email,
+								role:rowDatapacket.role
 							}
 						})
 						resolve(user)
