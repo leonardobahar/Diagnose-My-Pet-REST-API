@@ -1246,7 +1246,29 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    } else{
+    }else if(typeof req.body.doctor_name!=='undefined'){
+        const doctor=new Doctor(null,req.body.doctor_name)
+        dao.retrieveAppointmentByDoctorName(doctor).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+    else{
         const appointment=new Appointment(req.query.id,null,null,null,null)
         dao.retrieveOneAppointment(appointment).then(result=>{
             res.status(200).send({
