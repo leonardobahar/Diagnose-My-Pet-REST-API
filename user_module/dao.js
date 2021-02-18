@@ -1481,6 +1481,7 @@ export class Dao{
 				for(let i=0; i<result.length; i++){
 					participants.push(new Participant(
 						result[i].id,
+						result[i].full_name,
 						result[i].youtube_name,
 						result[i].youtube_email,
 						result[i].phone_number
