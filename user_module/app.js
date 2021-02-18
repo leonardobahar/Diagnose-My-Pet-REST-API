@@ -1958,6 +1958,44 @@ app.post("/api/user/update-participant",(req,res)=>{
     })
 })
 
+app.delete("/api/user/delete-participant",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneParticipant(new Participant(req.query.id)).then(result=>{
+        dao.deleteParticipant(new Participant(req.query.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:flase,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 /*
  / RETRIEVE MEDICAL RECORD
  / RETURN MEDICAL_RECORD_ITSELF + FILENAMES
