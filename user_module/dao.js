@@ -1494,7 +1494,7 @@ export class Dao{
 		})
 	}
 
-	retrieveOneParticipants(participant){
+	retrieveOneParticipant(participant){
 		return new Promise((resolve,reject)=>{
 			if(!participant instanceof Participant){
 				reject(MISMATCH_OBJ_TYPE)

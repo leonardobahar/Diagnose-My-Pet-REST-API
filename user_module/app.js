@@ -16,7 +16,7 @@ import {
     AnimalType, Appointment,
     Disease, Doctor,
     MedicalRecordAttachment,
-    MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
+    MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan, Participant,
     Patient,
     Symptoms, TreatmentPlan,
     User
@@ -1836,6 +1836,43 @@ app.delete("/api/user/delete-appointment", (req,res)=>{
             error:SOMETHING_WENT_WRONG
         })
     })
+})
+
+app.get("/api/user/retrieve-participants",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveParticipants().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        dao.retrieveOneParticipant(new Participant(req.query.id)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
 })
 
 /*
