@@ -195,7 +195,7 @@ export class Payment{
 	}
 }
 
-export class Competition{
+export class Participant{
 	constructor(id, youtube_email, youtube_name, user_id) {
 		this.id=id
 		this.youtube_email=youtube_email

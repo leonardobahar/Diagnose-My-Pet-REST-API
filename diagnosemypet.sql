@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS `payment`(
     `pm_id_transaction` INT(7),
     FOREIGN KEY (`pm_id_transaction`) REFERENCES transaction(`t_id_transaction`) ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TABLE IF NOT EXISTS `competition`(
+CREATE TABLE IF NOT EXISTS `participants`(
     `id` INT(7) PRIMARY KEY AUTO_INCREMENT,
     `youtube_email` VARCHAR(255) NOT NULL,
     `youtube_name` VARCHAR(255) NOT NULL,

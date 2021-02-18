@@ -14,9 +14,9 @@ import {
 import {
 	AnimalCategory,
 	AnimalType,
-	Appointment, Competition, Doctor,
+	Appointment, Doctor,
 	MedicalRecordAttachment,
-	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
+	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan, Participant,
 	Patient, Symptoms, TreatmentPlan,
 	User
 } from "../model";
@@ -1470,9 +1470,9 @@ export class Dao{
 
 	retrieveParticipants(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT c.id, c.youtube_email, c.youtube_name, c.user_id, " +
+			const query="SELECT p.id, p.youtube_email, p.youtube_name, p.user_id, " +
 				"u.user_name, u.mobile " +
-				"FROM competition c LEFT OUTER JOIN users u ON c.user_id=u.id "
+				"FROM participants p LEFT OUTER JOIN users u ON p.user_id=u.id "
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
@@ -1494,21 +1494,21 @@ export class Dao{
 		})
 	}
 
-	registerCompetition(competition){
+	registerParticipant(participant){
 		return new Promise((resolve,reject)=>{
-			if(!competition instanceof Competition){
+			if(!participant instanceof Participant){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 			const query="INSERT INTO competition (`youtube_email`, `youtube_name`, `user_id`) VALUES(?, ?, ?) "
-			this.mysqlConn.query(query,[competition.youtube_email, competition.youtube_name, competition.user_id],(error,result)=>{
+			this.mysqlConn.query(query,[participant.youtube_email, participant.youtube_name, participant.user_id],(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				competition.id=result.insertId
-				resolve(competition)
+				participant.id=result.insertId
+				resolve(participant)
 			})
 		})
 	}
