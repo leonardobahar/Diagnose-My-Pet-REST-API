@@ -2012,8 +2012,8 @@ app.listen(PORT, ()=>{
 })
 
 // SSL Certs for codedoc.xyz
-var privateKey  = fs.readFileSync('../sslcert/privkey.pem', 'utf8');
-var certificate = fs.readFileSync('../sslcert/fullchain.pem', 'utf8');
+var privateKey  = fs.readFileSync('sslcerts/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('sslcerts/fullchain.pem', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 const https = require('https')
 const httpsServer = https.createServer(credentials, app);
