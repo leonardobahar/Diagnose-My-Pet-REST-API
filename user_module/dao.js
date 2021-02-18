@@ -14,7 +14,7 @@ import {
 import {
 	AnimalCategory,
 	AnimalType,
-	Appointment, Doctor,
+	Appointment, Competition, Doctor,
 	MedicalRecordAttachment,
 	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan,
 	Patient, Symptoms, TreatmentPlan,
@@ -1465,6 +1465,25 @@ export class Dao{
 			} else{
 				reject(MISMATCH_OBJ_TYPE)
 			}
+		})
+	}
+
+	registerCompetition(competition){
+		return new Promise((resolve,reject)=>{
+			if(!competition instanceof Competition){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="INSERT INTO competition (`youtube_email`, `youtube_name`, `user_id`) VALUES(?, ?, ?) "
+			this.mysqlConn.query(query,[competition.youtube_email, competition.youtube_name, competition.user_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				competition.id=result.insertId
+				resolve(competition)
+			})
 		})
 	}
 }

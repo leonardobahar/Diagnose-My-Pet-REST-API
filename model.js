@@ -194,3 +194,12 @@ export class Payment{
 		this.id_transaction=id_transaction
 	}
 }
+
+export class Competition{
+	constructor(id, youtube_email, youtube_name, user_id) {
+		this.id=id
+		this.youtube_email=youtube_email
+		this.youtube_name=youtube_name
+		this.user_id=user_id
+	}
+}
