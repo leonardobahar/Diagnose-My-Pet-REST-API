@@ -1875,17 +1875,17 @@ app.get("/api/user/retrieve-participants",(req,res)=>{
     }
 })
 
-app.post("/api/user/add-participant",(req,res)=>{
-    if(typeof req.body.youtube_email==='undefined' ||
-       typeof req.body.youtube_name==='undefined' ||
-       typeof req.body.user_id==='undefined'){
+app.post("/api/user/register-participant",(req,res)=>{
+    if(typeof req.body.youtube_name==='undefined' ||
+       typeof req.body.youtube_email==='undefined' ||
+       typeof req.body.phone_number==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
         })
         return
     }
-    const participant=new Participant(null,req.body.youtube_email,req.body.youtube_name,req.body.user_id)
+    const participant=new Participant(null,req.body.youtube_name,req.body.youtube_email,req.body.phone_number)
 
     dao.retrieveUserId(new User(req.body.user_id)).then(result=>{
         dao.registerParticipant(participant).then(result=>{
