@@ -1917,9 +1917,9 @@ app.post("/api/user/register-participant",(req,res)=>{
 })
 
 app.post("/api/user/update-participant",(req,res)=>{
-    if(typeof req.body.youtube_email==='undefined' ||
-        typeof req.body.youtube_name==='undefined' ||
-        typeof req.body.user_id==='undefined' ||
+    if(typeof req.body.youtube_name==='undefined' ||
+        typeof req.body.youtube_email==='undefined' ||
+        typeof req.body.phone_number==='undefined' ||
         typeof req.body.id==='undefined'){
         res.status(400).send({
             success:false,
@@ -1927,7 +1927,7 @@ app.post("/api/user/update-participant",(req,res)=>{
         })
         return
     }
-    const participant=new Participant(req.body.id,req.body.youtube_email,req.body.youtube_name,req.body.user_id)
+    const participant=new Participant(req.body.id,req.body.youtube_name,req.body.youtube_email,req.body.phone_number)
 
     dao.retrieveOneParticipant(new Participant(req.body.id)).then(result=>{
         dao.updateParticipant(participant).then(result=>{
