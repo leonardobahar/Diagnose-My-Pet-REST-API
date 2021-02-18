@@ -1564,4 +1564,22 @@ export class Dao{
 			})
 		})
 	}
+
+	deleteParticipant(participant){
+		return new Promise((resolve,reject)=>{
+			if(!participant instanceof Participant){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="DELETE participant WHERE id=? "
+			this.mysqlConn.query(query,participant.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
 }
