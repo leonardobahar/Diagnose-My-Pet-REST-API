@@ -1511,6 +1511,7 @@ export class Dao{
 					for(let i=0; i<result.length; i++){
 						participants.push(new Participant(
 							result[i].id,
+							result[i].full_name,
 							result[i].youtube_name,
 							result[i].youtube_email,
 							result[i].phone_number
@@ -1530,8 +1531,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="INSERT INTO participants (`youtube_name`, `youtube_email`, `phone_number`) VALUES(?, ?, ?) "
-			this.mysqlConn.query(query,[participant.youtube_name, participant.youtube_email, participant.phone_number],(error,result)=>{
+			const query="INSERT INTO participants (`full_name`, `youtube_name`, `youtube_email`, `phone_number`) VALUES(?, ?, ?, ?) "
+			this.mysqlConn.query(query,[participant.full_name,participant.youtube_name, participant.youtube_email, participant.phone_number],(error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -1549,8 +1550,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="UPDATE participants SET youtube_name=?, youtube_email=?, phone_number=? WHERE id=? "
-			this.mysqlConn.query(query,[participant.youtube_name,participant.youtube_email,participant.phone_number,participant.id],(error,result)=>{
+			const query="UPDATE participants SET full_name=?, youtube_name=?, youtube_email=?, phone_number=? WHERE id=? "
+			this.mysqlConn.query(query,[participant.full_name,participant.youtube_name,participant.youtube_email,participant.phone_number,participant.id],(error,result)=>{
 				if(error){
 					reject(error)
 					return

@@ -196,8 +196,9 @@ export class Payment{
 }
 
 export class Participant{
-	constructor(id, youtube_name, youtube_email, phone_number) {
+	constructor(id, full_name, youtube_name, youtube_email, phone_number) {
 		this.id=id
+		this.full_name=full_name
 		this.youtube_name=youtube_name
 		this.youtube_email=youtube_email
 		this.phone_number=phone_number

@@ -201,6 +201,7 @@ CREATE TABLE IF NOT EXISTS `payment`(
 
 CREATE TABLE IF NOT EXISTS `participants`(
     `id` INT(7) PRIMARY KEY AUTO_INCREMENT,
+    `full_name` VARCHAR(255),
     `youtube_name` VARCHAR(255),
     `youtube_email` VARCHAR(255),
     `phone_number` VARCHAR(255)
