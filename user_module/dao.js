@@ -1567,7 +1567,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="DELETE participant WHERE id=? "
+			const query="DELETE FROM participantS WHERE id=? "
 			this.mysqlConn.query(query,participant.id,(error,result)=>{
 				if(error){
 					reject(error)
