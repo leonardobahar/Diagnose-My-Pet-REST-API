@@ -1887,27 +1887,12 @@ app.post("/api/user/register-participant",(req,res)=>{
     }
     const participant=new Participant(null,req.body.youtube_name,req.body.youtube_email,req.body.phone_number)
 
-    dao.retrieveUserId(new User(req.body.user_id)).then(result=>{
-        dao.registerParticipant(participant).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+    dao.registerParticipant(participant).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
-            return
-        }
         console.error(error)
         res.status(500).send({
             success:false,
