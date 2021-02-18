@@ -1470,25 +1470,22 @@ export class Dao{
 
 	retrieveParticipants(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.youtube_email, p.youtube_name, p.user_id, " +
-				"u.user_name, u.mobile " +
-				"FROM participants p LEFT OUTER JOIN users u ON p.user_id=u.id "
+			const query="SELECT * FROM participants "
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				const participants=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						youtube_email:rowDataPacket.youtube_email,
-						youtube_name:rowDataPacket.youtube_name,
-						user_id:rowDataPacket.user_id,
-						user_name:rowDataPacket.user_name,
-						mobile:rowDataPacket.mobile
-					}
-				})
+				let participants=[]
+				for(let i=0; i<result.length; i++){
+					participants.push(new Participant(
+						result[i].id,
+						result[i].youtube_name,
+						result[i].youtube_email,
+						result[i].phone_number
+					))
+				}
 				resolve(participants)
 			})
 		})
