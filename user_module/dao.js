@@ -1534,7 +1534,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="INSERT INTO competition (`youtube_email`, `youtube_name`, `user_id`) VALUES(?, ?, ?) "
+			const query="INSERT INTO participant (`youtube_email`, `youtube_name`, `user_id`) VALUES(?, ?, ?) "
 			this.mysqlConn.query(query,[participant.youtube_email, participant.youtube_name, participant.user_id],(error,result)=>{
 				if(error){
 					reject(error)
@@ -1542,6 +1542,24 @@ export class Dao{
 				}
 
 				participant.id=result.insertId
+				resolve(participant)
+			})
+		})
+	}
+
+	updateParticipant(participant){
+		return new Promise((resolve,reject)=>{
+			if(!participant instanceof Participant){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="UPDATE participant SET youtube_email=?, youtube_name=?, user_id=? 	WHERE id=? "
+			this.mysqlConn.query(query,[participant.youtube_email,participant.youtube_name,participant.user_id,participant.id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
 				resolve(participant)
 			})
 		})
