@@ -1549,8 +1549,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="UPDATE participant SET youtube_email=?, youtube_name=?, user_id=? 	WHERE id=? "
-			this.mysqlConn.query(query,[participant.youtube_email,participant.youtube_name,participant.user_id,participant.id],(error,result)=>{
+			const query="UPDATE participant SET youtube_name=?, youtube_email=?, phone_number=? WHERE id=? "
+			this.mysqlConn.query(query,[participant.youtube_name,participant.youtube_email,participant.phone_number,participant.id],(error,result)=>{
 				if(error){
 					reject(error)
 					return
