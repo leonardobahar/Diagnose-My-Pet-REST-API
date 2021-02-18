@@ -1530,8 +1530,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="INSERT INTO participants (`youtube_email`, `youtube_name`, `user_id`) VALUES(?, ?, ?) "
-			this.mysqlConn.query(query,[participant.youtube_email, participant.youtube_name, participant.user_id],(error,result)=>{
+			const query="INSERT INTO participants (`youtube_name`, `youtube_email`, `phone_number`) VALUES(?, ?, ?) "
+			this.mysqlConn.query(query,[participant.youtube_name, participant.youtube_email, participant.phone_number],(error,result)=>{
 				if(error){
 					reject(error)
 					return
