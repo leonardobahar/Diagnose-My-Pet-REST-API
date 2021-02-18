@@ -1468,6 +1468,32 @@ export class Dao{
 		})
 	}
 
+	retrieveParticipants(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT c.id, c.youtube_email, c.youtube_name, c.user_id, " +
+				"u.user_name, u.mobile " +
+				"FROM competition c LEFT OUTER JOIN users u ON c.user_id=u.id "
+			this.mysqlConn.query(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const participants=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						youtube_email:rowDataPacket.youtube_email,
+						youtube_name:rowDataPacket.youtube_name,
+						user_id:rowDataPacket.user_id,
+						user_name:rowDataPacket.user_name,
+						rowDataPacket:rowDataPacket.mobile
+					}
+				})
+				resolve(participants)
+			})
+		})
+	}
+
 	registerCompetition(competition){
 		return new Promise((resolve,reject)=>{
 			if(!competition instanceof Competition){
