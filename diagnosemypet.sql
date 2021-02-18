@@ -201,8 +201,7 @@ CREATE TABLE IF NOT EXISTS `payment`(
 
 CREATE TABLE IF NOT EXISTS `participants`(
     `id` INT(7) PRIMARY KEY AUTO_INCREMENT,
-    `youtube_email` VARCHAR(255) NOT NULL,
-    `youtube_name` VARCHAR(255) NOT NULL,
-    `user_id` INT(7),
-    FOREIGN KEY (`user_id`) REFERENCES users(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    `youtube_name` VARCHAR(255),
+    `youtube_email` VARCHAR(255),
+    `phone_number` VARCHAR(255)
 );
