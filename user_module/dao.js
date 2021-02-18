@@ -1549,7 +1549,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="UPDATE participant SET youtube_name=?, youtube_email=?, phone_number=? WHERE id=? "
+			const query="UPDATE participants SET youtube_name=?, youtube_email=?, phone_number=? WHERE id=? "
 			this.mysqlConn.query(query,[participant.youtube_name,participant.youtube_email,participant.phone_number,participant.id],(error,result)=>{
 				if(error){
 					reject(error)
@@ -1567,7 +1567,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="DELETE FROM participantS WHERE id=? "
+			const query="DELETE FROM participants WHERE id=? "
 			this.mysqlConn.query(query,participant.id,(error,result)=>{
 				if(error){
 					reject(error)
