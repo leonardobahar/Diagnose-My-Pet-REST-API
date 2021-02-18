@@ -1875,6 +1875,47 @@ app.get("/api/user/retrieve-participants",(req,res)=>{
     }
 })
 
+app.post("/api/user/add-participant",(req,res)=>{
+    if(typeof req.body.youtube_email==='undefined' ||
+       typeof req.body.youtube_name==='undefined' ||
+       typeof req.body.user_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+    const participant=new Participant(null,req.body.youtube_email,req.body.youtube_name,req.body.user_id)
+
+    dao.retrieveUserId(new User(req.body.user_id)).then(result=>{
+        dao.registerParticipant(participant).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 /*
  / RETRIEVE MEDICAL RECORD
  / RETURN MEDICAL_RECORD_ITSELF + FILENAMES
