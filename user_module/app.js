@@ -2010,3 +2010,11 @@ DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, T
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
+
+// SSL Certs for codedoc.xyz
+var privateKey  = fs.readFileSync('sslcert/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('sslcert/fullchain.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+const https = require('https')
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(8485)

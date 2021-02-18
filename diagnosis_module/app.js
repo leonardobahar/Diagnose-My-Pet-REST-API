@@ -4,7 +4,6 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import jsonwebtoken from 'jsonwebtoken';
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY,
@@ -1350,3 +1349,12 @@ app.post("/api/diagnosis/diagnose-this", (req, res)=>{
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)
 })
+
+
+// SSL Certs for codedoc.xyz
+var privateKey  = fs.readFileSync('sslcert/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('sslcert/fullchain.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+const https = require('https')
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(8486)
