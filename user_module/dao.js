@@ -1517,7 +1517,7 @@ export class Dao{
 							youtube_name:rowDataPacket.youtube_name,
 							user_id:rowDataPacket.user_id,
 							user_name:rowDataPacket.user_name,
-							rowDataPacket:rowDataPacket.mobile
+							mobile:rowDataPacket.mobile
 						}
 					})
 					resolve(participants)
