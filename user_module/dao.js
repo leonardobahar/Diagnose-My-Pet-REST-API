@@ -151,8 +151,30 @@ export class Dao{
 			const query = "INSERT INTO `users`(`user_name`, `mobile`, `email`, `birthdate`, `address`, `password`, `salt`, `role`) " +
 				"VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
 			const salt = await bcrypt.genSalt(5)
-			const hash = await bcrypt.hash(user.password,salt)
+			const hash = await bcrypt.hash(user.password, salt)
 			this.mysqlConn.query(query, [user.user_name, user.mobile, user.email, user.birthdate, user.address, hash, salt, user.role], (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				user.id = res.insertId
+				resolve(user)
+			})
+		})
+	}
+
+	resetPassword(user){
+		return new Promise(async (resolve, reject) => {
+			if (!user instanceof User) {
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query = "UPDATE `users` SET `password` = ?, `salt`=? WHERE `email` = ?";
+			const salt = await bcrypt.genSalt(5)
+			const hash = await bcrypt.hash(user.password, salt)
+			this.mysqlConn.query(query, [hash, salt, user.email], (err, res)=>{
 				if (err){
 					reject(err)
 					return

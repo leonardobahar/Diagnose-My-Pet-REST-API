@@ -135,6 +135,48 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
+app.post("/api/user/register-user", (req, res)=>{
+    if (typeof req.body.email === 'undefined' ||
+        typeof req.body.password === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }else{
+        const user = new User(null,
+            null,
+            null,
+            req.body.email,
+            null,
+            null,
+            req.body.password,
+            null,
+            'CUSTOMER')
+
+        dao.resetPassword(user).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }
+})
+
 app.post("/api/user/register-admin",(req,res)=>{
     if (typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
