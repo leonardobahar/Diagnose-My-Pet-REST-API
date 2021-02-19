@@ -701,7 +701,7 @@ app.post("/api/user/update-patient",(req,res)=>{
     const age=year-thisYear
 
     const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-        req.body.breed,req.body.birthdate,age,req.body.pet_owner)
+        req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner)
 
     dao.updatePatient(patient).then(result=>{
         res.status(200).send({
