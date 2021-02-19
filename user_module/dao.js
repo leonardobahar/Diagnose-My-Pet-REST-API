@@ -117,8 +117,42 @@ export class Dao{
 
 	retrieveOneUser(user){
 		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
 			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND id=?"
 			this.mysqlConn.query(query,user.id, (error,result)=>{
+				if(error){
+					reject(error)
+				}else if(result.length>0){
+					const customer=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							user_name:rowDataPacket.user_name,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							address:rowDataPacket.address,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(customer)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	retrieveUserByEmail(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND email=?"
+			this.mysqlConn.query(query,user.email, (error,result)=>{
 				if(error){
 					reject(error)
 				}else if(result.length>0){
@@ -284,8 +318,8 @@ export class Dao{
 
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			const query="UPDATE users SET password=?, salt=? WHERE user_name=?"
-			this.mysqlConn.query(query, [hash, salt, user.user_name],(error,result)=>{
+			const query="UPDATE users SET password=?, salt=? WHERE email=?"
+			this.mysqlConn.query(query, [hash, salt, user.email],(error,result)=>{
 				if(error){
 					reject(error)
 					return
