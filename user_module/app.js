@@ -607,7 +607,7 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
             })
         })
     }else if(typeof req.query.id==='undefined' &&
-        typeof req.query.owner_id!=='undefined'){
+             typeof req.query.owner_id!=='undefined'){
         dao.retrievePatientsByOwnerId(req.query.owner_id).then(result=>{
             res.status(200).send({
                 success:true,
@@ -627,6 +627,10 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
+    }else if(typeof req.query.id==='undefined' &&
+             typeof req.query.owner_id==='undefined' &&
+             typeof req.query.age!=='undefined'){
+
     } else{
         const patient=new Patient(req.query.id,null,null,null)
 
