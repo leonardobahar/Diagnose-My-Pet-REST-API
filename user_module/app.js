@@ -263,7 +263,8 @@ app.post("/api/user/confirm-user-email",(req,res)=>{
 
 app.post("/api/user/user-login",(req,res)=>{
     if(typeof req.body.user_name==='undefined' ||
-       typeof req.body.password==='undefined'){
+       typeof req.body.password==='undefined' ||
+       typeof req.body.email==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -271,6 +272,9 @@ app.post("/api/user/user-login",(req,res)=>{
         return
     }
 
+    if(typeof req.body.email!=='undefined'){
+
+    }
     const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
     dao.loginCustomer(user).then(loginResult=> {
         dao.userLastSignIn(loginResult[0].user_id).then(result=>{

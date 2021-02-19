@@ -245,6 +245,42 @@ export class Dao{
 		})
 	}
 
+	loginWithEmail(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE email=?"
+			this.mysqlConn.query(query,[user.email], (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}else if(result.length > 0){
+					const salt = result[0].salt
+					const hashedClientInput = bcrypt.hashSync(user.password, salt)
+					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
+					if (bcryptedPassword){
+						const user=result.map(rowDatapacket=>{
+							return{
+								user_id:rowDatapacket.id,
+								user_name:rowDatapacket.user_name,
+								email:rowDatapacket.email,
+								role:rowDatapacket.role
+							}
+						})
+						resolve(user)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	userLastSignIn(id){
 		return new Promise((resolve,reject)=>{
 			const query="UPDATE users SET last_sign_in= NOW() " +
