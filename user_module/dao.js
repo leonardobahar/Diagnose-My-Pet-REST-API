@@ -145,36 +145,6 @@ export class Dao{
 		})
 	}
 
-	retrieveUserByEmail(user){
-		return new Promise((resolve,reject)=>{
-			if(!user instanceof User){
-				reject(MISMATCH_OBJ_TYPE)
-				return
-			}
-			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND email=?"
-			this.mysqlConn.query(query,user.email, (error,result)=>{
-				if(error){
-					reject(error)
-				}else if(result.length>0){
-					const customer=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							user_name:rowDataPacket.user_name,
-							mobile:rowDataPacket.mobile,
-							email:rowDataPacket.email,
-							birthdate:rowDataPacket.birthdate,
-							address:rowDataPacket.address,
-							role:rowDataPacket.role
-						}
-					})
-					resolve(customer)
-				}else{
-					reject(NO_SUCH_CONTENT)
-				}
-			})
-		})
-	}
-
 	registerUser(user){
 		return new Promise(async (resolve, reject) => {
 			if (!user instanceof User) {
@@ -325,7 +295,7 @@ export class Dao{
 					return
 				}
 
-				resolve(user)
+				resolve(SUCCESS)
 			})
 		})
 	}

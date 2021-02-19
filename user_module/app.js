@@ -356,8 +356,7 @@ app.post("/api/user/update-user",(req,res)=>{
 
 app.post("/api/user/change-password",(req,res)=>{
     if(typeof req.body.email==='undefined' ||
-       typeof req.body.old_password==='undefined' ||
-        typeof req.body.new_password==='undefined'){
+       typeof req.body.password==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -365,7 +364,7 @@ app.post("/api/user/change-password",(req,res)=>{
         return
     }
 
-    const user = new User(null,null,req.body.email,null,null,req.body.new_password,null,null)
+    const user = new User(null,null,req.body.email,null,null,null,req.body.password,null)
     dao.changeCustomerPassword(user).then(result=>{
         res.status(200).send({
             success:true,
