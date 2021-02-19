@@ -22,6 +22,7 @@ import {
     User
 } from "../model";
 import multer from "multer";
+import moment from "moment";
 
 dotenv.config();
 
@@ -634,10 +635,11 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
              typeof req.query.age!=='undefined'){
 
         let birthDate=new Date()
-        birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
+        birthDate.setFullYear(birthDate.getFullYear()-req.query.age)
+        const finalDate=moment(birthDate, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD')
+        console.log(finalDate)
 
-
-        dao.retrievePatientByBirthDate(birthDate).then(result=>{
+        dao.retrievePatientByBirthDate(finalDate).then(result=>{
             res.status(200).send({
                 success:true,
                 result
@@ -700,6 +702,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
 
             let birthDate=new Date()
             birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
+            console.log(birthDate)
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
