@@ -555,7 +555,12 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
 
     dao.retrieveOneDoctor(new Doctor(req.query.id)).then(result=>{
         dao.deleteDoctor(new Doctor(req.query.id)).then(result=>{
-
+            dao.deleteCustomer(new User(req.query.id)).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            })
             res.status(200).send({
                 success:true,
                 result:result
@@ -703,7 +708,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
                 req.body.animal_type,req.body.breed.toUpperCase(),
-                birthDate,req.body.age,req.body.pet_owner,req.file.filename)
+                birthDate,req.body.pet_owner,req.file.filename)
 
             dao.registerPatient(patient).then(result=>{
                 res.status(200).send({
