@@ -81,7 +81,9 @@ CREATE TABLE IF NOT EXISTS `patients`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	patient_name VARCHAR(255) NOT NULL,
 	animal_type_id INT(11),
+	breed VARCHAR(255),
 	birthdate DATE DEFAULT NULL,
+	age INT(11),
 	pet_owner_id INT(11),
 	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE SET NULL ON UPDATE CASCADE,
 	FOREIGN KEY (pet_owner_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
