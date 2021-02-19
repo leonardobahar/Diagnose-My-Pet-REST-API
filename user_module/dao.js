@@ -556,8 +556,8 @@ export class Dao{
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
-				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`birthdate`,`age`,`pet_owner_id`) VALUES(?,?,?,?,?,?)"
-				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.birthdate,patient.age,patient.pet_owner],(err,res)=>{
+				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`birthdate`,`age`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?,?)"
+				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.birthdate,patient.age,patient.pet_owner,patient.picture],(err,res)=>{
 					if(err){
 						reject(err)
 						return
@@ -1367,9 +1367,11 @@ export class Dao{
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `duration`, `user_id`, `appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `duration`, `user_id`, `appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`, `description`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				const appointmentTime =  moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
-				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime, appointment.duration, appointment.user_id,appointment.appointment_status, appointment.is_real_appointment, appointment.patient_id, appointment.doctor_id],(error,result)=>{
+				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime,
+					appointment.duration, appointment.user_id,appointment.appointment_status,
+					appointment.is_real_appointment, appointment.patient_id, appointment.doctor_id, appointment.description],(error,result)=>{
 					if(error){
 						reject(error)
 						return

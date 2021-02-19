@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS `patients`(
 	birthdate DATE DEFAULT NULL,
 	age INT(11),
 	pet_owner_id INT(11),
+	patient_picture VARCHAR(255),
 	FOREIGN KEY (animal_type_id) REFERENCES animal_type(id) ON DELETE SET NULL ON UPDATE CASCADE,
 	FOREIGN KEY (pet_owner_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -131,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     patient_id INT(11) DEFAULT NULL,
     doctor_id INT(11) ,
     appointment_status varchar(255),
-    description varchar(255),
+    description varchar(255) DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE

@@ -55,6 +55,22 @@ const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : proce
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
 
+const storage=multer.diskStorage({
+    destination: './Uploads/',
+    filename: function (req,file,cb){
+        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+const medicalRecordFilter = (req, file, cb)=>{
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|doc|docx|pdf|txt|xls|csv|xlsx)$/)) {
+        req.fileValidationError = 'Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!';
+        return cb(new Error('Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!'), false);
+    }
+    cb(null, true);
+}
+
 app.get("/api/user/retrieve-users", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
@@ -629,49 +645,97 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
     }
 })
 
-app.post("/api/user/add-patient",(req,res)=>{
-    if (typeof req.body.patient_name === 'undefined' ||
-        typeof req.body.animal_type === 'undefined' ||
-        typeof req.body.breed==='undefined' ||
-        typeof req.body.birthdate === 'undefined' ||
-        typeof req.body.pet_owner === 'undefined'){
-        res.status(400).send({
-            success: false,
-            error: WRONG_BODY_FORMAT
-        })
-        return
-    }
-    const insertedDate=new Date(req.body.birthdate)
+app.post("/api/user/add-patient",async (req,res)=>{
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('patient_attachment')
 
-    const thisYear=insertedDate.getFullYear()
-
-    const dateToday=new Date()
-    const year=dateToday.getFullYear()
-
-    const age=year-thisYear
-
-    const patient = new Patient(
-        null,req.body.patient_name.toUpperCase(),
-        req.body.animal_type,req.body.breed.toUpperCase(),
-        req.body.birthdate,age,req.body.pet_owner)
-
-    dao.registerPatient(patient).then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
-        })
-    }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY') {
-            res.status(500).send({
+    upload(req,res, async(error)=>{
+        if (typeof req.body.patient_name === 'undefined' ||
+            typeof req.body.animal_type === 'undefined' ||
+            typeof req.body.breed==='undefined' ||
+            typeof req.body.birthdate === 'undefined' ||
+            typeof req.body.pet_owner === 'undefined'){
+            res.status(400).send({
                 success: false,
-                error: 'DUPLICATE-ENTRY'
+                error: WRONG_BODY_FORMAT
             })
-            res.end()
+            return
+        }
+
+        if(typeof req.file==='undefined'){
+            const insertedDate=new Date(req.body.birthdate)
+
+            const thisYear=insertedDate.getFullYear()
+
+            const dateToday=new Date()
+            const year=dateToday.getFullYear()
+
+            const age=year-thisYear
+
+            const patient = new Patient(
+                null,req.body.patient_name.toUpperCase(),
+                req.body.animal_type,req.body.breed.toUpperCase(),
+                req.body.birthdate,age,req.body.pet_owner,'No Attachment')
+
+            dao.registerPatient(patient).then(result=>{
+                res.status(200).send({
+                    success: true,
+                    result: result
+                })
+            }).catch(err=>{
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        success: false,
+                        error: 'DUPLICATE-ENTRY'
+                    })
+                    res.end()
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                }
+            })
         }else{
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
+            if(error instanceof multer.MulterError){
+                return res.send(error)
+            } else if(error){
+                return res.send(error)
+            }
+
+            const insertedDate=new Date(req.body.birthdate)
+
+            const thisYear=insertedDate.getFullYear()
+
+            const dateToday=new Date()
+            const year=dateToday.getFullYear()
+
+            const age=year-thisYear
+
+            const patient = new Patient(
+                null,req.body.patient_name.toUpperCase(),
+                req.body.animal_type,req.body.breed.toUpperCase(),
+                req.body.birthdate,age,req.body.pet_owner,req.file.filename)
+
+            dao.registerPatient(patient).then(result=>{
+                res.status(200).send({
+                    success: true,
+                    result: result
+                })
+            }).catch(err=>{
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        success: false,
+                        error: 'DUPLICATE-ENTRY'
+                    })
+                    res.end()
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                }
             })
         }
     })
@@ -904,21 +968,6 @@ app.delete("/api/user/delete-medical-record", (req,res)=>{
 })
 
 // STARTING FROM THIS LINE COMES ENDPOINTS WHICH HANDLES FILE
-const storage=multer.diskStorage({
-    destination: './Uploads/',
-    filename: function (req,file,cb){
-        cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
-
-const medicalRecordFilter = (req, file, cb)=>{
-    // Accept images only
-    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|doc|docx|pdf|txt|xls|csv|xlsx)$/)) {
-        req.fileValidationError = 'Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!';
-        return cb(new Error('Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!'), false);
-    }
-    cb(null, true);
-}
 
 /* MAKE /api/diagnosis/attach-medical-records
  / Pass query medical_record_id, filename
@@ -1412,7 +1461,8 @@ app.post("/api/user/add-appointment", (req,res)=>{
         req.body.is_real_appointment,
         req.body.patient_id,
         req.body.doctor_id,
-        'PENDING')
+        'PENDING',
+        req.body.description)
 
     if(typeof req.body.user_id !== 'undefined' &&
        typeof req.body.patient_id !== 'undefined'){

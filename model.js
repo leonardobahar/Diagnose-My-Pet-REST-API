@@ -89,7 +89,7 @@ export class MedicalRecordAttachment{
 }
 
 export class Patient{
-	constructor(id, patient_name, animal_type, breed, birthdate, age, pet_owner) {
+	constructor(id, patient_name, animal_type, breed, birthdate, age, pet_owner, picture) {
 		this.id=id
 		this.patient_name=patient_name
 		this.animal_type=animal_type
@@ -97,11 +97,12 @@ export class Patient{
 		this.birthdate=birthdate
 		this.age=age
 		this.pet_owner=pet_owner
+		this.picture=picture
 	}
 }
 
 export class Appointment{
-	constructor(id, appointment_name, appointment_time, duration, user_id, is_real_appointment, patient_id, doctor_id, appointment_status) {
+	constructor(id, appointment_name, appointment_time, duration, user_id, is_real_appointment, patient_id, doctor_id, appointment_status, description) {
 		this.id=id
 		this.appointment_name=appointment_name
 		this.appointment_time=appointment_time
@@ -111,6 +112,7 @@ export class Appointment{
 		this.patient_id=patient_id
 		this.doctor_id=doctor_id
 		this.appointment_status=appointment_status
+		this.description=description
 	}
 }
 
