@@ -744,42 +744,71 @@ app.post("/api/user/add-patient",async (req,res)=>{
 app.post("/api/user/update-patient",(req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('patient_attachment')
 
-    if(typeof req.body.id ==='undefined' ||
-        typeof req.body.patient_name === 'undefined' ||
-        typeof req.body.animal_type === 'undefined' ||
-        typeof req.body.birthdate === 'undefined' ||
-        typeof req.body.pet_owner === 'undefined' ||
-        typeof req.body.breed==='undefined'){
-        res.status(400).send({
-            success: false,
-            error: WRONG_BODY_FORMAT
-        })
-        return
-    }
+    upload(res,res,async (error)=>{
+        if(typeof req.body.id ==='undefined' ||
+            typeof req.body.patient_name === 'undefined' ||
+            typeof req.body.animal_type === 'undefined' ||
+            typeof req.body.birthdate === 'undefined' ||
+            typeof req.body.pet_owner === 'undefined' ||
+            typeof req.body.breed==='undefined'){
+            res.status(400).send({
+                success: false,
+                error: WRONG_BODY_FORMAT
+            })
+            return
+        }
 
-    const insertedDate=new Date(req.body.birthdate)
+        if(typeof req.file==='undefined'){
+            const insertedDate=new Date(req.body.birthdate)
 
-    const thisYear=insertedDate.getFullYear()
+            const thisYear=insertedDate.getFullYear()
 
-    const dateToday=new Date()
-    const year=dateToday.getFullYear()
+            const dateToday=new Date()
+            const year=dateToday.getFullYear()
 
-    const age=year-thisYear
+            const age=year-thisYear
 
-    const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-        req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner)
+            const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
+                req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner,'No Attachment')
 
-    dao.updatePatient(patient).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
-        })
+            dao.updatePatient(patient).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            })
+        }else{
+            const insertedDate=new Date(req.body.birthdate)
+
+            const thisYear=insertedDate.getFullYear()
+
+            const dateToday=new Date()
+            const year=dateToday.getFullYear()
+
+            const age=year-thisYear
+
+            const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
+                req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner,req.file.filename)
+
+            dao.updatePatient(patient).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            })
+        }
     })
 })
 
