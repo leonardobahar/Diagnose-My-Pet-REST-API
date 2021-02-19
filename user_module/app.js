@@ -560,10 +560,12 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
                     success:true,
                     result:result
                 })
-            })
-            res.status(200).send({
-                success:true,
-                result:result
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
         }).catch(error=>{
             console.error(error)
