@@ -262,9 +262,10 @@ app.post("/api/user/confirm-user-email",(req,res)=>{
 })
 
 app.post("/api/user/user-login",(req,res)=>{
-    if(typeof req.body.user_name==='undefined' ||
+    if(typeof req.body.user_name==='undefined' &&
        typeof req.body.password==='undefined' ||
-       typeof req.body.email==='undefined'){
+        typeof req.body.email==='undefined' &&
+        typeof req.body.password==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -275,12 +276,12 @@ app.post("/api/user/user-login",(req,res)=>{
     if(typeof req.body.email!=='undefined'){
         const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
         dao.loginWithEmail(user).then(LoginResult=>{
-            dao.userLastSignIn(loginResult[0].user_id).then(result=>{
+            dao.userLastSignIn(LoginResult[0].user_id).then(result=>{
                 res.status(200).send({
                     success: true,
                     authentication_approval: true,
                     message: 'Log in Successful',
-                    result:loginResult
+                    result:LoginResult
                 })
             }).catch(error=>{
                 console.error(error)
