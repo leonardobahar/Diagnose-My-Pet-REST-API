@@ -273,7 +273,37 @@ app.post("/api/user/user-login",(req,res)=>{
     }
 
     if(typeof req.body.email!=='undefined'){
-
+        const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
+        dao.loginWithEmail(user).then(LoginResult=>{
+            dao.userLastSignIn(loginResult[0].user_id).then(result=>{
+                res.status(200).send({
+                    success: true,
+                    authentication_approval: true,
+                    message: 'Log in Successful',
+                    result:loginResult
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(200).send({
+                    success:false,
+                    authentication_approval: false,
+                    message:'Invalid User Name/Password'
+                })
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+        return
     }
     const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
     dao.loginCustomer(user).then(loginResult=> {
