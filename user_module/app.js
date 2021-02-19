@@ -593,7 +593,8 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
 
 app.get("/api/user/retrieve-patient",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
-       typeof req.query.owner_id==='undefined'){
+       typeof req.query.owner_id==='undefined'&&
+        typeof req.query.age==='undefined'){
         dao.retrievePatient().then(result=>{
             res.status(200).send({
                 success: true,
@@ -607,7 +608,8 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
             })
         })
     }else if(typeof req.query.id==='undefined' &&
-             typeof req.query.owner_id!=='undefined'){
+             typeof req.query.owner_id!=='undefined'&&
+             typeof req.query.age==='undefined'){
         dao.retrievePatientsByOwnerId(req.query.owner_id).then(result=>{
             res.status(200).send({
                 success:true,
@@ -631,6 +633,29 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
              typeof req.query.owner_id==='undefined' &&
              typeof req.query.age!=='undefined'){
 
+        let birthDate=new Date()
+        birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
+
+
+        dao.retrievePatientByBirthDate(birthDate).then(result=>{
+            res.status(200).send({
+                success:true,
+                result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     } else{
         const patient=new Patient(req.query.id,null,null,null)
 
