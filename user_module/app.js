@@ -742,6 +742,8 @@ app.post("/api/user/add-patient",async (req,res)=>{
 })
 
 app.post("/api/user/update-patient",(req,res)=>{
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('patient_attachment')
+
     if(typeof req.body.id ==='undefined' ||
         typeof req.body.patient_name === 'undefined' ||
         typeof req.body.animal_type === 'undefined' ||
