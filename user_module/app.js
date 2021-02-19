@@ -278,16 +278,15 @@ app.post("/api/user/confirm-user-email",(req,res)=>{
 })
 
 app.post("/api/user/user-login",(req,res)=>{
-    if(typeof req.body.user_name==='undefined' &&
+    /*if(typeof req.body.user_name==='undefined' &&
        typeof req.body.password==='undefined' ||
-        typeof req.body.email==='undefined' &&
-        typeof req.body.password==='undefined'){
+        typeof req.body.email==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
         })
         return
-    }
+    }*/
 
     if(typeof req.body.email!=='undefined'){
         const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
@@ -651,8 +650,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
     upload(req,res, async(error)=>{
         if (typeof req.body.patient_name === 'undefined' ||
             typeof req.body.animal_type === 'undefined' ||
-            typeof req.body.breed==='undefined' ||
-            typeof req.body.birthdate === 'undefined' ||
+            typeof req.body.age==='undefined' ||
             typeof req.body.pet_owner === 'undefined'){
             res.status(400).send({
                 success: false,
@@ -662,19 +660,14 @@ app.post("/api/user/add-patient",async (req,res)=>{
         }
 
         if(typeof req.file==='undefined'){
-            const insertedDate=new Date(req.body.birthdate)
 
-            const thisYear=insertedDate.getFullYear()
-
-            const dateToday=new Date()
-            const year=dateToday.getFullYear()
-
-            const age=year-thisYear
+            let birthDate=new Date()
+            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
                 req.body.animal_type,req.body.breed.toUpperCase(),
-                req.body.birthdate,age,req.body.pet_owner,'No Attachment')
+                birthDate,req.body.age,req.body.pet_owner,'No Attachment')
 
             dao.registerPatient(patient).then(result=>{
                 res.status(200).send({
@@ -703,19 +696,13 @@ app.post("/api/user/add-patient",async (req,res)=>{
                 return res.send(error)
             }
 
-            const insertedDate=new Date(req.body.birthdate)
-
-            const thisYear=insertedDate.getFullYear()
-
-            const dateToday=new Date()
-            const year=dateToday.getFullYear()
-
-            const age=year-thisYear
+            let birthDate=new Date()
+            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
                 req.body.animal_type,req.body.breed.toUpperCase(),
-                req.body.birthdate,age,req.body.pet_owner,req.file.filename)
+                birthDate,req.body.age,req.body.pet_owner,req.file.filename)
 
             dao.registerPatient(patient).then(result=>{
                 res.status(200).send({
@@ -748,9 +735,8 @@ app.post("/api/user/update-patient",async (req,res)=>{
         if(typeof req.body.id ==='undefined' ||
             typeof req.body.patient_name === 'undefined' ||
             typeof req.body.animal_type === 'undefined' ||
-            typeof req.body.birthdate === 'undefined' ||
-            typeof req.body.pet_owner === 'undefined' ||
-            typeof req.body.breed==='undefined'){
+            typeof req.body.age=== 'undefined' ||
+            typeof req.body.pet_owner === 'undefined'){
             res.status(400).send({
                 success: false,
                 error: WRONG_BODY_FORMAT
@@ -759,17 +745,11 @@ app.post("/api/user/update-patient",async (req,res)=>{
         }
 
         if(typeof req.file==='undefined'){
-            const insertedDate=new Date(req.body.birthdate)
-
-            const thisYear=insertedDate.getFullYear()
-
-            const dateToday=new Date()
-            const year=dateToday.getFullYear()
-
-            const age=year-thisYear
+            let birthDate=new Date()
+            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-                req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner,'No Attachment')
+                req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,'No Attachment')
 
             dao.updatePatient(patient).then(result=>{
                 res.status(200).send({
@@ -790,17 +770,11 @@ app.post("/api/user/update-patient",async (req,res)=>{
                 return res.send(error)
             }
 
-            const insertedDate=new Date(req.body.birthdate)
-
-            const thisYear=insertedDate.getFullYear()
-
-            const dateToday=new Date()
-            const year=dateToday.getFullYear()
-
-            const age=year-thisYear
+            let birthDate=new Date()
+            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-                req.body.breed.toUpperCase(),req.body.birthdate,age,req.body.pet_owner,req.file.filename)
+                req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,req.file.filename)
 
             dao.updatePatient(patient).then(result=>{
                 res.status(200).send({
