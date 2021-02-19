@@ -682,7 +682,8 @@ app.post("/api/user/update-patient",(req,res)=>{
         typeof req.body.patient_name === 'undefined' ||
         typeof req.body.animal_type === 'undefined' ||
         typeof req.body.birthdate === 'undefined' ||
-        typeof req.body.pet_owner === 'undefined'){
+        typeof req.body.pet_owner === 'undefined' ||
+        typeof req.body.breed==='undefined'){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
@@ -690,7 +691,17 @@ app.post("/api/user/update-patient",(req,res)=>{
         return
     }
 
-    const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,req.body.birthdate,req.body.pet_owner)
+    const insertedDate=new Date(req.body.birthdate)
+
+    const thisYear=insertedDate.getFullYear()
+
+    const dateToday=new Date()
+    const year=dateToday.getFullYear()
+
+    const age=year-thisYear
+
+    const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
+        req.body.breed,req.body.birthdate,age,req.body.pet_owner)
 
     dao.updatePatient(patient).then(result=>{
         res.status(200).send({
