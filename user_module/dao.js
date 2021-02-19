@@ -458,7 +458,7 @@ export class Dao{
 
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.age, p.pet_owner_id, u.user_name " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id"
 			this.mysqlConn.query(query,(error,result)=>{
@@ -473,7 +473,9 @@ export class Dao{
 						patient_name:rowDataPacket.patient_name,
 						animal_type_id:rowDataPacket.animal_type_id,
 						animal_name:rowDataPacket.animal_name,
+						breed:rowDataPacket.breed,
 						birthdate:rowDataPacket.birthdate,
+						age:rowDataPacket.age,
 						pet_owner_id:rowDataPacket.pet_owner_id,
 						pet_owner_name:rowDataPacket.user_name
 					}
@@ -489,7 +491,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.age, p.pet_owner_id, u.user_name " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.id=?"
@@ -504,7 +506,9 @@ export class Dao{
 							patient_name:rowDataPacket.patient_name,
 							animal_type_id:rowDataPacket.animal_type_id,
 							animal_name:rowDataPacket.animal_name,
+							breed:rowDataPacket.breed,
 							birthdate:rowDataPacket.birthdate,
+							age:rowDataPacket.age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name
 						}
@@ -519,7 +523,7 @@ export class Dao{
 
 	retrievePatientsByOwnerId(owner_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.birthdate, p.pet_owner_id, u.user_name " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.age, p.pet_owner_id, u.user_name " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.pet_owner_id=?"
@@ -534,7 +538,9 @@ export class Dao{
 							patient_name:rowDataPacket.patient_name,
 							animal_type_id:rowDataPacket.animal_type_id,
 							animal_name:rowDataPacket.animal_name,
+							breed:rowDataPacket.breed,
 							birthdate:rowDataPacket.birthdate,
+							age:rowDataPacket.age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name
 						}
@@ -550,8 +556,8 @@ export class Dao{
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
-				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`birthdate`, `pet_owner_id`) VALUES(?, ?, ?, ?)"
-				this.mysqlConn.query(query,[patient.patient_name, patient.animal_type, patient.birthdate, patient.pet_owner],(err,res)=>{
+				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`birthdate`,`age`,`pet_owner_id`) VALUES(?,?,?,?,?,?)"
+				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.birthdate,patient.age,patient.pet_owner],(err,res)=>{
 					if(err){
 						reject(err)
 						return
@@ -572,14 +578,13 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			} else{
-				const query="UPDATE patients SET patient_name=?, animal_type_id=?, birthdate=?, pet_owner_id=? WHERE id=?"
-				this.mysqlConn.query(query, [patient.patient_name, patient.animal_type, patient.birthdate, patient.pet_owner, patient.id], (err, res)=>{
+				const query="UPDATE patients SET patient_name=?,animal_type_id=?,breed=?,birthdate=?,age=?,pet_owner_id=? WHERE id=?"
+				this.mysqlConn.query(query, [patient.patient_name,patient.animal_type,patient.breed,patient.birthdate,patient.age,patient.pet_owner,patient.id], (err, res)=>{
 					if(err){
 						reject(err)
 						return
 					}
 
-					patient.id=res.insertId
 					resolve(patient)
 				})
 			}
