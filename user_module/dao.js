@@ -468,6 +468,12 @@ export class Dao{
 				}
 
 				const patients=result.map(rowDataPacket=>{
+					const date=new Date()
+					const year=date.getFullYear()
+					const birthDate=rowDataPacket.birthdate
+					const bdYear=birthDate.getFullYear()
+					const age=year-bdYear
+
 					return{
 						id:rowDataPacket.id,
 						patient_name:rowDataPacket.patient_name,
@@ -475,7 +481,7 @@ export class Dao{
 						animal_name:rowDataPacket.animal_name,
 						breed:rowDataPacket.breed,
 						birthdate:rowDataPacket.birthdate,
-						age:rowDataPacket.age,
+						age:age,
 						pet_owner_id:rowDataPacket.pet_owner_id,
 						pet_owner_name:rowDataPacket.user_name,
 						picture:rowDataPacket.patient_picture
@@ -502,6 +508,11 @@ export class Dao{
 					return
 				}else if(result.length>0){
 					const patients=result.map(rowDataPacket=>{
+						const date=new Date()
+						const year=date.getFullYear()
+						const birthDate=rowDataPacket.birthdate
+						const bdYear=birthDate.getFullYear()
+						const age=year-bdYear
 						return{
 							id:rowDataPacket.id,
 							patient_name:rowDataPacket.patient_name,
@@ -509,7 +520,7 @@ export class Dao{
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
 							birthdate:rowDataPacket.birthdate,
-							age:rowDataPacket.age,
+							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name,
 							picture:rowDataPacket.patient_picture
@@ -535,6 +546,11 @@ export class Dao{
 					return
 				}else if(result.length>0){
 					const patients=result.map(rowDataPacket=>{
+						const date=new Date()
+						const year=date.getFullYear()
+						const birthDate=rowDataPacket.birthdate
+						const bdYear=birthDate.getFullYear()
+						const age=year-bdYear
 						return{
 							id:rowDataPacket.id,
 							patient_name:rowDataPacket.patient_name,
@@ -542,7 +558,7 @@ export class Dao{
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
 							birthdate:rowDataPacket.birthdate,
-							age:rowDataPacket.age,
+							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name,
 							picture:rowDataPacket.patient_picture
@@ -568,6 +584,11 @@ export class Dao{
 					return
 				}else if(result.length>0){
 					const patients=result.map(rowDataPacket=>{
+						const date=new Date()
+						const year=date.getFullYear()
+						const birthDate=rowDataPacket.birthdate
+						const bdYear=birthDate.getFullYear()
+						const age=year-bdYear
 						return{
 							id:rowDataPacket.id,
 							patient_name:rowDataPacket.patient_name,
@@ -575,7 +596,7 @@ export class Dao{
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
 							birthdate:rowDataPacket.birthdate,
-							age:rowDataPacket.age,
+							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name,
 							picture:rowDataPacket.patient_picture
