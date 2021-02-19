@@ -741,10 +741,10 @@ app.post("/api/user/add-patient",async (req,res)=>{
     })
 })
 
-app.post("/api/user/update-patient",(req,res)=>{
+app.post("/api/user/update-patient",async (req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('patient_attachment')
 
-    upload(res,res,async (error)=>{
+    upload(req,res, async(error)=>{
         if(typeof req.body.id ==='undefined' ||
             typeof req.body.patient_name === 'undefined' ||
             typeof req.body.animal_type === 'undefined' ||
@@ -784,6 +784,12 @@ app.post("/api/user/update-patient",(req,res)=>{
                 })
             })
         }else{
+            if(error instanceof multer.MulterError){
+                return res.send(error)
+            } else if(error){
+                return res.send(error)
+            }
+
             const insertedDate=new Date(req.body.birthdate)
 
             const thisYear=insertedDate.getFullYear()
