@@ -640,7 +640,6 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
         let birthDate=new Date()
         birthDate.setFullYear(birthDate.getFullYear()-req.query.age)
         const finalDate=moment(birthDate, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD')
-        console.log(finalDate)
 
         dao.retrievePatientByBirthDate(finalDate).then(result=>{
             res.status(200).send({
