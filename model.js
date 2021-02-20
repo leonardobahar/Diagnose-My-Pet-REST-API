@@ -89,11 +89,12 @@ export class MedicalRecordAttachment{
 }
 
 export class Patient{
-	constructor(id, patient_name, animal_type, breed, birthdate, pet_owner, picture) {
+	constructor(id, patient_name, animal_type, breed, gender, birthdate, pet_owner, picture) {
 		this.id=id
 		this.patient_name=patient_name
 		this.animal_type=animal_type
 		this.breed=breed
+		this.gender=gender
 		this.birthdate=birthdate
 		this.pet_owner=pet_owner
 		this.picture=picture
