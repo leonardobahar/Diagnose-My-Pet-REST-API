@@ -664,20 +664,10 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
         const patient=new Patient(req.query.id,null,null,null)
 
         dao.retrieveOnePatient(patient).then(result=>{
-            // if(result[0].picture==='No Attachment'){
-            //     res.status(200).send({
-            //         success:true,
-            //         result:result
-            //     })
-            //     return
-            // }
             res.status(200).send({
                 success:true,
                 result:result
             })
-            // console.log(result[0].picture)
-            // res.sendFile('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads'+result[0].picture)
-            // res.send('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads/'+result[0].picture)
         }).catch(err=>{
             if(err===NO_SUCH_CONTENT){
                 res.status(204).send({
@@ -693,6 +683,37 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
             })
         })
     }
+})
+
+app.get("/api/user/retrieve-patient-picture",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(404).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrievePatientPicture(new Patient(req.query.id)).then(result=>{
+        if(result==='No Attachment'){
+            res.status(204).send('No Attachment')
+            return
+        }
+        res.status(200).sendFile('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads/'+result)
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
 
 app.post("/api/user/add-patient",async (req,res)=>{

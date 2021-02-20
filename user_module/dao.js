@@ -624,7 +624,7 @@ export class Dao{
 				}
 
 				if(result.length>0){
-					resolve(result.patient_picture)
+					resolve(result[0].patient_picture)
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
