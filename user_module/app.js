@@ -737,7 +737,6 @@ app.post("/api/user/add-patient",async (req,res)=>{
 
             let birthDate=new Date()
             birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
-            console.log(birthDate)
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
@@ -826,18 +825,66 @@ app.post("/api/user/update-patient",async (req,res)=>{
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
                 req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,'No Attachment')
 
-            dao.updatePatient(patient).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
+            dao.retrieveOnePatient(new Patient(req.body.id)).then(patientResult=>{
+                dao.retrievePatientPicture(new Patient(req.body.id)).then(pictureResult=>{
+                    if(pictureResult==='No Attachment'){
+                        dao.updatePatient(patient).then(result=>{
+                            res.status(200).send({
+                                success:true,
+                                result:result
+                            })
+                        }).catch(err=>{
+                            console.error(err)
+                            res.status(500).send({
+                                success: false,
+                                error: SOMETHING_WENT_WRONG
+                            })
+                        })
+                        return
+                    }
+
+                    fs.unlinkSync(UPLOADPATH+pictureResult)
+                    dao.updatePatient(patient).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    })
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
                 })
-            }).catch(err=>{
-                console.error(err)
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
+                    })
+                    return
+                }
+                console.error(error)
                 res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
                 })
             })
+
         }else{
             if(error instanceof multer.MulterError){
                 return res.send(error)
@@ -851,16 +898,63 @@ app.post("/api/user/update-patient",async (req,res)=>{
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
                 req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,req.file.filename)
 
-            dao.updatePatient(patient).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
+            dao.retrieveOnePatient(new Patient(req.body.id)).then(patientResult=>{
+                dao.retrievePatientPicture(new Patient(req.body.id)).then(pictureResult=>{
+                    if(pictureResult==='No Attachment'){
+                        dao.updatePatient(patient).then(result=>{
+                            res.status(200).send({
+                                success:true,
+                                result:result
+                            })
+                        }).catch(err=>{
+                            console.error(err)
+                            res.status(500).send({
+                                success: false,
+                                error: SOMETHING_WENT_WRONG
+                            })
+                        })
+                        return
+                    }
+
+                    fs.unlinkSync(UPLOADPATH+pictureResult)
+                    dao.updatePatient(patient).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    })
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
                 })
-            }).catch(err=>{
-                console.error(err)
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
+                    })
+                    return
+                }
+                console.error(error)
                 res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
                 })
             })
         }
