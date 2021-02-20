@@ -843,6 +843,7 @@ app.post("/api/user/update-patient",async (req,res)=>{
             typeof req.body.patient_name === 'undefined' ||
             typeof req.body.animal_type === 'undefined' ||
             typeof req.body.age=== 'undefined' ||
+            typeof req.body.gender==='undefined' ||
             typeof req.body.pet_owner === 'undefined'){
             res.status(400).send({
                 success: false,
@@ -856,7 +857,7 @@ app.post("/api/user/update-patient",async (req,res)=>{
             birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-                req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,'No Attachment')
+                req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),birthDate,req.body.pet_owner,'No Attachment')
 
             dao.retrieveOnePatient(new Patient(req.body.id)).then(patientResult=>{
                 dao.retrievePatientPicture(new Patient(req.body.id)).then(pictureResult=>{
@@ -929,7 +930,7 @@ app.post("/api/user/update-patient",async (req,res)=>{
             birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
 
             const patient=new Patient(req.body.id,req.body.patient_name.toUpperCase(),req.body.animal_type,
-                req.body.breed.toUpperCase(),birthDate,req.body.pet_owner,req.file.filename)
+                req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),birthDate,req.body.pet_owner,req.file.filename)
 
             dao.retrieveOnePatient(new Patient(req.body.id)).then(patientResult=>{
                 dao.retrievePatientPicture(new Patient(req.body.id)).then(pictureResult=>{
