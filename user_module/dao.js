@@ -610,6 +610,28 @@ export class Dao{
 		})
 	}
 
+	retrievePatientPicture(patient){
+		return new Promise((resolve,reject)=>{
+			if(!patient instanceof Patient){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="SELECT patient_picture FROM patients WHERE id=? "
+			this.mysqlConn.query(query,patient.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					resolve(result.patient_picture)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
