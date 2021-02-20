@@ -725,6 +725,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
         if (typeof req.body.patient_name === 'undefined' ||
             typeof req.body.animal_type === 'undefined' ||
             typeof req.body.age==='undefined' ||
+            typeof req.body.gender==='undefined' ||
             typeof req.body.pet_owner === 'undefined'){
             res.status(400).send({
                 success: false,
@@ -740,7 +741,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
-                req.body.animal_type,req.body.breed.toUpperCase(),
+                req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
                 birthDate,req.body.pet_owner,'No Attachment')
 
             dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
@@ -791,7 +792,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
 
             const patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
-                req.body.animal_type,req.body.breed.toUpperCase(),
+                req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
                 birthDate,req.body.pet_owner,req.file.filename)
 
             dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
