@@ -639,8 +639,8 @@ export class Dao{
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
-				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?)"
-				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
+				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`patient_gender`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?)"
+				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
 					if(err){
 						reject(err)
 						return
