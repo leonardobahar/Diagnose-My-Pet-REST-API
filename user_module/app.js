@@ -55,6 +55,7 @@ const host = process.env.MY_SQL_HOST
 const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
+const UPLOADPATH = process.env.UPLOAD_PATH
 const dao = new Dao(host, user, password, dbname)
 
 const storage=multer.diskStorage({
@@ -700,7 +701,7 @@ app.get("/api/user/retrieve-patient-picture",(req,res)=>{
             return
         }
         //res.status(200).sendFile('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads/'+result)
-        res.status(200).sendFile('../Uploads/'+result)
+        res.status(200).sendFile(UPLOADPATH+result)
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
             res.status(204).send({
