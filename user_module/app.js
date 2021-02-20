@@ -743,26 +743,42 @@ app.post("/api/user/add-patient",async (req,res)=>{
                 req.body.animal_type,req.body.breed.toUpperCase(),
                 birthDate,req.body.pet_owner,'No Attachment')
 
-            dao.registerPatient(patient).then(result=>{
-                res.status(200).send({
-                    success: true,
-                    result: result
+            dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
+                dao.registerPatient(patient).then(result=>{
+                    res.status(200).send({
+                        success: true,
+                        result: result
+                    })
+                }).catch(err=>{
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        res.status(500).send({
+                            success: false,
+                            error: 'DUPLICATE-ENTRY'
+                        })
+                        res.end()
+                    }else{
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    }
                 })
-            }).catch(err=>{
-                if (err.code === 'ER_DUP_ENTRY') {
-                    res.status(500).send({
-                        success: false,
-                        error: 'DUPLICATE-ENTRY'
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
                     })
-                    res.end()
-                }else{
-                    console.error(err)
-                    res.status(500).send({
-                        success: false,
-                        error: SOMETHING_WENT_WRONG
-                    })
+                    return
                 }
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
+
         }else{
             if(error instanceof multer.MulterError){
                 return res.send(error)
@@ -778,26 +794,42 @@ app.post("/api/user/add-patient",async (req,res)=>{
                 req.body.animal_type,req.body.breed.toUpperCase(),
                 birthDate,req.body.pet_owner,req.file.filename)
 
-            dao.registerPatient(patient).then(result=>{
-                res.status(200).send({
-                    success: true,
-                    result: result
+            dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
+                dao.registerPatient(patient).then(result=>{
+                    res.status(200).send({
+                        success: true,
+                        result: result
+                    })
+                }).catch(err=>{
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        res.status(500).send({
+                            success: false,
+                            error: 'DUPLICATE-ENTRY'
+                        })
+                        res.end()
+                    }else{
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    }
                 })
-            }).catch(err=>{
-                if (err.code === 'ER_DUP_ENTRY') {
-                    res.status(500).send({
-                        success: false,
-                        error: 'DUPLICATE-ENTRY'
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
                     })
-                    res.end()
-                }else{
-                    console.error(err)
-                    res.status(500).send({
-                        success: false,
-                        error: SOMETHING_WENT_WRONG
-                    })
+                    return
                 }
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
+
         }
     })
 })
