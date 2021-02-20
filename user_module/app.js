@@ -971,18 +971,65 @@ app.delete("/api/user/delete-patient",(req,res)=>{
     }
 
     const patient=new Patient(req.query.id,null,null,null,null)
-    dao.deletePatient(patient).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:SUCCESS
+    dao.retrieveOnePatient(patient).then(patientResult=>{
+        dao.retrievePatientPicture(patient).then(pictureResult=>{
+            if(pictureResult==='No Attachment'){
+                dao.deletePatient(patient).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:SUCCESS
+                    })
+                }).catch(err=>{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                })
+                return
+            }
+            fs.unlinkSync(UPLOADPATH+pictureResult)
+            dao.deletePatient(patient).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:SUCCESS
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
         res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
+
 })
 
 app.post("/api/user/bind-user-to-pet", (req,res)=>{
