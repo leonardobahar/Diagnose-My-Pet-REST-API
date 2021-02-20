@@ -458,7 +458,7 @@ export class Dao{
 
 	retrievePatient(){
 		return new Promise((resolve, reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id"
 			this.mysqlConn.query(query,(error,result)=>{
@@ -481,6 +481,7 @@ export class Dao{
 						animal_name:rowDataPacket.animal_name,
 						breed:rowDataPacket.breed,
 						birthdate:rowDataPacket.birthdate,
+						gender:rowDataPacket.patient_gender,
 						age:age,
 						pet_owner_id:rowDataPacket.pet_owner_id,
 						pet_owner_name:rowDataPacket.user_name,
@@ -498,7 +499,7 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.gender, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.id=?"
@@ -519,6 +520,7 @@ export class Dao{
 							animal_type_id:rowDataPacket.animal_type_id,
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
+							gender:rowDataPacket.patient_gender,
 							birthdate:rowDataPacket.birthdate,
 							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
@@ -536,7 +538,7 @@ export class Dao{
 
 	retrievePatientsByOwnerId(owner_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.pet_owner_id=?"
@@ -557,6 +559,7 @@ export class Dao{
 							animal_type_id:rowDataPacket.animal_type_id,
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
+							gender:rowDataPacket.patient_gender,
 							birthdate:rowDataPacket.birthdate,
 							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
@@ -574,7 +577,7 @@ export class Dao{
 
 	retrievePatientByBirthDate(birthdate){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.birthdate=?"
@@ -595,6 +598,7 @@ export class Dao{
 							animal_type_id:rowDataPacket.animal_type_id,
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
+							gender:rowDataPacket.patient_gender,
 							birthdate:rowDataPacket.birthdate,
 							age:age,
 							pet_owner_id:rowDataPacket.pet_owner_id,
