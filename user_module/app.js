@@ -1579,7 +1579,8 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
        typeof req.query.doctor_id==='undefined' &&
         typeof req.query.date1 ==='undefined' &&
         typeof req.query.date2 ==='undefined' &&
-        typeof req.query.doctor_name==='undefined'){
+        typeof req.query.doctor_name==='undefined' &&
+        typeof req.query.customer_id==='undefined'){
         dao.retrieveAppointment().then(result=>{
             res.status(200).send({
                 success:true,
@@ -1676,8 +1677,9 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    }
-    else{
+    }else if(typeof req.query.customer_id !=='undefined'){
+
+    } else{
         const appointment=new Appointment(req.query.id,null,null,null,null)
         dao.retrieveOneAppointment(appointment).then(result=>{
             res.status(200).send({

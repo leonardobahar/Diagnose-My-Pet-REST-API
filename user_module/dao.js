@@ -1413,6 +1413,51 @@ export class Dao{
 		})
 	}
 
+	retrieveAppointmentByCustomerId(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
+				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
+				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
+				"WHERE a.user_id=? "
+			this.mysqlConn.query(query,user.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						const appointmentTime =  moment(rowDataPacket.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+						return{
+							id:rowDataPacket.id,
+							appointment_name:rowDataPacket.appointment_name,
+							appointment_time:appointmentTime,
+							duration:rowDataPacket.duration,
+							appointment_status:rowDataPacket.appointment_status,
+							user_id:rowDataPacket.user_id,
+							user_name:rowDataPacket.user_name,
+							is_real_appointment:rowDataPacket.is_real_appointment,
+							patient_id:rowDataPacket.patient_id,
+							pet_name:rowDataPacket.patient_name,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							description:rowDataPacket.description
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	retrieveAppointmentByStatus(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
