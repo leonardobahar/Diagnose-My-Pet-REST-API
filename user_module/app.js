@@ -700,7 +700,7 @@ app.get("/api/user/retrieve-patient-picture",(req,res)=>{
             return
         }
         //res.status(200).sendFile('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads/'+result)
-        res.status(200).sendFile('/Uploads/'+result)
+        res.status(200).sendFile('../Uploads/'+result)
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
             res.status(204).send({
