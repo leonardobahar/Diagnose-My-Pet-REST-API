@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `patients`(
 	patient_name VARCHAR(255) NOT NULL,
 	animal_type_id INT(11),
 	breed VARCHAR(255),
-	patient_gender VARCHAR(255)
+	patient_gender VARCHAR(255),
 	birthdate DATE DEFAULT NULL,
 	pet_owner_id INT(11),
 	patient_picture VARCHAR(255),
