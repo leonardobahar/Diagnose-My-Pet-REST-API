@@ -1940,7 +1940,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 return
             }
 
-            console.error(err)
+            console.error(error)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
