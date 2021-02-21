@@ -4,7 +4,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import jsonwebtoken from 'jsonwebtoken';
+import multer from "multer";
+import moment from "moment";
 import {Dao} from "./dao";
 import {
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
@@ -21,9 +22,6 @@ import {
     Symptoms, TreatmentPlan,
     User
 } from "../model";
-import multer from "multer";
-import moment from "moment";
-import * as util from "util";
 
 dotenv.config();
 
@@ -281,7 +279,7 @@ app.post("/api/user/confirm-user-email",(req,res)=>{
 })
 
 app.post("/api/user/user-login",(req,res)=>{
-    /*if(typeof req.body.user_name==='undefined' &&
+    if(typeof req.body.user_name==='undefined' &&
        typeof req.body.password==='undefined' ||
         typeof req.body.email==='undefined'){
         res.status(400).send({
@@ -289,7 +287,7 @@ app.post("/api/user/user-login",(req,res)=>{
             error:WRONG_BODY_FORMAT
         })
         return
-    }*/
+    }
 
     if(typeof req.body.email!=='undefined'){
         const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
@@ -322,38 +320,38 @@ app.post("/api/user/user-login",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-        return
-    }
-    const user=new User(null,req.body.user_name,null,null,null,null,req.body.password,null)
-    dao.loginCustomer(user).then(loginResult=> {
-        dao.userLastSignIn(loginResult[0].user_id).then(result=>{
-            res.status(200).send({
-                success: true,
-                authentication_approval: true,
-                message: 'Log in Successful',
-                result:loginResult
+    }else {
+        const user = new User(null, req.body.user_name, null, null, null, null, req.body.password, null)
+        dao.loginCustomer(user).then(loginResult => {
+            dao.userLastSignIn(loginResult[0].user_id).then(result => {
+                res.status(200).send({
+                    success: true,
+                    authentication_approval: true,
+                    message: 'Log in Successful',
+                    result: loginResult
+                })
+            }).catch(error => {
+                console.error(error)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
             })
-        }).catch(error=>{
+        }).catch(error => {
+            if (error === NO_SUCH_CONTENT) {
+                res.status(200).send({
+                    success: false,
+                    authentication_approval: false,
+                    message: 'Invalid User Name/Password'
+                })
+            }
             console.error(error)
             res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
+                success: false,
+                error: SOMETHING_WENT_WRONG
             })
         })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(200).send({
-                success:false,
-                authentication_approval: false,
-                message:'Invalid User Name/Password'
-            })
-        }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
+    }
 })
 
 app.post("/api/user/update-user",(req,res)=>{
