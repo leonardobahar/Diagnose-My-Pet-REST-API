@@ -1869,7 +1869,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                     dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                         dao.updateAppointment(new Appointment(req.body.id,
                             req.body.appointment_name,
-                            null,
+                            appointmentResult.appointment_time,
                             null,
                             req.body.user_id,
                             req.body.is_real_appointment,
@@ -1949,14 +1949,38 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }
 
-    dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-        dao.updateAppointment(appointment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
+    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+        dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+            dao.updateAppointment(new Appointment(req.body.id,
+                req.body.appointment_name,
+                appointmentResult.appointment_time,
+                null,
+                req.body.user_id,
+                req.body.is_real_appointment,
+                req.body.patient_id,
+                req.body.doctor_id,
+                'UPDATED')).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
-        }).catch(err=>{
-            console.error(err)
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+
+            console.error(error)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
@@ -1970,7 +1994,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
             })
             return
         }
-
         console.error(error)
         res.status(500).send({
             success:false,
