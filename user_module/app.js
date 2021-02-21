@@ -631,33 +631,6 @@ app.get("/api/user/retrieve-patient",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    }else if(typeof req.query.id==='undefined' &&
-             typeof req.query.owner_id==='undefined' &&
-             typeof req.query.age!=='undefined'){
-
-        let birthDate=new Date()
-        birthDate.setFullYear(birthDate.getFullYear()-req.query.age)
-        const finalDate=moment(birthDate, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD')
-
-        dao.retrievePatientByBirthDate(finalDate).then(result=>{
-            res.status(200).send({
-                success:true,
-                result
-            })
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
     } else{
         const patient=new Patient(req.query.id,null,null,null)
 
@@ -1888,23 +1861,21 @@ app.post("/api/user/update-appointment", (req,res)=>{
         return
     }
 
-    const appointment=new Appointment(req.body.id,
-        req.body.appointment_name,
-        null,
-        null,
-        req.body.user_id,
-        req.body.is_real_appointment,
-        req.body.patient_id,
-        req.body.doctor_id,
-        'UPDATED')
-
     if(typeof req.body.user_id !== 'undefined' &&
         typeof req.body.patient_id !== 'undefined'){
-        dao.getAppointmentId(new Appointment(req.body.id)).then(result=>{
+        dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
             dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
                 dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
                     dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                        dao.updateAppointment(appointment).then(result=>{
+                        dao.updateAppointment(new Appointment(req.body.id,
+                            req.body.appointment_name,
+                            null,
+                            null,
+                            req.body.user_id,
+                            req.body.is_real_appointment,
+                            req.body.patient_id,
+                            req.body.doctor_id,
+                            'UPDATED')).then(result=>{
                             res.status(200).send({
                                 success:true,
                                 result:result

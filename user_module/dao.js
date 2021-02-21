@@ -470,7 +470,7 @@ export class Dao{
 				const patients=result.map(rowDataPacket=>{
 					const date=new Date()
 					const year=date.getFullYear()
-					const birthDate=rowDataPacket.birthdate
+					const birthDate=new Date(rowDataPacket.birthdate)
 					const bdYear=birthDate.getFullYear()
 					const age=year-bdYear
 
@@ -511,7 +511,7 @@ export class Dao{
 					const patients=result.map(rowDataPacket=>{
 						const date=new Date()
 						const year=date.getFullYear()
-						const birthDate=rowDataPacket.birthdate
+						const birthDate=new Date(rowDataPacket.birthdate)
 						const bdYear=birthDate.getFullYear()
 						const age=year-bdYear
 						return{
@@ -550,46 +550,7 @@ export class Dao{
 					const patients=result.map(rowDataPacket=>{
 						const date=new Date()
 						const year=date.getFullYear()
-						const birthDate=rowDataPacket.birthdate
-						const bdYear=birthDate.getFullYear()
-						const age=year-bdYear
-						return{
-							id:rowDataPacket.id,
-							patient_name:rowDataPacket.patient_name,
-							animal_type_id:rowDataPacket.animal_type_id,
-							animal_name:rowDataPacket.animal_name,
-							breed:rowDataPacket.breed,
-							gender:rowDataPacket.patient_gender,
-							birthdate:rowDataPacket.birthdate,
-							age:age,
-							pet_owner_id:rowDataPacket.pet_owner_id,
-							pet_owner_name:rowDataPacket.user_name,
-							picture:rowDataPacket.patient_picture
-						}
-					})
-					resolve(patients)
-				}else {
-					reject(NO_SUCH_CONTENT)
-				}
-			})
-		})
-	}
-
-	retrievePatientByBirthDate(birthdate){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
-				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
-				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
-				"WHERE p.birthdate=?"
-			this.mysqlConn.query(query,birthdate,(error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}else if(result.length>0){
-					const patients=result.map(rowDataPacket=>{
-						const date=new Date()
-						const year=date.getFullYear()
-						const birthDate=rowDataPacket.birthdate
+						const birthDate=new Date(rowDataPacket.birthdate)
 						const bdYear=birthDate.getFullYear()
 						const age=year-bdYear
 						return{
