@@ -2698,7 +2698,7 @@ app.delete("/api/user/delete-appointment", (req,res)=>{
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
         if(appointmentResult[0].proof_of_payment==='No Attachment' ||
             appointmentResult[0].proof_of_payment==='' ||
-            appointmentResult[0].proof_of_payment==='NULL'){
+            appointmentResult[0].proof_of_payment===null){
             dao.deleteAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
