@@ -1740,6 +1740,29 @@ app.get("/api/user/retrieve-appointment", (req,res)=>{
     }
 })
 
+app.get("/api/image",(req,res)=>{
+    if(typeof req.query.image_name==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    // fs.readdirSync(Buffer.from(UPLOADPATH+req.query.payment_attachment_name),(error,result)=>{
+    //     if(error){
+    //         res.status(500).send({
+    //             success:false,
+    //             error:SOMETHING_WENT_WRONG
+    //         })
+    //         return
+    //     }
+    // })
+
+    //res.status(200).sendFile('C:/xampp/htdocs/BaharTech/Diagnose-My-Pet-REST-API/'+'/Uploads/'+req.query.image_name)
+     res.status(200).sendFile(UPLOADPATH+req.query.image_name)
+})
+
 app.post("/api/user/add-appointment", (req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
