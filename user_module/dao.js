@@ -1514,11 +1514,14 @@ export class Dao{
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
-				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `duration`, `user_id`, `appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`, `description`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"
+				const query="INSERT INTO `appointment` (`appointment_name`, `appointment_time`, `duration`, `user_id`, " +
+					"`appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`, `description`, `proof_of_payment`) " +
+					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 				const appointmentTime =  moment(appointment.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
 				this.mysqlConn.query(query, [appointment.appointment_name, appointmentTime,
 					appointment.duration, appointment.user_id,appointment.appointment_status,
-					appointment.is_real_appointment, appointment.patient_id, appointment.doctor_id, appointment.description],(error,result)=>{
+					appointment.is_real_appointment, appointment.patient_id, appointment.doctor_id,
+					appointment.description, appointment.proof_of_payment],(error,result)=>{
 					if(error){
 						reject(error)
 						return
