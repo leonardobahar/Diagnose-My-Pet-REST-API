@@ -2052,7 +2052,8 @@ app.post("/api/user/update-appointment", (req,res)=>{
                     dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
                         dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
                             dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                                if(appointmentResult[0].proof_of_payment==='No Attachment'){
+                                if(appointmentResult[0].proof_of_payment==='No Attachment' ||
+                                    appointmentResult[0].proof_of_payment===''){
                                     dao.updateAppointment(new Appointment(req.body.id,
                                         req.body.appointment_name,
                                         appointmentResult.appointment_time,
@@ -2123,7 +2124,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
                                 })
                                 return
                             }
-
                             console.error(error)
                             res.status(500).send({
                                 success:false,
@@ -2138,7 +2138,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
                             })
                             return
                         }
-
                         console.error(error)
                         res.status(500).send({
                             success:false,
@@ -2162,9 +2161,16 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 return
             }
 
+            if(error instanceof multer.MulterError){
+                return res.send(error)
+            } else if(error){
+                return res.send(error)
+            }
+
             dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
                 dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                    if(appointmentResult[0].proof_of_payment==='No Attachment'){
+                    if(appointmentResult[0].proof_of_payment==='No Attachment' ||
+                        appointmentResult[0].proof_of_payment===''){
                         dao.updateAppointment(new Appointment(req.body.id,
                             req.body.appointment_name,
                             appointmentResult.appointment_time,
@@ -2250,7 +2256,8 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
                     dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
                         dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                            if(appointmentResult[0].proof_of_payment==='No Attachment'){
+                            if(appointmentResult[0].proof_of_payment==='No Attachment' ||
+                                appointmentResult[0].proof_of_payment===''){
                                 dao.updateAppointment(new Appointment(req.body.id,
                                     req.body.appointment_name,
                                     appointmentResult.appointment_time,
@@ -2360,7 +2367,8 @@ app.post("/api/user/update-appointment", (req,res)=>{
 
         dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
             dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-                if(appointmentResult[0].proof_of_payment==='No Attachment'){
+                if(appointmentResult[0].proof_of_payment==='No Attachment' ||
+                    appointmentResult[0].proof_of_payment===''){
                     dao.updateAppointment(new Appointment(req.body.id,
                         req.body.appointment_name,
                         appointmentResult.appointment_time,
@@ -2684,7 +2692,8 @@ app.delete("/api/user/delete-appointment", (req,res)=>{
 
     const appointment=new Appointment(req.query.id,null,null,null,null)
     dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
-        if(appointmentResult[0].proof_of_payment==='No Attachment'){
+        if(appointmentResult[0].proof_of_payment==='No Attachment' ||
+            appointmentResult[0].proof_of_payment===''){
             dao.deleteAppointment(appointment).then(result=>{
                 res.status(200).send({
                     success:true,
