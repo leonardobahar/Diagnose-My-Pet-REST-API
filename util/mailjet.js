@@ -1,5 +1,6 @@
 export const sendResetPasswordMail = (username, email, token) =>{
     return new Promise((resolve,reject) => {
+        console.info("Sending an email to "+email)
         /**
          *
          * Run:

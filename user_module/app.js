@@ -314,12 +314,13 @@ app.post("/api/user/user-login",(req,res)=>{
                     authentication_approval: false,
                     message:'Invalid User Name/Password'
                 })
+            }else{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
         })
     }else {
         const user = new User(null, req.body.user_name, null, null, null, null, req.body.password, null)
@@ -458,6 +459,7 @@ app.post("/api/user/change-password",(req,res)=>{
 
     dao.retrieveUserIdFromToken(req.body.token).then(userId=>{
         const user = new User(userId,null,null,null,null,null,req.body.password,null)
+        console.log("Resetting password for user id "+userId)
         dao.changeCustomerPassword(user).then(result=>{
             dao.removeToken(req.body.token)
             res.status(200).send({
