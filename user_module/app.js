@@ -2451,7 +2451,6 @@ app.post("/api/user/reschedule-appointment",(req,res)=>{
             })
             return
         }
-
         console.error(error)
         res.status(500).send({
             success:false,
@@ -2661,13 +2660,45 @@ app.delete("/api/user/delete-appointment", (req,res)=>{
     }
 
     const appointment=new Appointment(req.query.id,null,null,null,null)
-    dao.deleteAppointment(appointment).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.retrieveOneAppointment(appointment).then(appointmentResult=>{
+        if(appointmentResult.proof_of_payment==='No Attachment'){
+            dao.deleteAppointment(appointment).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+            return
+        }
+
+        fs.unlinkSync(UPLOADPATH+appointmentResult.proof_of_payment)
+        dao.deleteAppointment(appointment).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(err=>{
-        console.error(err)
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
