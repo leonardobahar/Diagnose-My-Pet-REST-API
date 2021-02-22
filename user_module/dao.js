@@ -357,7 +357,6 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			console.log(user)
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
 			const query="UPDATE users SET password=?, salt=? WHERE id=?"
