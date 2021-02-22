@@ -447,7 +447,7 @@ app.post("/api/user/request-password-reset", (req, res)=>{
 })
 
 app.post("/api/user/change-password",(req,res)=>{
-    if(typeof req.body.email==='undefined' ||
+    if(typeof req.body.token==='undefined' ||
        typeof req.body.password==='undefined'){
         res.status(400).send({
             success:false,
@@ -456,18 +456,24 @@ app.post("/api/user/change-password",(req,res)=>{
         return
     }
 
-    const user = new User(null,null,req.body.email,null,null,null,req.body.password,null)
-    dao.changeCustomerPassword(user).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
+    dao.retrieveUserIdFromToken(req.body.token).then(userId=>{
+        const user = new User(userId,null,null,null,null,null,req.body.password,null)
+        dao.changeCustomerPassword(user).then(result=>{
+            dao.removeToken(req.body.token)
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-    }).catch(error=>{
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(204).send()
     })
 })
 

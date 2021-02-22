@@ -158,6 +158,28 @@ export class Dao{
 		})
 	}
 
+	retrieveUserIdFromToken(token){
+		return new Promise((resolve, reject)=>{
+			const query = `SELECT user_id FROM forgot_password_token WHERE token = ?`
+			this.mysqlConn.query(query, [token], (err, res)=>{
+				if (res.length == 0){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(res.user_id)
+				}
+			})
+		})
+	}
+
+	removeToken(token){
+		return new Promise(resolve=>{
+			const query = `DELETE FROM forgot_password_token WHERE token = ?`
+			this.mysqlConn.query(query, [token], (err, res)=>{
+				resolve()
+			})
+		})
+	}
+
 	registerUser(user){
 		return new Promise(async (resolve, reject) => {
 			if (!user instanceof User) {
@@ -337,8 +359,8 @@ export class Dao{
 
 			const salt = await bcrypt.genSalt(5)
 			const hash = await bcrypt.hash(user.password,salt)
-			const query="UPDATE users SET password=?, salt=? WHERE email=?"
-			this.mysqlConn.query(query, [hash, salt, user.email],(error,result)=>{
+			const query="UPDATE users SET password=?, salt=? WHERE id=?"
+			this.mysqlConn.query(query, [hash, salt, user.id],(error,result)=>{
 				if(error){
 					reject(error)
 					return

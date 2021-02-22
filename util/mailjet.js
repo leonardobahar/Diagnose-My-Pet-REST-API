@@ -99,7 +99,7 @@ export const sendResetPasswordMail = (username, email, token) =>{
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td class="button" style="font-family: Geneva, Tahoma, Verdana, sans-serif; font-size: 16px; padding-top: 26px;" width="640" align="left">
-                                                                                            <a href="${token}"  style="background: #0c99d5; color: #fff; text-decoration: none; border: 14px solid #0c99d5; border-left-width: 50px; border-right-width: 50px; text-transform: uppercase; display: inline-block;">
+                                                                                            <a href="https://klinikhewanrajanti.com/forgot-password/${token}"  style="background: #0c99d5; color: #fff; text-decoration: none; border: 14px solid #0c99d5; border-left-width: 50px; border-right-width: 50px; text-transform: uppercase; display: inline-block;">
                                                                                                 Confirm
                                                                                             </a>
                                                                                         </td>
@@ -125,10 +125,8 @@ export const sendResetPasswordMail = (username, email, token) =>{
         
                                             <br>
         
-                                            We understand your concern so, please let us know by clicking <a href="#"  style="color: #0c99d5;">here</a>
-                                            if you never register using this email. We'll put a big flag beside the user account and
-                                            pay close attention to it. Please allow us to let you know if there is any serious concern
-                                            about this email regarding our clinic in the future.
+                                            We understand your concern so, please ignore this email if you never requested for a password reset. Please allow us to let you know if there is any serious concern
+                                            about this email regarding our clinic in the future. Thank you.
         
                                             <br>
                                             <br>
