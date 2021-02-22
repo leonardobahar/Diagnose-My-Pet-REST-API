@@ -22,6 +22,7 @@ import {
     Symptoms, TreatmentPlan,
     User
 } from "../model";
+import {sendResetPasswordMail} from "../util/mailjet";
 
 dotenv.config();
 
@@ -402,6 +403,46 @@ app.post("/api/user/update-user",(req,res)=>{
             success:false,
             error:SOMETHING_WENT_WRONG
         })
+    })
+})
+
+app.post("/api/user/request-password-reset", (req, res)=>{
+    if (typeof req.body.email === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    const user = new User(null,null,null,req.body.email,null,null,null,null)
+    dao.retrieveOneUser(user).then(result=>{
+        const user_id = result[0].id
+        const user_name = result[0].user_name
+        const email = result[0].email
+        const token = Math.random().toString(36).substr(2)
+        dao.addResetPasswordToken(token, user_id).then(result=>{
+            sendResetPasswordMail(user_name, email, token).then(result=>{
+                res.status(200).send({
+                    success: true
+                })
+            }).catch(err=>{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(204).send()
     })
 })
 

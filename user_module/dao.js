@@ -121,8 +121,8 @@ export class Dao{
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
-			const query="SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND id=?"
-			this.mysqlConn.query(query,user.id, (error,result)=>{
+			const query= user.id === null ? `SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND email='${user.email}'; ` : `SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' AND id=${user.id}`
+			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
 				}else if(result.length>0){
@@ -140,6 +140,19 @@ export class Dao{
 					resolve(customer)
 				}else{
 					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	addResetPasswordToken(token, user_id){
+		return new Promise((resolve, reject) => {
+			const query = `INSERT INTO forgot_password_token(token, user_id) VALUES(?,?)`;
+			this.mysqlConn.query(query, [token, user_id], (err, res)=>{
+				if (err){
+					reject(err)
+				}else{
+					resolve(res)
 				}
 			})
 		})
