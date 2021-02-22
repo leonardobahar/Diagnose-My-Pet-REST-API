@@ -2054,7 +2054,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                             dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                                 if(appointmentResult[0].proof_of_payment==='No Attachment' ||
                                     appointmentResult[0].proof_of_payment===''||
-                                    appointmentResult[0].proof_of_payment==='NULL'){
+                                    appointmentResult[0].proof_of_payment===null){
                                     dao.updateAppointment(new Appointment(req.body.id,
                                         req.body.appointment_name,
                                         appointmentResult.appointment_time,
@@ -2172,7 +2172,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                     if(appointmentResult[0].proof_of_payment==='No Attachment' ||
                         appointmentResult[0].proof_of_payment==='' ||
-                        appointmentResult[0].proof_of_payment==='NULL'){
+                        appointmentResult[0].proof_of_payment===null){
                         dao.updateAppointment(new Appointment(req.body.id,
                             req.body.appointment_name,
                             appointmentResult.appointment_time,
@@ -2260,7 +2260,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
                         dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                             if(appointmentResult[0].proof_of_payment==='No Attachment' ||
                                 appointmentResult[0].proof_of_payment==='' ||
-                                appointmentResult[0].proof_of_payment==='NULL'){
+                                appointmentResult[0].proof_of_payment===null){
                                 dao.updateAppointment(new Appointment(req.body.id,
                                     req.body.appointment_name,
                                     appointmentResult.appointment_time,
@@ -2372,7 +2372,7 @@ app.post("/api/user/update-appointment", (req,res)=>{
             dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
                 if(appointmentResult[0].proof_of_payment==='No Attachment' ||
                     appointmentResult[0].proof_of_payment==='' ||
-                    appointmentResult[0].proof_of_payment==='NULL'){
+                    appointmentResult[0].proof_of_payment===null){
                     dao.updateAppointment(new Appointment(req.body.id,
                         req.body.appointment_name,
                         appointmentResult.appointment_time,
