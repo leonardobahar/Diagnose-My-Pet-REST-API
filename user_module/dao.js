@@ -1152,7 +1152,8 @@ export class Dao{
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id "
@@ -1177,7 +1178,8 @@ export class Dao{
 						pet_name:rowDataPacket.patient_name,
 						doctor_id:rowDataPacket.doctor_id,
 						doctor_name:rowDataPacket.doctor_name,
-						description:rowDataPacket.description
+						description:rowDataPacket.description,
+						proof_of_payment:rowDataPacket.proof_of_payment
 					}
 				})
 				resolve(schedule)
@@ -1192,7 +1194,8 @@ export class Dao{
 				return
 			}
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1217,7 +1220,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1235,7 +1239,8 @@ export class Dao{
 				return
 			}
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1260,7 +1265,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1279,7 +1285,8 @@ export class Dao{
 			}
 
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1304,7 +1311,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1318,7 +1326,8 @@ export class Dao{
 	retrieveAppointmentsBetweenDates(date1,date2){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1343,7 +1352,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1357,7 +1367,8 @@ export class Dao{
 	retrieveAppointmentByDoctorAndBetweenDates(doctorId,date1,date2){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1382,7 +1393,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1420,7 +1432,8 @@ export class Dao{
 				return
 			}
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
@@ -1447,7 +1460,8 @@ export class Dao{
 							pet_name:rowDataPacket.patient_name,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
-							description:rowDataPacket.description
+							description:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment
 						}
 					})
 					resolve(schedule)
@@ -1461,7 +1475,8 @@ export class Dao{
 	retrieveAppointmentByStatus(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof Appointment){
-				const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.description " +
+				const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, " +
+					"a.user_id, a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.description, a.proof_of_payment " +
 					"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 					"LEFT OUTER JOIN patients p ON a.patient_id=p.id" +
 					"WHERE a.appointment_status=?"
@@ -1483,7 +1498,8 @@ export class Dao{
 								patient_id:rowDataPacket.patient_id,
 								pet_name:rowDataPacket.patient_name,
 								is_real_appointment:rowDataPacket.is_real_appointment,
-								description:rowDataPacket.description
+								description:rowDataPacket.description,
+								proof_of_payment:rowDataPacket.proof_of_payment
 							}
 						})
 						resolve(attachment)
