@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS `appointment`(
     doctor_id INT(11) ,
     appointment_status varchar(255),
     description LONGTEXT DEFAULT NULL,
+    proof_of_payment varchar(255) DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
