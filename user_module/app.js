@@ -1901,7 +1901,6 @@ app.post("/api/user/add-appointment", (req,res)=>{
                             })
                             return
                         }
-
                         console.error(error)
                         res.status(500).send({
                             success:false,
@@ -2009,23 +2008,140 @@ app.post("/api/user/add-appointment-description",(req,res)=>{
 })
 
 app.post("/api/user/update-appointment", (req,res)=>{
-    if(typeof req.body.id==='undefined' ||
-        typeof req.body.appointment_name==='undefined' ||
-        typeof req.body.is_real_appointment==='undefined' ||
-        typeof req.body.doctor_id==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    if(typeof req.body.user_id !== 'undefined' &&
-        typeof req.body.patient_id !== 'undefined'){
-        dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
-            dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
-                dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
-                    dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+    upload(req,res,async(error)=>{
+        if(typeof req.body.id==='undefined' ||
+            typeof req.body.appointment_name==='undefined' ||
+            typeof req.body.is_real_appointment==='undefined' ||
+            typeof req.body.doctor_id==='undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        if(typeof req.file==='undefined'){
+            if(typeof req.body.user_id !== 'undefined' &&
+                typeof req.body.patient_id !== 'undefined'){
+                dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+                    dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
+                        dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
+                            dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                                if(appointmentResult.proof_of_payment==='No Attachment'){
+                                    dao.updateAppointment(new Appointment(req.body.id,
+                                        req.body.appointment_name,
+                                        appointmentResult.appointment_time,
+                                        null,
+                                        req.body.user_id,
+                                        req.body.is_real_appointment,
+                                        req.body.patient_id,
+                                        req.body.doctor_id,
+                                        'UPDATED',
+                                        null,
+                                        'No Attachment')).then(result=>{
+                                        res.status(200).send({
+                                            success:true,
+                                            result:result
+                                        })
+                                    }).catch(err=>{
+                                        console.error(err)
+                                        res.status(500).send({
+                                            success:false,
+                                            error:SOMETHING_WENT_WRONG
+                                        })
+                                    })
+                                    return
+                                }
+
+                                fs.unlinkSync(UPLOADPATH+appointmentResult.proof_of_payment)
+                                dao.updateAppointment(new Appointment(req.body.id,
+                                    req.body.appointment_name,
+                                    appointmentResult.appointment_time,
+                                    null,
+                                    req.body.user_id,
+                                    req.body.is_real_appointment,
+                                    req.body.patient_id,
+                                    req.body.doctor_id,
+                                    'UPDATED',
+                                    null,
+                                    'No Attachment')).then(result=>{
+                                    res.status(200).send({
+                                        success:true,
+                                        result:result
+                                    })
+                                }).catch(err=>{
+                                    console.error(err)
+                                    res.status(500).send({
+                                        success:false,
+                                        error:SOMETHING_WENT_WRONG
+                                    })
+                                })
+                            }).catch(error=>{
+                                if(error===NO_SUCH_CONTENT){
+                                    res.status(204).send({
+                                        success:false,
+                                        error:NO_SUCH_CONTENT
+                                    })
+                                    return
+                                }
+                                console.error(error)
+                                res.status(500).send({
+                                    success:false,
+                                    error:SOMETHING_WENT_WRONG
+                                })
+                            })
+                        }).catch(error=>{
+                            if(error===NO_SUCH_CONTENT){
+                                res.status(204).send({
+                                    success:false,
+                                    error:NO_SUCH_CONTENT
+                                })
+                                return
+                            }
+
+                            console.error(error)
+                            res.status(500).send({
+                                success:false,
+                                error:SOMETHING_WENT_WRONG
+                            })
+                        })
+                    }).catch(error=>{
+                        if(error===NO_SUCH_CONTENT){
+                            res.status(204).send({
+                                success:false,
+                                error:NO_SUCH_CONTENT
+                            })
+                            return
+                        }
+
+                        console.error(error)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    })
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                })
+                return
+            }
+
+            dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+                dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                    if(appointmentResult.proof_of_payment==='No Attachment'){
                         dao.updateAppointment(new Appointment(req.body.id,
                             req.body.appointment_name,
                             appointmentResult.appointment_time,
@@ -2034,13 +2150,141 @@ app.post("/api/user/update-appointment", (req,res)=>{
                             req.body.is_real_appointment,
                             req.body.patient_id,
                             req.body.doctor_id,
-                            'UPDATED')).then(result=>{
+                            'UPDATED',
+                            null,
+                            'No Attachment')).then(result=>{
                             res.status(200).send({
                                 success:true,
                                 result:result
                             })
                         }).catch(err=>{
                             console.error(err)
+                            res.status(500).send({
+                                success:false,
+                                error:SOMETHING_WENT_WRONG
+                            })
+                        })
+                        return
+                    }
+
+                    fs.unlinkSync(UPLOADPATH+appointmentResult.proof_of_payment)
+                    dao.updateAppointment(new Appointment(req.body.id,
+                        req.body.appointment_name,
+                        appointmentResult.appointment_time,
+                        null,
+                        req.body.user_id,
+                        req.body.is_real_appointment,
+                        req.body.patient_id,
+                        req.body.doctor_id,
+                        'UPDATED',
+                        null,
+                        'No Attachment')).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    })
+                }).catch(error=>{
+                    if(error===NO_SUCH_CONTENT){
+                        res.status(204).send({
+                            success:false,
+                            error:NO_SUCH_CONTENT
+                        })
+                        return
+                    }
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                })
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
+                    })
+                    return
+                }
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+            return
+        }
+
+        if(typeof req.body.user_id !== 'undefined' &&
+            typeof req.body.patient_id !== 'undefined'){
+            dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+                dao.retrieveOneUser(new User(req.body.user_id)).then(result=>{
+                    dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(result=>{
+                        dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                            if(appointmentResult.proof_of_payment==='No Attachment'){
+                                dao.updateAppointment(new Appointment(req.body.id,
+                                    req.body.appointment_name,
+                                    appointmentResult.appointment_time,
+                                    null,
+                                    req.body.user_id,
+                                    req.body.is_real_appointment,
+                                    req.body.patient_id,
+                                    req.body.doctor_id,
+                                    'UPDATED',
+                                    null,
+                                    req.file.filename)).then(result=>{
+                                    res.status(200).send({
+                                        success:true,
+                                        result:result
+                                    })
+                                }).catch(err=>{
+                                    console.error(err)
+                                    res.status(500).send({
+                                        success:false,
+                                        error:SOMETHING_WENT_WRONG
+                                    })
+                                })
+                                return
+                            }
+
+                            fs.unlinkSync(UPLOADPATH+appointmentResult.proof_of_payment)
+                            dao.updateAppointment(new Appointment(req.body.id,
+                                req.body.appointment_name,
+                                appointmentResult.appointment_time,
+                                null,
+                                req.body.user_id,
+                                req.body.is_real_appointment,
+                                req.body.patient_id,
+                                req.body.doctor_id,
+                                'UPDATED',
+                                null,
+                                req.file.filename)).then(result=>{
+                                res.status(200).send({
+                                    success:true,
+                                    result:result
+                                })
+                            }).catch(err=>{
+                                console.error(err)
+                                res.status(500).send({
+                                    success:false,
+                                    error:SOMETHING_WENT_WRONG
+                                })
+                            })
+                        }).catch(error=>{
+                            if(error===NO_SUCH_CONTENT){
+                                res.status(204).send({
+                                    success:false,
+                                    error:NO_SUCH_CONTENT
+                                })
+                                return
+                            }
+                            console.error(error)
                             res.status(500).send({
                                 success:false,
                                 error:SOMETHING_WENT_WRONG
@@ -2068,7 +2312,6 @@ app.post("/api/user/update-appointment", (req,res)=>{
                         })
                         return
                     }
-
                     console.error(error)
                     res.status(500).send({
                         success:false,
@@ -2083,7 +2326,74 @@ app.post("/api/user/update-appointment", (req,res)=>{
                     })
                     return
                 }
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+            return
+        }
 
+        dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+            dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
+                if(appointmentResult.proof_of_payment==='No Attachment'){
+                    dao.updateAppointment(new Appointment(req.body.id,
+                        req.body.appointment_name,
+                        appointmentResult.appointment_time,
+                        null,
+                        req.body.user_id,
+                        req.body.is_real_appointment,
+                        req.body.patient_id,
+                        req.body.doctor_id,
+                        'UPDATED',
+                        null,
+                        req.file.filename)).then(result=>{
+                        res.status(200).send({
+                            success:true,
+                            result:result
+                        })
+                    }).catch(err=>{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    })
+                    return
+                }
+
+                fs.unlinkSync(UPLOADPATH+appointmentResult.proof_of_payment)
+                dao.updateAppointment(new Appointment(req.body.id,
+                    req.body.appointment_name,
+                    appointmentResult.appointment_time,
+                    null,
+                    req.body.user_id,
+                    req.body.is_real_appointment,
+                    req.body.patient_id,
+                    req.body.doctor_id,
+                    'UPDATED',
+                    null,
+                    req.file.filename)).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:result
+                    })
+                }).catch(err=>{
+                    console.error(err)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                })
+            }).catch(error=>{
+                if(error===NO_SUCH_CONTENT){
+                    res.status(204).send({
+                        success:false,
+                        error:NO_SUCH_CONTENT
+                    })
+                    return
+                }
                 console.error(error)
                 res.status(500).send({
                     success:false,
@@ -2098,65 +2408,11 @@ app.post("/api/user/update-appointment", (req,res)=>{
                 })
                 return
             }
-
             console.error(error)
             res.status(500).send({
                 success:false,
                 error:SOMETHING_WENT_WRONG
             })
-        })
-        return
-    }
-
-    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
-        dao.retrieveOneDoctor(new Doctor(req.body.doctor_id)).then(result=>{
-            dao.updateAppointment(new Appointment(req.body.id,
-                req.body.appointment_name,
-                appointmentResult.appointment_time,
-                null,
-                req.body.user_id,
-                req.body.is_real_appointment,
-                req.body.patient_id,
-                req.body.doctor_id,
-                'UPDATED')).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(err=>{
-                console.error(err)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
-            return
-        }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
         })
     })
 })
