@@ -1681,7 +1681,7 @@ export class Dao{
 						return
 					}
 
-					resolve(appointment)
+					resolve(SUCCESS)
 				})
 			} else{
 				reject(MISMATCH_OBJ_TYPE)
