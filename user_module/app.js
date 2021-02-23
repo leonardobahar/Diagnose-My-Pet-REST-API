@@ -3059,6 +3059,28 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
     })
 })
 
+app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
+    dao.bindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if (err===ERROR_DUPLICATE_ENTRY){
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
 app.get("/api/user/retrieve-appointment-schedule",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
