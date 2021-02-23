@@ -3018,6 +3018,35 @@ app.get("/api/user/retrieve-duration-of-booking-type", (req, res)=>{
     })
 })
 
+app.get("/api/user/retrieve-booking-type-by-doctor-id",(req,res)=>{
+    if(typeof req.query.doctor_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+    dao.retrieveBookingTypeBasedOnDoctorId(req.query.doctor_id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/delete-booking-type", (req, res)=>{
     if(typeof req.body.booking_type_name==='undefined' ){
         res.status(400).send({
@@ -3063,7 +3092,7 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
 })
 
 app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
-    dao.bindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
+    dao.bindDoctorToBookingType(req.body.booking_type_name.toUpperCase(), req.body.doctor_id).then(result=>{
         res.status(200).send({
             success: true,
             result: result

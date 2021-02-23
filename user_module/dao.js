@@ -2136,7 +2136,7 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM `v2_booking_type` " +
 				"WHERE booking_type_name=? "
-			this.mysqlConn.query(query,id,(error,result)=>{
+			this.mysqlConn.query(query,name,(error,result)=>{
 				if(error){
 					reject(error)
 				}else if(result.length>0){
@@ -2180,7 +2180,7 @@ export class Dao{
 
 	bindDoctorToBookingType(booking_type_name, doctor_id){
 		return new Promise((resolve, reject)=>{
-			let query = "SELECT FROM v2_booking_type_has_doctors WHERE doctor_id = ? AND booking_type_name = ?"
+			let query = "SELECT doctor_id FROM v2_booking_type_has_doctors WHERE doctor_id = ? "
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 				if	(res.length > 0){
 					// doctor has already been previously binded
