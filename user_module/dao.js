@@ -2209,7 +2209,7 @@ export class Dao{
 				}else if(res.length>0){
 					resolve(res)
 				}else{
-					reject(err)
+					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})
