@@ -1904,6 +1904,33 @@ export class Dao{
 		})
 	}
 
+	addSchedule(schedule){
+		return new Promise((resolve,reject)=>{
+			if(schedule instanceof Schedule){
+				const query="INSERT INTO `schedule` (`appointment_name`, `start_time`, `end_time`, `user_id`, " +
+					"`appointment_status`, `is_real_appointment`, `patient_id`, `doctor_id`, `description`, `proof_of_payment`) " +
+					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+				const startTime =  moment(schedule.start_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+				const endTime = moment(schedule.end_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+
+				this.mysqlConn.query(query, [schedule.appointment_name, startTime,
+					endTime, schedule.user_id,schedule.appointment_status,
+					schedule.is_real_appointment, schedule.patient_id, schedule.doctor_id,
+					schedule.description, schedule.payment_attachment],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					schedule.id=result.insertId
+					resolve(schedule)
+				})
+			} else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
 	retrieveParticipants(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM participants "
