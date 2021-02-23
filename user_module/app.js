@@ -2911,7 +2911,9 @@ app.post("/api/user/add-booking-type", (req, res)=>{
         return
     }
 
-    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+    const bookable = typeof req.body.bookable === "undefined" ? false : req.body.bookable
+
+    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, bookable).then(result=>{
         res.status(200).send({
             success: true,
             result : result
@@ -2934,7 +2936,8 @@ app.post("/api/user/add-booking-type", (req, res)=>{
 
 app.post("/api/user/edit-booking-type", (req, res)=>{
     if(typeof req.body.booking_type_name==='undefined' ||
-        typeof req.body.duration==='undefined'){
+        typeof req.body.duration==='undefined' ||
+        typeof req.body.bookable === 'undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2943,7 +2946,7 @@ app.post("/api/user/edit-booking-type", (req, res)=>{
     }
 
     dao.retrieveOneBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
-        dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+        dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, req.body.bookable).then(result=>{
             res.status(200).send({
                 success: true,
                 result : result
@@ -3061,6 +3064,28 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
 
 app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
     dao.bindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if (err===ERROR_DUPLICATE_ENTRY){
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.post("/api/user/unbind-doctor-to-booking-type", (req, res)=>{
+    dao.unbindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
         res.status(200).send({
             success: true,
             result: result

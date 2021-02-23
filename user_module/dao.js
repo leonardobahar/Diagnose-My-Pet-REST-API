@@ -2093,10 +2093,10 @@ export class Dao{
 	}
 
 	// Start of v2 Development
-	addBookingType(booking_type_name, duration){
+	addBookingType(booking_type_name, duration, bookable){
 		return new Promise((resolve, reject)=>{
-			const query = "INSERT INTO `v2_booking_type`(`booking_type_name`, `duration`) VALUES (?,?)";
-			this.mysqlConn.query(query, [booking_type_name, duration], (err, res)=>{
+			const query = "INSERT INTO `v2_booking_type`(`booking_type_name`, `duration`, `bookable`) VALUES (?,?)";
+			this.mysqlConn.query(query, [booking_type_name, duration, bookable], (err, res)=>{
 				if(!err){
 					resolve(res)
 				}else{
@@ -2106,10 +2106,10 @@ export class Dao{
 		})
 	}
 
-	editBookingType(booking_type_name, duration){
+	editBookingType(booking_type_name, duration, bookable){
 		return new Promise((resolve, reject)=>{
-			const query = "UPDATE `v2_booking_type` SET `duration` = ? WHERE `booking_type_name` = ?";
-			this.mysqlConn.query(query, [duration, booking_type_name], (err, res)=>{
+			const query = "UPDATE `v2_booking_type` SET `duration` = ?, `bookable` = ? WHERE `booking_type_name` = ?";
+			this.mysqlConn.query(query, [duration, bookable, booking_type_name], (err, res)=>{
 				if(!err){
 					resolve(res)
 				}else{
