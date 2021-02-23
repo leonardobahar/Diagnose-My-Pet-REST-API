@@ -2469,6 +2469,10 @@ export class Dao{
 		})
 	}
 
-	//useAppointmentSlot
+	useAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
+		return new Promise((resolve, reject)=>{
+			this.retrieveAvailableAppointmentScheduleForDoctorDay()
+		})
+	}
 	// End of v2 Development
 }
