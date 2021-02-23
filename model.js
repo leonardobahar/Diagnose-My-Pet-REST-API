@@ -118,6 +118,23 @@ export class Appointment{
 	}
 }
 
+export class Schedule{
+	constructor(id, appointment_name, start_time, end_time, user_id, is_real_appointment,
+				patient_id, doctor_id, appointment_status, description, payment_attachment) {
+		this.id=id
+		this.appointment_name=appointment_name
+		this.start_time=start_time
+		this.end_time=end_time
+		this.user_id=user_id
+		this.is_real_appointment=is_real_appointment
+		this.patient_id=patient_id
+		this.doctor_id=doctor_id
+		this.appointment_status=appointment_status
+		this.description=description
+		this.payment_attachment=payment_attachment
+	}
+}
+
 export class User{
 	constructor(id, user_name, mobile, email, birthdate, address, password, salt, role){
 		this.id = id
