@@ -1931,6 +1931,33 @@ export class Dao{
 		})
 	}
 
+	updateSchedule(schedule){
+		return new Promise((resolve,reject)=>{
+			if(schedule instanceof Schedule){
+				const query="UPDATE schedule SET appointment_name=?, user_id=?, is_real_appointment=?, patient_id=?, " +
+					"doctor_id=?, appointment_status=?, proof_of_payment=? " +
+					"WHERE id=? "
+				this.mysqlConn.query(query, [schedule.appointment_name.toUpperCase(),
+					schedule.user_id,
+					schedule.is_real_appointment,
+					schedule.patient_id,
+					schedule.doctor_id,
+					schedule.appointment_status,
+					schedule.payment_attachment,
+					schedule.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(schedule)
+				})
+			} else {
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
 	retrieveParticipants(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM participants "
