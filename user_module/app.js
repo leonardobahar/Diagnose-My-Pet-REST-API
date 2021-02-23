@@ -3029,6 +3029,24 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
     })
 })
 
+app.get("/api/user/retrieve-appointment-schedule",(req,res)=>{
+    if(typeof req.query.id==='undefined' &&
+       typeof req.query.doctor_id==='undefined' &&
+       typeof req.query.patient_id==='undefined'){
+
+    }else if(typeof req.query.id==='undefined' &&
+        typeof req.query.doctor_id!=='undefined' &&
+        typeof req.query.patient_id==='undefined'){
+
+    }else if(typeof req.query.id==='undefined' &&
+        typeof req.query.doctor_id==='undefined' &&
+        typeof req.query.patient_id!=='undefined'){
+
+    }else{
+
+    }
+})
+
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
