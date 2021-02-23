@@ -2132,6 +2132,22 @@ export class Dao{
 		})
 	}
 
+	retrieveOneBookingType(id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM `v2_booking_type` " +
+				"WHERE id=? "
+			this.mysqlConn.query(query,id,(error,result)=>{
+				if(error){
+					reject(error)
+				}else if(result.length>0){
+					resolve(result)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	retrieveBookingTypeDuration(booking_type_name){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT duration FROM v2_booking_type WHERE booking_type_name = ?"
