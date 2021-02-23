@@ -2899,6 +2899,138 @@ app.delete("/api/user/delete-participant",(req,res)=>{
 DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, TELAH DI-DIAGNOSA DOKTER/DIAGNOSED BY THE DOCTOR, RAWAT INAP/INPATIENT, SELESAI/DONE
  */
 
+
+// Start of v2 Development
+app.post("/api/user/add-booking-type", (req, res)=>{
+    if(typeof req.body.booking_type_name==='undefined' ||
+        typeof req.body.duration==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+        res.status(200).send({
+            success: true,
+            result : result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.post("/api/user/edit-booking-type", (req, res)=>{
+    if(typeof req.body.booking_type_name==='undefined' ||
+        typeof req.body.duration==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+        res.status(200).send({
+            success: true,
+            result : result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.get("/api/user/retrieve-booking-types", (req, res)=>{
+    dao.retrieveBookingTypes().then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.get("/api/user/retrieve-duration-of-booking-type", (req, res)=>{
+    if (typeof req.query.booking_type_name === "undefined"){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+    dao.retrieveBookingTypeDuration(req.query.booking_type_name).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
+app.post("/api/user/delete-booking-type", (req, res)=>{
+    if(typeof req.body.booking_type_name==='undefined' ){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.deleteBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
+        res.status(200).send({
+            success: true
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+// End of v2 Development
+
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
 app.listen(PORT, ()=>{
     console.info(`Server serving port ${PORT}`)

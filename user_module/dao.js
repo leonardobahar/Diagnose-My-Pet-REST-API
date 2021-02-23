@@ -2091,4 +2091,118 @@ export class Dao{
 			})
 		})
 	}
+
+	// Start of v2 Development
+	addBookingType(booking_type_name, duration){
+		return new Promise((resolve, reject)=>{
+			const query = "INSERT INTO `v2_booking_type`(`booking_type_name`, `duration`) VALUES (?,?)";
+			this.mysqlConn.query(query, [booking_type_name, duration], (err, res)=>{
+				if(!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	editBookingType(booking_type_name, duration){
+		return new Promise((resolve, reject)=>{
+			const query = "UPDATE `v2_booking_type` SET `duration` = ? WHERE `booking_type_name` = ?";
+			this.mysqlConn.query(query, [duration, booking_type_name], (err, res)=>{
+				if(!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	retrieveBookingTypes(){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM `v2_booking_type`";
+			this.mysqlConn.query(query, (err, res)=>{
+				if(!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	retrieveBookingTypeDuration(booking_type_name){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT duration FROM v2_booking_type WHERE booking_type_name = ?"
+			this.mysqlConn.query(query, [booking_type_name], (err, res)=>{
+				if	(!err){
+					if	(res.length == 0){
+						reject(NO_SUCH_CONTENT)
+					}else {
+						resolve(res[0].duration)
+					}
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	deleteBookingType(booking_type_name){
+		return new Promise((resolve, reject)=>{
+			const query = "DELETE FROM v2_booking_type WHERE booking_type_name = ?"
+			this.mysqlConn.query(query, [booking_type_name], (err, res)=>{
+				if(!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	bindDoctorToBookingType(booking_type_name, doctor_id){
+		return new Promise((resolve, reject)=>{
+			let query = "SELECT FROM v2_booking_type_has_doctors WHERE doctor_id = ? AND booking_type_name = ?"
+			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+				if	(res.length > 0){
+					// doctor has already been previously binded
+					reject(ERROR_DUPLICATE_ENTRY)
+				}else{
+					query = "INSERT INTO `v2_booking_type_has_doctors`(`doctor_id`, `booking_type_name`) VALUES (?, ?)"
+					this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+						if (!err){
+							resolve(res)
+						}else{
+							reject(err)
+						}
+					})
+				}
+			})
+
+		})
+	}
+
+	unbindDoctorToBookingType(booking_type_name, doctor_id){
+		return new Promise((resolve, reject)=>{
+			const query = "DELETE FROM `v2_booking_type_has_doctors` WHERE `doctor_id` = ? AND `booking_type_name` = ?"
+			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+				if (!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
+	}
+
+	retrieveDoctorsBasedOnBookingType(booking_type_name){
+
+	}
+
+	retrieveBookingTypeBasedOnDoctorId(doctor_id){
+
+	}
+	// End of v2 Development
 }
