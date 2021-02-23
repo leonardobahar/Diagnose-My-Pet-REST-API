@@ -3122,7 +3122,7 @@ app.post("/api/user/unbind-doctor-to-booking-type", (req, res)=>{
         })
         return
     }
-    dao.unbindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
+    dao.unbindDoctorToBookingType(req.body.booking_type_name.toUpperCase(), req.body.doctor_id).then(result=>{
         res.status(200).send({
             success: true,
             result: result
@@ -3133,7 +3133,12 @@ app.post("/api/user/unbind-doctor-to-booking-type", (req, res)=>{
                 success: false,
                 error: ERROR_DUPLICATE_ENTRY
             })
-        }else {
+        }else if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+        } else {
             console.error(err)
             res.status(500).send({
                 success: false,
