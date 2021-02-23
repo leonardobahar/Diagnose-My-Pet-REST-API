@@ -2216,7 +2216,7 @@ export class Dao{
 	retrieveDoctorsBasedOnBookingType(booking_type_name){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `booking_type_name` = ?"
-			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+			this.mysqlConn.query(query, [booking_type_name], (err, res)=>{
 				if (!err){
 					res = res.map(rdp=>{
 						return{
@@ -2233,10 +2233,10 @@ export class Dao{
 		})
 	}
 
-	retrieveBookingTypeBasedOnDoctorId(booking_type_name){
+	retrieveBookingTypeBasedOnDoctorId(doctor_id){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ? AND `booking_type_name` = ?"
-			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ?"
+			this.mysqlConn.query(query, [doctor_id], (err, res)=>{
 				if (!err){
 					res = res.map(rdp=>{
 						return{
@@ -2400,6 +2400,12 @@ export class Dao{
 				}
 			})
 		})
+	}
+
+	addAppointmentSchedule(start_time, end_time, proof_of_payment, description, additional_storage, status, doctor_id, patient_id, booking_type_name){
+		let query = "SELECT * FROM "
+			query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `proof_of_payment`, `description`, `additional_storage`, `status`, `doctor_id`, `patient_id`, `booking_type_name`) " +
+			"VALUES (?,?,?,?,?,?,?,?,?)"
 	}
 	// End of v2 Development
 }
