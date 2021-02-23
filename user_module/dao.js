@@ -2198,11 +2198,29 @@ export class Dao{
 	}
 
 	retrieveDoctorsBasedOnBookingType(booking_type_name){
-
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctors` d ON bthd.doctor_id = d.id WHERE `booking_type_name` = ?"
+			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+				if (!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
 	}
 
-	retrieveBookingTypeBasedOnDoctorId(doctor_id){
-
+	retrieveBookingTypeBasedOnDoctorId(booking_type_name){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctors` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ? AND `booking_type_name` = ?"
+			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
+				if (!err){
+					resolve(res)
+				}else{
+					reject(err)
+				}
+			})
+		})
 	}
 	// End of v2 Development
 }
