@@ -2471,7 +2471,7 @@ export class Dao{
 
 	useAppointmentSlot(start_time, end_time, description, additional_storage, status, patient_id, doctor_id, proof_of_payment, booking_type_name){
 		return new Promise((resolve, reject)=>{
-			this.retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id).then(result=>{
+			this.retrieveAvailableAppointmentScheduleFrontend(start_time, end_time, doctor_id, booking_type_name).then(result=>{
 				if	(result.length === 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
 				}else if (result.length === 1){
