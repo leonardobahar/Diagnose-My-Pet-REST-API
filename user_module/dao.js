@@ -2132,10 +2132,10 @@ export class Dao{
 		})
 	}
 
-	retrieveOneBookingType(id){
+	retrieveOneBookingType(name){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM `v2_booking_type` " +
-				"WHERE id=? "
+				"WHERE booking_type_name=? "
 			this.mysqlConn.query(query,id,(error,result)=>{
 				if(error){
 					reject(error)

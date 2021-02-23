@@ -2942,24 +2942,39 @@ app.post("/api/user/edit-booking-type", (req, res)=>{
         return
     }
 
-    dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
-        res.status(200).send({
-            success: true,
-            result : result
+    dao.retrieveOneBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
+        dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+            res.status(200).send({
+                success: true,
+                result : result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: ERROR_DUPLICATE_ENTRY
+                })
+            }else {
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
         })
-    }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY') {
-            res.status(500).send({
-                success: false,
-                error: ERROR_DUPLICATE_ENTRY
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
             })
-        }else {
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+            return
         }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:NO_SUCH_CONTENT
+        })
     })
 })
 
@@ -3009,23 +3024,38 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
         return
     }
 
-    dao.deleteBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
-        res.status(200).send({
-            success: true
+    dao.retrieveOneBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
+        dao.deleteBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
+            res.status(200).send({
+                success: true
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: ERROR_DUPLICATE_ENTRY
+                })
+            }else {
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
         })
-    }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY') {
-            res.status(500).send({
-                success: false,
-                error: ERROR_DUPLICATE_ENTRY
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
             })
-        }else {
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+            return
         }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:NO_SUCH_CONTENT
+        })
     })
 })
 
