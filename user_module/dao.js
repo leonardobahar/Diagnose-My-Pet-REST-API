@@ -2449,7 +2449,7 @@ export class Dao{
 	addAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
 		return new Promise((resolve, reject)=>{
 			// Validate start_time and end_time format
-			if	( !moment(start_time,"YYYY/MM/DD HH:mm:ss", true).isValid() || !moment(start_time,"YYYY/MM/DD HH:mm:ss", true).isValid()){
+			if	( !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid() || !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid()){
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
