@@ -3111,11 +3111,11 @@ app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
     })
 })
 
-app.get("/api/user/retrieve-appointment-schedule",(req,res)=>{
+app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
        typeof req.query.patient_id==='undefined'){
-        dao.retrieveAppointmentSchedule().then(result=>{
+        dao.retrieveBookedAppointmentSchedule().then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
