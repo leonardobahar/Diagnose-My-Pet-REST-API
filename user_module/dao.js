@@ -2286,7 +2286,7 @@ export class Dao{
 
 	retrieveAvailableAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE b.bookable = TRUE AND a.patient_id IS NULL"
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR a.booking_type_name IS NULL "
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2315,7 +2315,7 @@ export class Dao{
 
 	retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE b.bookable = TRUE AND a.patient_id IS NULL AND d.id = ? AND a.start_time BETWEEN ? AND a.end_time <= ?"
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR a.booking_type_name IS NULL AND d.id = ? AND a.start_time >= ? AND a.end_time <= ?"
 			this.mysqlConn.query(query, [doctor_id, start_time, end_time],(error,result)=>{
 				if(error){
 					reject(error)
@@ -2451,21 +2451,24 @@ export class Dao{
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			let query = "SELECT * FROM `v2_appointment_schedule` WHERE start_time >= ? AND end_time <= ? AND booking_type_name IS NOT NULL"
+			let query = "SELECT * FROM `v2_appointment_schedule` WHERE start_time >= ? AND end_time <= ?"
 			this.mysqlConn.query(query, [start_time, end_time], (err, res)=>{
 				if (res.length > 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
+				}else {
+					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?)"
+					this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name], (err, res) => {
+						if (!err) {
+							resolve(SUCCESS)
+						} else {
+							reject(err)
+						}
+					})
 				}
-				query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?,?,?)"
-				this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name], (err, res)=>{
-					if (!err){
-						resolve(SUCCESS)
-					}else{
-						reject(err)
-					}
-				})
 			})
 		})
 	}
+
+	//useAppointmentSlot
 	// End of v2 Development
 }

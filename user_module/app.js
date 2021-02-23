@@ -3255,6 +3255,40 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
     }
 })
 
+app.post("/api/user/add-appointment-slot", (req, res)=>{
+    if (typeof req.body.start_time === 'undefined' ||
+        typeof req.body.end_time === 'undefined' ||
+        typeof req.body.description === 'undefined' ||
+        typeof req.body.additional_storage === 'undefined' ||
+        typeof req.body.status === 'undefined' ||
+        typeof req.body.doctor_id === 'undefined' ||
+        typeof req.body.booking_type_name === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    req.body.description = req.body.description === "" ? null : req.body.description
+    req.body.additional_storage = req.body.additional_storage === "" ? null : req.body.additional_storage
+    req.body.status = req.body.status === "" ? "ADMIN CREATED" : req.body.status
+    req.body.booking_type_name = req.body.booking_type_name === "" ? null : req.body.booking_type_name
+
+    dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status, req.body.doctor_id, req.body.booking_type_name).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(400).send({
+            success:false,
+            error:err
+        })
+    })
+})
+
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
