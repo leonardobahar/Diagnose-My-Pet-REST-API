@@ -2215,9 +2215,16 @@ export class Dao{
 
 	retrieveDoctorsBasedOnBookingType(booking_type_name){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctors` d ON bthd.doctor_id = d.id WHERE `booking_type_name` = ?"
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `booking_type_name` = ?"
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 				if (!err){
+					res = res.map(rdp=>{
+						return{
+							doctor_id: rdp.doctor_id,
+							doctor_name: rdp.doctor_name,
+							booking_type_name: rdp.booking_type_name
+						}
+					})
 					resolve(res)
 				}else{
 					reject(err)
@@ -2228,9 +2235,16 @@ export class Dao{
 
 	retrieveBookingTypeBasedOnDoctorId(booking_type_name){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctors` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ? AND `booking_type_name` = ?"
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ? AND `booking_type_name` = ?"
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 				if (!err){
+					res = res.map(rdp=>{
+						return{
+							doctor_id: rdp.doctor_id,
+							doctor_name: rdp.doctor_name,
+							booking_type_name: rdp.booking_type_name
+						}
+					})
 					resolve(res)
 				}else{
 					reject(err)
