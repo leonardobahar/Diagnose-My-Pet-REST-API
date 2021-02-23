@@ -2471,16 +2471,14 @@ export class Dao{
 		})
 	}
 
-	useAppointmentSlot(start_time, end_time, description, additional_storage, status, patient_id, doctor_id, proof_of_payment, booking_type_name){
+	useAppointmentSlot(appointment_id, patient_id){
 		return new Promise((resolve, reject)=>{
-			this.retrieveAvailableAppointmentScheduleFrontend(start_time, end_time, doctor_id, booking_type_name).then(result=>{
-				if	(result.length === 0){
-					reject("APPOINTMENT SLOT NOT AVAILABLE")
-				}else if (result.length === 1){
-					const appointment_id = result[0].id
-					const query = "UPDATE `v2_appointment_schedule` SET patient_id = ? WHERE id = ?"
+			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ? WHERE id = ?"
+			this.mysqlConn.query(query, [patient_id, appointment_id], (err, res)=>{
+				if	(!err){
+					resolve(SUCCESS)
 				}else{
-					// Result.length > 1
+					reject(err)
 				}
 			})
 		})

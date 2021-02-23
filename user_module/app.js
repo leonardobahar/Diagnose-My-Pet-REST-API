@@ -3333,6 +3333,34 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
     })
 })
 
+app.post("/api/user/use-appointment-slot", (req, res)=>{
+    if (typeof req.body.appointment_id === 'undefined' ||
+        typeof req.body.patient_id === 'undefined'
+       ){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id).then(result=>{
+        if (result.affectedRows === 0){
+            res.status(204).send()
+        }else{
+            res.status(200).send({
+                success: true
+            })
+        }
+    }).catch(err=>{
+        console.error(err)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT
