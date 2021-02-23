@@ -2204,7 +2204,9 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			const query = "DELETE FROM `v2_booking_type_has_doctors` WHERE `doctor_id` = ? AND `booking_type_name` = ?"
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
-				if (!err){
+				if (err){
+					reject(err)
+				}else if(res.length>0){
 					resolve(res)
 				}else{
 					reject(err)
@@ -2227,7 +2229,7 @@ export class Dao{
 					})
 					resolve(res)
 				}else{
-					reject(err)
+					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})
@@ -2247,7 +2249,7 @@ export class Dao{
 					})
 					resolve(res)
 				}else{
-					reject(err)
+					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})

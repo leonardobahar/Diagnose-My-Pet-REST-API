@@ -3081,6 +3081,36 @@ app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
     })
 })
 
+app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
+    if(typeof req.query.booking_type_name==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveDoctorsBasedOnBookingType(req.query.booking_type_name).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.get("/api/user/retrieve-appointment-schedule",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
