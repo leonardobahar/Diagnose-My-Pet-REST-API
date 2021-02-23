@@ -3346,18 +3346,28 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
 
     dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id).then(result=>{
         if (result.affectedRows === 0){
-            res.status(204).send()
+            res.status(404).send({
+                success: false,
+                message: ERROR_FOREIGN_KEY
+            })
         }else{
             res.status(200).send({
                 success: true
             })
         }
     }).catch(err=>{
-        console.error(err)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
-        })
+        if (err.code==="ER_NO_REFERENCED_ROW_2"){
+            res.status(404).send({
+                success: false,
+                message: ERROR_FOREIGN_KEY
+            })
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
     })
 })
 
