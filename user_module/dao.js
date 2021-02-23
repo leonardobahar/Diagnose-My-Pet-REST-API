@@ -1958,6 +1958,27 @@ export class Dao{
 		})
 	}
 
+	rescheduleSchedule(schedule){
+		return new Promise((resolve,reject)=>{
+			if(!schedule instanceof Schedule){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="UPDATE schedule SET start_time=?, end-time=?, appointment_status='RESCHEDULED' WHERE id=? "
+			const startTime=moment(schedule.start_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+			const endTime=moment(schedule.end_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+			this.mysqlConn.query(query,[startTime, endTime,schedule.id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	retrieveParticipants(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT * FROM participants "
