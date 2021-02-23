@@ -2318,35 +2318,6 @@ export class Dao{
 		})
 	}
 
-	retrieveAvailableAppointmentSchedule(){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR a.booking_type_name IS NULL "
-			this.mysqlConn.query(query, (error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}
-
-				const schedule=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						start_time:rowDataPacket.start_time,
-						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
-						additional_storage:rowDataPacket.additional_storage,
-						status:rowDataPacket.status,
-						doctor_id:rowDataPacket.doctor_id,
-						doctor_name:rowDataPacket.doctor_name,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name
-					}
-				})
-				resolve(schedule)
-			})
-		})
-	}
-
 	retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id, booking_type_name){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR (a.booking_type_name IS NULL OR a.booking_type_name = ? ) AND a.start_time >= ? AND a.end_time <= ? AND d.id = ?"
@@ -2470,13 +2441,22 @@ export class Dao{
 	}
 
 	useAppointmentSlot(start_time, end_time, description, additional_storage, status, patient_id, doctor_id, proof_of_payment, booking_type_name){
+		// Designated for non null appointment slots
 		return new Promise((resolve, reject)=>{
-			this.retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id).then(result=>{
+			this.retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id, booking_type_name).then(result=>{
+				// Result are booking types that matches appointment slot or null
 				if	(result.length === 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
 				}else if (result.length === 1){
 					const appointment_id = result[0].id
-					const query = "UPDATE `v2_appointment_schedule` SET patient_id = ? WHERE id = ?"
+					const query = "UPDATE `v2_appointment_schedule` SET patient_id = ?, start_time = ?, end_time = ? WHERE id = ?"
+					this.mysqlConn.query(query, [patient_id, start_time, end_time, appointment_id], (err, res)=>{
+						if	(!err){
+							resolve(res)
+						}else{
+							reject(err)
+						}
+					})
 				}else{
 					// Result.length > 1
 				}
