@@ -2254,5 +2254,38 @@ export class Dao{
 			})
 		})
 	}
+
+	retrieveOneAppointmentSchedule(id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, " +
+				"a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name " +
+				"FROM v2_appointment_schedule LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
+				"LEFT OUTER JOIN patient p a.patient_id=p.id " +
+				"WHERE a.id=? "
+			this.mysqlConn.query(query, id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const schedule=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						start_time:rowDataPacket.start_time,
+						end_time:rowDataPacket.end_time,
+						proof_of_payment:rowDataPacket.description,
+						additional_storage:rowDataPacket.additional_storage,
+						status:rowDataPacket.status,
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name,
+						patient_id:rowDataPacket.patient_id,
+						patient_name:rowDataPacket.patient_name,
+						booking_type_name:rowDataPacket.booking_type_name
+					}
+				})
+				resolve(schedule)
+			})
+		})
+	}
 	// End of v2 Development
 }
