@@ -17,7 +17,7 @@ import {
 	Appointment, Doctor,
 	MedicalRecordAttachment,
 	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan, Participant,
-	Patient, Symptoms, TreatmentPlan,
+	Patient, Schedule, Symptoms, TreatmentPlan,
 	User
 } from "../model";
 
@@ -1698,6 +1698,46 @@ export class Dao{
 				"LEFT OUTER JOIN patients p ON s.patient_id=p.id " +
 				"LEFT OUTER JOIN doctor d ON s.doctor_id=d.id "
 			this.mysqlConn.query(query,(error,result)=>{
+				const schedule=result.map(rowDataPacket=>{
+					const startTime =  moment(rowDataPacket.start_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+					const endTime =  moment(rowDataPacket.end_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+					return{
+						id:rowDataPacket.id,
+						appointment_name:rowDataPacket.appointment_name,
+						start_time:startTime,
+						end_time:endTime,
+						appointment_status:rowDataPacket.appointment_status,
+						user_id:rowDataPacket.user_id,
+						user_name:rowDataPacket.user_name,
+						is_real_appointment:rowDataPacket.is_real_appointment,
+						patient_id:rowDataPacket.patient_id,
+						pet_name:rowDataPacket.patient_name,
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name,
+						description:rowDataPacket.description,
+						proof_of_payment:rowDataPacket.proof_of_payment
+					}
+				})
+				resolve(schedule)
+			})
+		})
+	}
+
+	retrieveOneSchedule(schedule){
+		return new Promise((resolve,reject)=>{
+			if(!schedule instanceof Schedule){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT s.id, s.appointment_name, s.start_time, s.end_time, s.appointment_status, s.user_id, " +
+				"s.is_real_appointment, u.user_name, s.patient_id, p.patient_name, s.doctor_id, d.doctor_name, s.description, " +
+				"s.proof_of_payment " +
+				"FROM schedule s LEFT OUTER JOIN users u ON a.user_id=u.id " +
+				"LEFT OUTER JOIN patients p ON s.patient_id=p.id " +
+				"LEFT OUTER JOIN doctor d ON s.doctor_id=d.id " +
+				"WHERE s.id=? "
+			this.mysqlConn.query(query,schedule.id,(error,result)=>{
 				const schedule=result.map(rowDataPacket=>{
 					const startTime =  moment(rowDataPacket.start_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
 					const endTime =  moment(rowDataPacket.end_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
