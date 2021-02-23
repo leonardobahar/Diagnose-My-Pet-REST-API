@@ -2284,6 +2284,40 @@ export class Dao{
 		})
 	}
 
+	retrieveBookedAppointmentScheduleByDoctorId(doctor_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE b.bookable = FALSE OR a.patient_id IS NOT NULL AND a.doctor_id = ?"
+			this.mysqlConn.query(query, doctor_id, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							start_time:rowDataPacket.start_time,
+							end_time:rowDataPacket.end_time,
+							proof_of_payment:rowDataPacket.description,
+							additional_storage:rowDataPacket.additional_storage,
+							status:rowDataPacket.status,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							booking_type_name:rowDataPacket.booking_type_name,
+							duration:rowDataPacket.duration
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	retrieveAvailableAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR a.booking_type_name IS NULL "
@@ -2376,40 +2410,6 @@ export class Dao{
 		})
 	}
 
-	retrieveAppointmentScheduleByDoctorId(doctor_id){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.doctor_id=? "
-			this.mysqlConn.query(query, doctor_id, (error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}
-
-				if(result.length>0){
-					const schedule=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							start_time:rowDataPacket.start_time,
-							end_time:rowDataPacket.end_time,
-							proof_of_payment:rowDataPacket.description,
-							additional_storage:rowDataPacket.additional_storage,
-							status:rowDataPacket.status,
-							doctor_id:rowDataPacket.doctor_id,
-							doctor_name:rowDataPacket.doctor_name,
-							patient_id:rowDataPacket.patient_id,
-							patient_name:rowDataPacket.patient_name,
-							booking_type_name:rowDataPacket.booking_type_name,
-							duration:rowDataPacket.duration
-						}
-					})
-					resolve(schedule)
-				}else{
-					reject(NO_SUCH_CONTENT)
-				}
-			})
-		})
-	}
-
 	retrieveAppointmentScheduleByPatientId(patient_id){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.patient_id=? "
@@ -2471,7 +2471,7 @@ export class Dao{
 
 	useAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
 		return new Promise((resolve, reject)=>{
-			this.retrieveAvailableAppointmentScheduleForDoctorDay()
+			//this.retrieveAvailableAppointmentScheduleForDoctorDay()
 		})
 	}
 	// End of v2 Development

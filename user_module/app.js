@@ -3191,7 +3191,7 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
     }else if(typeof req.query.id==='undefined' &&
         typeof req.query.doctor_id!=='undefined' &&
         typeof req.query.patient_id==='undefined'){
-        dao.retrieveAppointmentScheduleByDoctorId(req.query.doctor_id).then(result=>{
+        dao.retrieveBookedAppointmentScheduleByDoctorId(req.query.doctor_id).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
