@@ -2257,10 +2257,36 @@ export class Dao{
 
 	retrieveAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, " +
-				"a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name " +
-				"FROM v2_appointment_schedule LEFT OUTER JOIN doctor d ON a.doctor_id=d.id " +
-				"LEFT OUTER JOIN patient p a.patient_id=p.id "
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id"
+			this.mysqlConn.query(query, (error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const schedule=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						start_time:rowDataPacket.start_time,
+						end_time:rowDataPacket.end_time,
+						proof_of_payment:rowDataPacket.description,
+						additional_storage:rowDataPacket.additional_storage,
+						status:rowDataPacket.status,
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name,
+						patient_id:rowDataPacket.patient_id,
+						patient_name:rowDataPacket.patient_name,
+						booking_type_name:rowDataPacket.booking_type_name
+					}
+				})
+				resolve(schedule)
+			})
+		})
+	}
+
+	retrieveAvailableAppointmentSchedule(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id"
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2404,10 +2430,28 @@ export class Dao{
 		})
 	}
 
-	addAppointmentSchedule(start_time, end_time, proof_of_payment, description, additional_storage, status, doctor_id, patient_id, booking_type_name){
-		let query = "SELECT * FROM "
-			query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `proof_of_payment`, `description`, `additional_storage`, `status`, `doctor_id`, `patient_id`, `booking_type_name`) " +
-			"VALUES (?,?,?,?,?,?,?,?,?)"
+	addAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
+		return new Promise((resolve, reject)=>{
+			// Validate start_time and end_time format
+			if	( !moment(start_time,"YYYY/MM/DD HH:mm:ss", true).isValid() || !moment(start_time,"YYYY/MM/DD HH:mm:ss", true).isValid()){
+				reject("WRONG DATETIME FORMAT")
+				return
+			}
+			let query = "SELECT * FROM `v2_appointment_schedule` WHERE start_time >= ? AND end_time <= ? AND booking_type_name IS NOT NULL"
+			this.mysqlConn.query(query, [start_time, end_time], (err, res)=>{
+				if (res.length > 0){
+					reject("APPOINTMENT SLOT NOT AVAILABLE")
+				}
+				query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?,?,?)"
+				this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name], (err, res)=>{
+					if (!err){
+						resolve(SUCCESS)
+					}else{
+						reject(err)
+					}
+				})
+			})
+		})
 	}
 	// End of v2 Development
 }
