@@ -2318,7 +2318,36 @@ export class Dao{
 		})
 	}
 
-	retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id, booking_type_name){
+	retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR a.booking_type_name IS NULL AND a.start_time >= ? AND a.end_time <= ? AND d.id = ?"
+			this.mysqlConn.query(query, [start_time, end_time, doctor_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const schedule=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						start_time:rowDataPacket.start_time,
+						end_time:rowDataPacket.end_time,
+						proof_of_payment:rowDataPacket.description,
+						additional_storage:rowDataPacket.additional_storage,
+						status:rowDataPacket.status,
+						doctor_id:rowDataPacket.doctor_id,
+						doctor_name:rowDataPacket.doctor_name,
+						patient_id:rowDataPacket.patient_id,
+						patient_name:rowDataPacket.patient_name,
+						booking_type_name:rowDataPacket.booking_type_name
+					}
+				})
+				resolve(schedule)
+			})
+		})
+	}
+
+	retrieveAvailableAppointmentScheduleFrontend(start_time, end_time, doctor_id, booking_type_name){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE (b.bookable = TRUE AND a.patient_id IS NULL) OR (a.booking_type_name IS NULL OR a.booking_type_name = ? ) AND a.start_time >= ? AND a.end_time <= ? AND d.id = ?"
 			this.mysqlConn.query(query, [booking_type_name, start_time, end_time, doctor_id],(error,result)=>{
