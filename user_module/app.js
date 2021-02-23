@@ -3114,6 +3114,14 @@ app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
 })
 
 app.post("/api/user/unbind-doctor-to-booking-type", (req, res)=>{
+    if(typeof req.body.booking_type_name==='undefined' ||
+       typeof req.body.doctor_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
     dao.unbindDoctorToBookingType(req.body.booking_type_name, req.body.doctor_id).then(result=>{
         res.status(200).send({
             success: true,
