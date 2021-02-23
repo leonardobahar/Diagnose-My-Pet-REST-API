@@ -3319,10 +3319,41 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
     req.body.status = req.body.status  ? req.body.status : "ADMIN CREATED"
     req.body.booking_type_name = req.body.booking_type_name ? req.body.booking_type_name : null
 
-    dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status, req.body.doctor_id, req.body.booking_type_name).then(result=>{
+    console.log(req.body.patient_id)
+    if(typeof req.body.patient_id!=='undefined'){
+        dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
+            // res.status(200).send({
+            //     success: true,
+            //     result: appointmentResult
+            // })
+            console.log('test')
+            dao.useAppointmentSlot(appointmentResult,req.body.patient_id).then(result=>{
+                console.log(appointmentResult)
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(400).send({
+                success:false,
+                error:err
+            })
+        })
+        return
+    }
+
+    dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
         res.status(200).send({
             success: true,
-            result: result
+            result: appointmentResult
         })
     }).catch(err=>{
         console.error(err)

@@ -2461,7 +2461,7 @@ export class Dao{
 					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?)"
 					this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name], (err, res) => {
 						if (!err) {
-							resolve(SUCCESS)
+							resolve(res.insertId)
 						} else {
 							reject(err)
 						}
