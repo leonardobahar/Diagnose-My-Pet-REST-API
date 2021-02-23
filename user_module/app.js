@@ -2911,9 +2911,8 @@ app.post("/api/user/add-booking-type", (req, res)=>{
         return
     }
 
-    const bookable = typeof req.body.bookable === "undefined" ? false : req.body.bookable
 
-    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, bookable).then(result=>{
+    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
         res.status(200).send({
             success: true,
             result : result
@@ -2936,8 +2935,7 @@ app.post("/api/user/add-booking-type", (req, res)=>{
 
 app.post("/api/user/edit-booking-type", (req, res)=>{
     if(typeof req.body.booking_type_name==='undefined' ||
-        typeof req.body.duration==='undefined' ||
-        typeof req.body.bookable === 'undefined'){
+        typeof req.body.duration==='undefined' ){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2946,7 +2944,7 @@ app.post("/api/user/edit-booking-type", (req, res)=>{
     }
 
     dao.retrieveOneBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
-        dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, req.body.bookable).then(result=>{
+        dao.editBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
             res.status(200).send({
                 success: true,
                 result : result
@@ -3303,10 +3301,10 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
         return
     }
 
-    req.body.description = req.body.description === "" ? null : req.body.description
-    req.body.additional_storage = req.body.additional_storage === "" ? null : req.body.additional_storage
-    req.body.status = req.body.status === "" ? "ADMIN CREATED" : req.body.status
-    req.body.booking_type_name = req.body.booking_type_name === "" ? null : req.body.booking_type_name
+    req.body.description = req.body.description ? req.body.description : null
+    req.body.additional_storage = req.body.additional_storage ? req.body.additional_storage : null
+    req.body.status = req.body.status  ? req.body.status : "ADMIN CREATED"
+    req.body.booking_type_name = req.body.booking_type_name ? req.body.booking_type_name : null
 
     dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status, req.body.doctor_id, req.body.booking_type_name).then(result=>{
         res.status(200).send({
