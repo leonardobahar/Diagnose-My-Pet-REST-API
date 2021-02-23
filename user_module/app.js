@@ -3033,17 +3033,89 @@ app.get("/api/user/retrieve-appointment-schedule",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
        typeof req.query.patient_id==='undefined'){
-
+        dao.retrieveAppointmentSchedule().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }else if(typeof req.query.id==='undefined' &&
         typeof req.query.doctor_id!=='undefined' &&
         typeof req.query.patient_id==='undefined'){
-
+        dao.retrieveAppointmentScheduleByDoctorId(req.query.doctor_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }else if(typeof req.query.id==='undefined' &&
         typeof req.query.doctor_id==='undefined' &&
         typeof req.query.patient_id!=='undefined'){
-
+        dao.retrieveAppointmentScheduleByPatientId(req.query.patient_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }else{
-
+        dao.retrieveOneAppointmentSchedule(req.query.id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }
 })
 

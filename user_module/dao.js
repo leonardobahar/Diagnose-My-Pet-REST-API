@@ -2269,23 +2269,27 @@ export class Dao{
 					return
 				}
 
-				const schedule=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						start_time:rowDataPacket.start_time,
-						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
-						additional_storage:rowDataPacket.additional_storage,
-						status:rowDataPacket.status,
-						doctor_id:rowDataPacket.doctor_id,
-						doctor_name:rowDataPacket.doctor_name,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name,
-						duration:rowDataPacket.duration
-					}
-				})
-				resolve(schedule)
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							start_time:rowDataPacket.start_time,
+							end_time:rowDataPacket.end_time,
+							proof_of_payment:rowDataPacket.description,
+							additional_storage:rowDataPacket.additional_storage,
+							status:rowDataPacket.status,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							booking_type_name:rowDataPacket.booking_type_name,
+							duration:rowDataPacket.duration
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -2304,23 +2308,27 @@ export class Dao{
 					return
 				}
 
-				const schedule=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						start_time:rowDataPacket.start_time,
-						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
-						additional_storage:rowDataPacket.additional_storage,
-						status:rowDataPacket.status,
-						doctor_id:rowDataPacket.doctor_id,
-						doctor_name:rowDataPacket.doctor_name,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name,
-						duration:rowDataPacket.duration
-					}
-				})
-				resolve(schedule)
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							start_time:rowDataPacket.start_time,
+							end_time:rowDataPacket.end_time,
+							proof_of_payment:rowDataPacket.description,
+							additional_storage:rowDataPacket.additional_storage,
+							status:rowDataPacket.status,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							booking_type_name:rowDataPacket.booking_type_name,
+							duration:rowDataPacket.duration
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -2339,23 +2347,27 @@ export class Dao{
 					return
 				}
 
-				const schedule=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						start_time:rowDataPacket.start_time,
-						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
-						additional_storage:rowDataPacket.additional_storage,
-						status:rowDataPacket.status,
-						doctor_id:rowDataPacket.doctor_id,
-						doctor_name:rowDataPacket.doctor_name,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name,
-						duration:rowDataPacket.duration
-					}
-				})
-				resolve(schedule)
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							start_time:rowDataPacket.start_time,
+							end_time:rowDataPacket.end_time,
+							proof_of_payment:rowDataPacket.description,
+							additional_storage:rowDataPacket.additional_storage,
+							status:rowDataPacket.status,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							booking_type_name:rowDataPacket.booking_type_name,
+							duration:rowDataPacket.duration
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
