@@ -210,3 +210,20 @@ CREATE TABLE IF NOT EXISTS `participants`(
     `youtube_email` VARCHAR(255),
     `phone_number` VARCHAR(255)
 );
+
+CREATE TABLE IF NOT EXISTS `schedule`(
+    id INT(7) PRIMARY KEY AUTO_INCREMENT,
+    appointment_name varchar(255),
+    start_time timestamp,
+    end_time timestamp,
+    user_id INT(11) DEFAULT NULL,
+    is_real_appointment tinyint(1),
+    patient_id INT(11) DEFAULT NULL,
+    doctor_id INT(11) ,
+    appointment_status varchar(255),
+    description LONGTEXT DEFAULT NULL,
+    proof_of_payment varchar(255) DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

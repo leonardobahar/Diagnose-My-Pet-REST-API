@@ -1511,10 +1511,6 @@ export class Dao{
 		})
 	}
 
-	getPaymentAttachment(attachmentName){
-
-	}
-
 	addAppointment(appointment){
 		return new Promise((resolve,reject)=>{
 			if(appointment instanceof  Appointment){
