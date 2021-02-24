@@ -2217,14 +2217,17 @@ export class Dao{
 
 	retrieveDoctorsBasedOnBookingType(booking_type_name){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `booking_type_name` = ?"
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id " +
+				"INNER JOIN `v2_booking_type` bt ON bthd.booking_type_name=bt.booking_type_name " +
+				"WHERE bthd.`booking_type_name` = ? "
 			this.mysqlConn.query(query, [booking_type_name], (err, res)=>{
 				if (!err){
 					res = res.map(rdp=>{
 						return{
 							doctor_id: rdp.doctor_id,
 							doctor_name: rdp.doctor_name,
-							booking_type_name: rdp.booking_type_name
+							booking_type_name: rdp.booking_type_name,
+							duration: rdp.duration
 						}
 					})
 					resolve(res)
@@ -2237,7 +2240,8 @@ export class Dao{
 
 	retrieveBookingTypeBasedOnDoctorId(doctor_id){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id WHERE `doctor_id` = ?"
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id  " +
+				"WHERE `doctor_id` = ?"
 			this.mysqlConn.query(query, [doctor_id], (err, res)=>{
 				if (!err){
 					res = res.map(rdp=>{
@@ -2477,10 +2481,10 @@ export class Dao{
 		})
 	}
 
-	useAppointmentSlot(appointment_id, patient_id, proof_of_payment){
+	useAppointmentSlot(appointment_id, patient_id, proof_of_payment, description, additional_storage){
 		return new Promise((resolve, reject)=>{
-			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ?, proof_of_payment=? WHERE id = ?"
-			this.mysqlConn.query(query, [patient_id, proof_of_payment, appointment_id], (err, res)=>{
+			const query = "UPDATE v2_appointment_schedule SET description=?, additional_storage=?, status = 'PENDING', patient_id = ?, proof_of_payment=? WHERE id = ?"
+			this.mysqlConn.query(query, [description, additional_storage, patient_id, proof_of_payment, appointment_id], (err, res)=>{
 				if	(!err){
 					resolve(SUCCESS)
 				}else{

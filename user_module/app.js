@@ -3155,7 +3155,7 @@ app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
         return
     }
 
-    dao.retrieveDoctorsBasedOnBookingType(req.query.booking_type_name).then(result=>{
+    dao.retrieveDoctorsBasedOnBookingType(req.query.booking_type_name.toUpperCase()).then(result=>{
         res.status(200).send({
             success:true,
             result:result
@@ -3334,8 +3334,6 @@ app.get("/api/user/retrieve-available-slot-for-doctor",(req,res)=>{
 app.post("/api/user/add-appointment-slot", (req, res)=>{
     if(typeof req.body.start_time==='undefined' ||
        typeof req.body.end_time==='undefined' ||
-       typeof req.body.description==='undefined' ||
-       typeof req.body.additional_storage==='undefined' ||
        typeof req.body.status==='undefined' ||
        typeof req.body.doctor_id==='undefined' ||
        typeof req.body.booking_type_name==='undefined'){
@@ -3374,7 +3372,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
         }
 
         if(typeof req.file==='undefined'){
-            dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null).then(result=>{
+            dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null, req.body.description, req.body.additional_question).then(result=>{
                 if (result.affectedRows === 0){
                     res.status(404).send({
                         success: false,
@@ -3408,7 +3406,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
             return res.send(error)
         }
 
-        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename).then(result=>{
+        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result=>{
             if (result.affectedRows === 0){
                 res.status(404).send({
                     success: false,
