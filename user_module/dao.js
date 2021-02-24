@@ -2471,6 +2471,19 @@ export class Dao{
 		})
 	}
 
+	freeAppointmentSlot(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET patient_id =?, proof_of_payment=? WHERE id = ?"
+			this.mysqlConn.query(query,[null,null,appointment_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	useAppointmentSlot(appointment_id, patient_id, proof_of_payment){
 		return new Promise((resolve, reject)=>{
 			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ?, proof_of_payment=? WHERE id = ?"
