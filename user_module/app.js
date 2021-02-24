@@ -3299,6 +3299,38 @@ app.get("/api/user/retrieve-available-slot-for-frontend",(req,res)=>{
     })
 })
 
+app.get("/api/user/retrieve-available-slot-for-doctor",(req,res)=>{
+    if(typeof req.query.start_time==='undefined' ||
+        typeof req.query.end_time==='undefined' ||
+        typeof req.query.doctor_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            false:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveAvailableAppointmentScheduleForDoctorDay(req.query.start_time,req.query.end_time,req.query.doctor_id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/add-appointment-slot", (req, res)=>{
     if(typeof req.body.start_time==='undefined' ||
        typeof req.body.end_time==='undefined' ||
