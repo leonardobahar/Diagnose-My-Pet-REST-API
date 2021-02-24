@@ -2483,5 +2483,19 @@ export class Dao{
 			})
 		})
 	}
+
+	deleteAppointmentSlot(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET status = 'DELETED', WHERE id=?"
+			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
 	// End of v2 Development
 }
