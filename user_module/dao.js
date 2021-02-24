@@ -2240,15 +2240,15 @@ export class Dao{
 
 	retrieveBookingTypeBasedOnDoctorId(doctor_id){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id  " +
-				"WHERE `doctor_id` = ?"
+			const query = "SELECT * FROM `v2_booking_type_has_doctors` bthd INNER JOIN `doctor` d ON bthd.doctor_id = d.id INNER JOIN v2_booking_type bt ON bthd.booking_type_name=bt.booking_type_name WHERE bthd.`doctor_id` = ?"
 			this.mysqlConn.query(query, [doctor_id], (err, res)=>{
 				if (!err){
 					res = res.map(rdp=>{
 						return{
 							doctor_id: rdp.doctor_id,
 							doctor_name: rdp.doctor_name,
-							booking_type_name: rdp.booking_type_name
+							booking_type_name: rdp.booking_type_name,
+							duration:rdp.duration
 						}
 					})
 					resolve(res)
