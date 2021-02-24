@@ -3404,6 +3404,61 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
     })
 })
 
+app.post("/api/user/switch-appointment-slot",(req,res)=>{
+    if(typeof req.body.previous_appointment_id==='undefined' ||
+        typeof req.body.appointment_id==='undefined' ||
+        typeof req.body.patient_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneAppointmentSchedule(req.body.previous_appointment_id).then(appointmentResult=>{
+        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, appointmentResult[0].proof_of_payment).then(result=>{
+            if (result.affectedRows === 0){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
+                })
+            }else{
+                dao.freeAppointmentSlot(req.body.previous_appointment_id).then(result=>{
+                    res.status(200).send({
+                        success: true,
+                        result:result
+                    })
+                }).catch(error=>{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                })
+            }
+        }).catch(err=>{
+            if (err.code==="ER_NO_REFERENCED_ROW_2"){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
+                })
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT

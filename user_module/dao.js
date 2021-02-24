@@ -2269,7 +2269,8 @@ export class Dao{
 						id:rowDataPacket.id,
 						start_time:rowDataPacket.start_time,
 						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
+						proof_of_payment:rowDataPacket.proof_of_payment,
+						description:rowDataPacket.description,
 						additional_storage:rowDataPacket.additional_storage,
 						status:rowDataPacket.status,
 						doctor_id:rowDataPacket.doctor_id,
@@ -2299,7 +2300,8 @@ export class Dao{
 							id:rowDataPacket.id,
 							start_time:rowDataPacket.start_time,
 							end_time:rowDataPacket.end_time,
-							proof_of_payment:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment,
+							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
 							status:rowDataPacket.status,
 							doctor_id:rowDataPacket.doctor_id,
@@ -2332,7 +2334,8 @@ export class Dao{
 						id:rowDataPacket.id,
 						start_time:rowDataPacket.start_time,
 						end_time:rowDataPacket.end_time,
-						proof_of_payment:rowDataPacket.description,
+						proof_of_payment:rowDataPacket.proof_of_payment,
+						description:rowDataPacket.description,
 						additional_storage:rowDataPacket.additional_storage,
 						status:rowDataPacket.status,
 						doctor_id:rowDataPacket.doctor_id,
@@ -2363,7 +2366,8 @@ export class Dao{
 						id:rowDataPacket.id,
 						start_time:startTime,
 						end_time:endTime,
-						proof_of_payment:rowDataPacket.description,
+						proof_of_payment:rowDataPacket.proof_of_payment,
+						description:rowDataPacket.description,
 						additional_storage:rowDataPacket.additional_storage,
 						status:rowDataPacket.status,
 						doctor_id:rowDataPacket.doctor_id,
@@ -2393,7 +2397,8 @@ export class Dao{
 							id:rowDataPacket.id,
 							start_time:rowDataPacket.start_time,
 							end_time:rowDataPacket.end_time,
-							proof_of_payment:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment,
+							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
 							status:rowDataPacket.status,
 							doctor_id:rowDataPacket.doctor_id,
@@ -2427,7 +2432,8 @@ export class Dao{
 							id:rowDataPacket.id,
 							start_time:rowDataPacket.start_time,
 							end_time:rowDataPacket.end_time,
-							proof_of_payment:rowDataPacket.description,
+							proof_of_payment:rowDataPacket.proof_of_payment,
+							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
 							status:rowDataPacket.status,
 							doctor_id:rowDataPacket.doctor_id,
@@ -2442,6 +2448,22 @@ export class Dao{
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
+			})
+		})
+	}
+
+	getAppointmentAttachment(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT proof_of_payment FROM v2_appointment_schedule WHERE id=? "
+			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const picture=result.map(rowDatapacket)
+				console.log(result)
+				resolve(result)
 			})
 		})
 	}
@@ -2471,19 +2493,6 @@ export class Dao{
 		})
 	}
 
-	freeAppointmentSlot(appointment_id){
-		return new Promise((resolve,reject)=>{
-			const query="UPDATE v2_appointment_schedule SET patient_id =?, proof_of_payment=? WHERE id = ?"
-			this.mysqlConn.query(query,[null,null,appointment_id],(error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}
-				resolve(SUCCESS)
-			})
-		})
-	}
-
 	useAppointmentSlot(appointment_id, patient_id, proof_of_payment){
 		return new Promise((resolve, reject)=>{
 			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ?, proof_of_payment=? WHERE id = ?"
@@ -2493,6 +2502,19 @@ export class Dao{
 				}else{
 					reject(err)
 				}
+			})
+		})
+	}
+
+	freeAppointmentSlot(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET status='AVAILABLE', patient_id=?, proof_of_payment=? WHERE id = ?"
+			this.mysqlConn.query(query,[null,null,appointment_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+				resolve(SUCCESS)
 			})
 		})
 	}
