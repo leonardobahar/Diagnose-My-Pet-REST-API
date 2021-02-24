@@ -3451,6 +3451,13 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
             }
         })
     }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(error)
         res.status(500).send({
             success:false,

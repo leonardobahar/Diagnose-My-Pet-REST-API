@@ -2452,22 +2452,6 @@ export class Dao{
 		})
 	}
 
-	getAppointmentAttachment(appointment_id){
-		return new Promise((resolve,reject)=>{
-			const query="SELECT proof_of_payment FROM v2_appointment_schedule WHERE id=? "
-			this.mysqlConn.query(query,appointment_id,(error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}
-
-				const picture=result.map(rowDatapacket)
-				console.log(result)
-				resolve(result)
-			})
-		})
-	}
-
 	addAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
 		return new Promise((resolve, reject)=>{
 			// Validate start_time and end_time format
