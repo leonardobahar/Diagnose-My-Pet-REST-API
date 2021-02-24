@@ -2471,10 +2471,10 @@ export class Dao{
 		})
 	}
 
-	useAppointmentSlot(appointment_id, patient_id){
+	useAppointmentSlot(appointment_id, patient_id, proof_of_payment){
 		return new Promise((resolve, reject)=>{
-			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ? WHERE id = ?"
-			this.mysqlConn.query(query, [patient_id, appointment_id], (err, res)=>{
+			const query = "UPDATE v2_appointment_schedule SET status = 'PENDING', patient_id = ?, proof_of_payment=? WHERE id = ?"
+			this.mysqlConn.query(query, [patient_id, proof_of_payment, appointment_id], (err, res)=>{
 				if	(!err){
 					resolve(SUCCESS)
 				}else{

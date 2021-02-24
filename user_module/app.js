@@ -3371,40 +3371,79 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
 })
 
 app.post("/api/user/use-appointment-slot", (req, res)=>{
-    if (typeof req.body.appointment_id === 'undefined' ||
-        typeof req.body.patient_id === 'undefined'
-       ){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id).then(result=>{
-        if (result.affectedRows === 0){
-            res.status(404).send({
-                success: false,
-                message: ERROR_FOREIGN_KEY
+    upload(req,res,async(error)=>{
+        if (typeof req.body.appointment_id === 'undefined' ||
+            typeof req.body.patient_id === 'undefined'
+        ){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
             })
-        }else{
-            res.status(200).send({
-                success: true
-            })
+            return
         }
-    }).catch(err=>{
-        if (err.code==="ER_NO_REFERENCED_ROW_2"){
-            res.status(404).send({
-                success: false,
-                message: ERROR_FOREIGN_KEY
+
+        if(req.file==='undefined'){
+            dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, 'No Attachment').then(result=>{
+                if (result.affectedRows === 0){
+                    res.status(404).send({
+                        success: false,
+                        message: ERROR_FOREIGN_KEY
+                    })
+                }else{
+                    res.status(200).send({
+                        success: true
+                    })
+                }
+            }).catch(err=>{
+                if (err.code==="ER_NO_REFERENCED_ROW_2"){
+                    res.status(404).send({
+                        success: false,
+                        message: ERROR_FOREIGN_KEY
+                    })
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                }
             })
-        }else{
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+            return
         }
+
+        if(error instanceof multer.MulterError){
+            return res.send(error)
+        } else if(error){
+            return res.send(error)
+        }
+
+        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename).then(result=>{
+            if (result.affectedRows === 0){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
+                })
+            }else{
+                res.status(200).send({
+                    success: true
+                })
+            }
+        }).catch(err=>{
+            if (err.code==="ER_NO_REFERENCED_ROW_2"){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
+                })
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
     })
 })
 
