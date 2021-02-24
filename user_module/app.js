@@ -3179,7 +3179,8 @@ app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
 app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
        typeof req.query.doctor_id==='undefined' &&
-       typeof req.query.patient_id==='undefined'){
+       typeof req.query.patient_id==='undefined' &&
+       typeof req.query.user_id==='undefined'){
         dao.retrieveBookedAppointmentSchedule().then(result=>{
             res.status(200).send({
                 success:true,
@@ -3201,7 +3202,8 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
         })
     }else if(typeof req.query.id==='undefined' &&
         typeof req.query.doctor_id!=='undefined' &&
-        typeof req.query.patient_id==='undefined'){
+        typeof req.query.patient_id==='undefined'&&
+        typeof req.query.user_id==='undefined'){
         dao.retrieveBookedAppointmentScheduleByDoctorId(req.query.doctor_id).then(result=>{
             res.status(200).send({
                 success:true,
@@ -3223,8 +3225,32 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
         })
     }else if(typeof req.query.id==='undefined' &&
         typeof req.query.doctor_id==='undefined' &&
-        typeof req.query.patient_id!=='undefined'){
+        typeof req.query.patient_id!=='undefined'&&
+        typeof req.query.user_id==='undefined'){
         dao.retrieveAppointmentScheduleByPatientId(req.query.patient_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else if(typeof req.query.id==='undefined' &&
+        typeof req.query.doctor_id==='undefined' &&
+        typeof req.query.patient_id==='undefined'&&
+        typeof req.query.user_id!=='undefined'){
+        dao.retrieveAppointmentScheduleByUserId(req.query.user_id).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
