@@ -2446,7 +2446,7 @@ export class Dao{
 		})
 	}
 
-	addAppointmentSlot(start_time, end_time, proof_of_payment, description, additional_storage, status, doctor_id, booking_type_name){
+	addAppointmentSlot(start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name){
 		return new Promise((resolve, reject)=>{
 			// Validate start_time and end_time format
 			if	( !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid() || !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid()){
@@ -2458,8 +2458,8 @@ export class Dao{
 				if (res.length > 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
 				}else {
-					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `proof_of_payment`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?,?)"
-					this.mysqlConn.query(query, [start_time, end_time, proof_of_payment, description, additional_storage, status, doctor_id, booking_type_name], (err, res) => {
+					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?)"
+					this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, booking_type_name], (err, res) => {
 						if (!err) {
 							resolve(res.insertId)
 						} else {
