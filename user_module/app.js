@@ -3300,42 +3300,65 @@ app.get("/api/user/retrieve-available-slot-for-frontend",(req,res)=>{
 })
 
 app.post("/api/user/add-appointment-slot", (req, res)=>{
-    if (typeof req.body.start_time === 'undefined' ||
-        typeof req.body.end_time === 'undefined' ||
-        typeof req.body.description === 'undefined' ||
-        typeof req.body.additional_storage === 'undefined' ||
-        typeof req.body.status === 'undefined' ||
-        typeof req.body.doctor_id === 'undefined' ||
-        typeof req.body.booking_type_name === 'undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    req.body.description = req.body.description ? req.body.description : null
-    req.body.additional_storage = req.body.additional_storage ? req.body.additional_storage : null
-    req.body.status = req.body.status  ? req.body.status : "ADMIN CREATED"
-    req.body.booking_type_name = req.body.booking_type_name ? req.body.booking_type_name : null
+    upload(req,res,async (error)=>{
+        if (typeof req.body.start_time === 'undefined' ||
+            typeof req.body.end_time === 'undefined' ||
+            typeof req.body.description === 'undefined' ||
+            typeof req.body.additional_storage === 'undefined' ||
+            typeof req.body.status === 'undefined' ||
+            typeof req.body.doctor_id === 'undefined' ||
+            typeof req.body.booking_type_name === 'undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
 
-    if(typeof req.body.patient_id!=='undefined'){
-        dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
-            // res.status(200).send({
-            //     success: true,
-            //     result: appointmentResult
-            // })
-            dao.useAppointmentSlot(appointmentResult,req.body.patient_id).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
+        req.body.description = req.body.description ? req.body.description : null
+        req.body.additional_storage = req.body.additional_storage ? req.body.additional_storage : null
+        req.body.status = req.body.status  ? req.body.status : "ADMIN CREATED"
+        req.body.booking_type_name = req.body.booking_type_name ? req.body.booking_type_name : null
+
+        if(typeof req.body.patient_id!=='undefined' && req.file!=='undefined'){
+            if(error instanceof multer.MulterError){
+                return res.send(error)
+            } else if(error){
+                return res.send(error)
+            }
+
+            dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.file.filename, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
+                // res.status(200).send({
+                //     success: true,
+                //     result: appointmentResult
+                // })
+                dao.useAppointmentSlot(appointmentResult,req.body.patient_id).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:result
+                    })
+                }).catch(error=>{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
                 })
-            }).catch(error=>{
-                console.error(error)
-                res.status(500).send({
+            }).catch(err=>{
+                console.error(err)
+                res.status(400).send({
                     success:false,
-                    error:SOMETHING_WENT_WRONG
+                    error:err
                 })
+            })
+            return
+        }
+
+        dao.addAppointmentSlot(req.body.start_time, req.body.end_time, 'No Attachment', req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
+            res.status(200).send({
+                success: true
             })
         }).catch(err=>{
             console.error(err)
@@ -3343,20 +3366,6 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
                 success:false,
                 error:err
             })
-        })
-        return
-    }
-
-    dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
-        res.status(200).send({
-            success: true,
-            result: appointmentResult
-        })
-    }).catch(err=>{
-        console.error(err)
-        res.status(400).send({
-            success:false,
-            error:err
         })
     })
 })
