@@ -3318,12 +3318,12 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
             })
         })
     } else if(typeof req.query.id==='undefined' &&
-        typeof req.query.doctor_id==='undefined' &&
+        typeof req.query.doctor_id!=='undefined' &&
         typeof req.query.patient_id==='undefined'&&
         typeof req.query.user_id==='undefined' &&
         typeof req.query.start_time!=='undefined' &&
         typeof req.query.end_time!=='undefined'){
-        dao.retrieveAppointmentScheduleByStartTimeEndTime(req.query.start_time,req.query.end_time).then(result=>{
+        dao.retrieveAppointmentScheduleByStartTimeEndTimeDoctorId(req.query.start_time,req.query.end_time,req.query.doctor_id).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result

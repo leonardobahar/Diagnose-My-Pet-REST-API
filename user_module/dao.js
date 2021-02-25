@@ -2523,14 +2523,14 @@ export class Dao{
 		})
 	}
 
-	retrieveAppointmentScheduleByStartTimeEndTime(start_time,end_time){
+	retrieveAppointmentScheduleByStartTimeEndTimeDoctorId(start_time,end_time,doctor_id){
 		return new Promise((resolve,reject)=>{
 			if	( !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid() || !moment(end_time,"YYYY-MM-DD HH:mm:ss", true).isValid()){
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? "
-			this.mysqlConn.query(query,[start_time,end_time],(error,result)=>{
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "
+			this.mysqlConn.query(query,[start_time,end_time,doctor_id],(error,result)=>{
 				if(error){
 					reject(error)
 					return
