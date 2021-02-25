@@ -3090,7 +3090,47 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
 })
 
 app.post("/api/user/bind-doctor-to-booking-type", (req, res)=>{
+    if (typeof req.body.booking_type_name === 'undefined' ||
+        typeof req.body.doctor_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
     dao.bindDoctorToBookingType(req.body.booking_type_name.toUpperCase(), req.body.doctor_id).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if (err===ERROR_DUPLICATE_ENTRY){
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
+})
+
+app.post("/api/user/bind-and-rebind-doctor-to-booking-type", (req, res)=>{
+    if (typeof req.body.booking_type_name_array === 'undefined' ||
+        typeof req.body.doctor_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.bindAndRebind(JSON.parse(req.body.booking_type_name_array), req.body.doctor_id).then(result=>{
         res.status(200).send({
             success: true,
             result: result

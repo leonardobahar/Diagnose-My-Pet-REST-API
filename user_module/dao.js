@@ -2180,7 +2180,7 @@ export class Dao{
 
 	bindDoctorToBookingType(booking_type_name, doctor_id){
 		return new Promise((resolve, reject)=>{
-			let query = "SELECT doctor_id FROM v2_booking_type_has_doctors WHERE doctor_id = ? "
+			let query = "SELECT doctor_id FROM v2_booking_type_has_doctors WHERE doctor_id = ? AND booking_type_name = ? "
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 				if	(res.length > 0){
 					// doctor has already been previously binded
@@ -2189,7 +2189,7 @@ export class Dao{
 					query = "INSERT INTO `v2_booking_type_has_doctors`(`doctor_id`, `booking_type_name`) VALUES (?, ?)"
 					this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 						if (!err){
-							resolve(res)
+							resolve(booking_type_name)
 						}else{
 							reject(err)
 						}
@@ -2206,10 +2206,37 @@ export class Dao{
 			this.mysqlConn.query(query, [doctor_id, booking_type_name], (err, res)=>{
 				if (err){
 					reject(err)
-				}else if(res.length>0){
+				}else if(res.affectedRows>0){
 					resolve(res)
 				}else{
 					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	bindAndRebind(booking_type_name_array, doctor_id){
+		return new Promise((resolve, reject)=>{
+			let query = "DELETE FROM `v2_booking_type_has_doctors` WHERE `doctor_id` = ?"
+			this.mysqlConn.query(query, [doctor_id], async(err, res)=>{
+				if (err){
+					reject(err)
+				}else {
+					let failedBinds = []
+					let successfulBinds = []
+					for (let i=0; i<booking_type_name_array.length; i++){
+						const bindResult = await this.bindDoctorToBookingType(booking_type_name_array[i].toUpperCase(),doctor_id).catch(err=>{
+							//console.error("Error from bindAndRebind Arr function: "+err)
+							failedBinds.push(booking_type_name_array[i])
+						})
+						if	(bindResult){
+							successfulBinds.push(bindResult)
+						}
+					}
+					resolve({
+						successfulBinds: successfulBinds,
+						failedBinds : failedBinds
+					})
 				}
 			})
 		})
