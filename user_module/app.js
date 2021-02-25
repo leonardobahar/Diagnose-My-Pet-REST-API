@@ -3528,7 +3528,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
             return res.send(error)
         }
 
-        dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(result=>{
+        dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
             dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result=>{
                 if (result.affectedRows === 0){
                     res.status(404).send({
@@ -3536,8 +3536,16 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
                         message: ERROR_FOREIGN_KEY
                     })
                 }else{
-                    res.status(200).send({
-                        success: true
+                    dao.addAppointmentLog(req.body.patient_id, appointmentResult[0].booking_type_name, result[0].start_time, req.body.notes, 'NOW()').then(result=>{
+                        res.status(200).send({
+                            success: true
+                        })
+                    }).catch(error=>{
+                        console.error(error)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
                     })
                 }
             }).catch(err=>{
