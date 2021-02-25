@@ -3479,8 +3479,16 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
                             message: ERROR_FOREIGN_KEY
                         })
                     }else{
-                        res.status(200).send({
-                            success: true
+                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes,'NOW()').then(result=>{
+                            res.status(200).send({
+                                success: true
+                            })
+                        }).catch(error=>{
+                            console.error(error)
+                            res.status(500).send({
+                                success:false,
+                                error:SOMETHING_WENT_WRONG
+                            })
                         })
                     }
                 }).catch(err=>{
