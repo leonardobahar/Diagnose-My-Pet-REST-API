@@ -3323,7 +3323,25 @@ app.get("/api/user/retrieve-booked-appointment-schedule",(req,res)=>{
         typeof req.query.user_id==='undefined' &&
         typeof req.query.start_time!=='undefined' &&
         typeof req.query.end_time!=='undefined'){
-
+        dao.retrieveAppointmentScheduleByStartTimeEndTime(req.query.start_time,req.query.end_time).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     } else{
         dao.retrieveOneAppointmentSchedule(req.query.id).then(result=>{
             res.status(200).send({
