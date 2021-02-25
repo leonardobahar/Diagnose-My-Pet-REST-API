@@ -3595,6 +3595,61 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
     })
 })
 
+app.post("/api/user/cancel-appointment-slot",(req,res)=>{
+    if(typeof req.body.appointment_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
+        if(appointmentResult.proof_of_payment===null){
+            dao.unbindAppointment(req.body.appointment_id).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            })
+            return
+        }
+
+        fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
+        dao.unbindAppointment(req.body.appointment_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT

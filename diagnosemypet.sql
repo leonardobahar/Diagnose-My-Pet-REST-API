@@ -227,3 +227,12 @@ CREATE TABLE IF NOT EXISTS `schedule`(
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS `v2_appointment_log`(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    patient_id INT(11),
+    booking_type_name VARCHAR(255),
+    appointment_time timestamp,
+    internal_notes longtext,
+    date_created timestamp
+);

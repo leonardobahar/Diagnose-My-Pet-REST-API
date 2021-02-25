@@ -2615,6 +2615,19 @@ export class Dao{
 		})
 	}
 
+	unbindAppointment(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET status='AVAILABLE', patient_id=?, proof_of_payment=? WHERE id = ?"
+			this.mysqlConn.query(query,[null,null,appointment_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	deleteAppointmentSlot(appointment_id){
 		return new Promise((resolve,reject)=>{
 			const query="UPDATE v2_appointment_schedule SET status = 'DELETED', WHERE id=?"
