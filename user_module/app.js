@@ -3471,7 +3471,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
         }
 
         if(typeof req.file==='undefined'){
-            dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(result=>{
+            dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
                 dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null, req.body.description, req.body.additional_question).then(result=>{
                     if (result.affectedRows === 0){
                         res.status(404).send({

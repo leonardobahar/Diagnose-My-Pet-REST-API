@@ -2288,7 +2288,8 @@ export class Dao{
 
 	retrieveBookedAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE a.patient_id IS NOT NULL"
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
+				"FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE a.patient_id IS NOT NULL"
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2308,7 +2309,10 @@ export class Dao{
 						doctor_name:rowDataPacket.doctor_name,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name
+						customer_id:rowDataPacket.pet_owner_id,
+						customer_name:rowDataPacket.user_name,
+						booking_type_name:rowDataPacket.booking_type_name,
+						duration:rowDataPacket.duration
 					}
 				})
 				resolve(schedule)
@@ -2318,7 +2322,9 @@ export class Dao{
 
 	retrieveBookedAppointmentScheduleByDoctorId(doctor_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE a.patient_id IS NOT NULL AND a.doctor_id = ?"
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
+				"FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.patient_id IS NOT NULL AND a.doctor_id = ?"
 			this.mysqlConn.query(query, doctor_id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2339,8 +2345,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
-							duration:rowDataPacket.duration
+							duration:rowDataPacket.duration,
 						}
 					})
 					resolve(schedule)
@@ -2353,7 +2361,9 @@ export class Dao{
 
 	retrieveAvailableAppointmentScheduleForDoctorDay(start_time, end_time, doctor_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE a.start_time >= ? AND a.end_time <= ? AND d.id = ? AND a.patient_id IS NULL OR a.booking_type_name IS NULL "
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.start_time >= ? AND a.end_time <= ? AND d.id = ? AND a.patient_id IS NULL OR a.booking_type_name IS NULL "
 			this.mysqlConn.query(query, [start_time, end_time, doctor_id],(error,result)=>{
 				if(error){
 					reject(error)
@@ -2373,7 +2383,10 @@ export class Dao{
 						doctor_name:rowDataPacket.doctor_name,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name
+						customer_id:rowDataPacket.pet_owner_id,
+						customer_name:rowDataPacket.user_name,
+						booking_type_name:rowDataPacket.booking_type_name,
+						duration:rowDataPacket.duration
 					}
 				})
 				resolve(schedule)
@@ -2383,7 +2396,9 @@ export class Dao{
 
 	retrieveAvailableAppointmentScheduleFrontend(start_time, end_time, doctor_id, booking_type_name){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id WHERE a.patient_id IS NULL AND (a.booking_type_name IS NULL OR a.booking_type_name = ? ) AND a.start_time >= ? AND a.end_time <= ? AND d.id = ?"
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duartion " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.patient_id IS NULL AND (a.booking_type_name IS NULL OR a.booking_type_name = ? ) AND a.start_time >= ? AND a.end_time <= ? AND d.id = ?"
 			this.mysqlConn.query(query, [booking_type_name, start_time, end_time, doctor_id],(error,result)=>{
 				if(error){
 					reject(error)
@@ -2405,7 +2420,10 @@ export class Dao{
 						doctor_name:rowDataPacket.doctor_name,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
-						booking_type_name:rowDataPacket.booking_type_name
+						customer_id:rowDataPacket.pet_owner_id,
+						customer_name:rowDataPacket.customer_name,
+						booking_type_name:rowDataPacket.booking_type_name,
+						duration:rowDataPacket.duration
 					}
 				})
 				resolve(schedule)
@@ -2415,7 +2433,9 @@ export class Dao{
 
 	retrieveOneAppointmentSchedule(id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.id = ? "
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.id = ? "
 			this.mysqlConn.query(query, id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2436,6 +2456,8 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
 							duration:rowDataPacket.duration
 						}
@@ -2450,7 +2472,7 @@ export class Dao{
 
 	retrieveAppointmentScheduleByUserId(user_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration, p.pet_owner_id, u.user_name " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE p.pet_owner_id = ? "
@@ -2474,10 +2496,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
-							duration:rowDataPacket.duration,
-							pet_owner_id:rowDataPacket.pet_owner_id,
-							pet_owner_name:rowDataPacket.user_name
+							duration:rowDataPacket.duration
 						}
 					})
 					resolve(schedule)
@@ -2490,7 +2512,9 @@ export class Dao{
 
 	retrieveAppointmentScheduleByPatientId(patient_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.patient_id=? "
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.patient_id=? "
 			this.mysqlConn.query(query, patient_id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -2511,6 +2535,8 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
 							duration:rowDataPacket.duration
 						}
@@ -2529,7 +2555,10 @@ export class Dao{
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, a.booking_type_name, bt.duration FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
+				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "
 			this.mysqlConn.query(query,[start_time,end_time,doctor_id],(error,result)=>{
 				if(error){
 					reject(error)
@@ -2552,6 +2581,8 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
 							duration:rowDataPacket.duration
 						}
@@ -2632,6 +2663,21 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			const query="UPDATE v2_appointment_schedule SET status = 'DELETED', WHERE id=?"
 			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	addAppointmentLog(patient_id,booking_type_name,appointment_time,internal_notes,date_created){
+		return new Promise((resolve,reject)=>{
+			const query="INSERT INTO `v2_appointment_log` (`patient_id`,`booking_type_name`,`appointment_time`,`internal_notes`,`date_created`) " +
+				"VALUES(?,?,?,?,?) "
+			this.mysqlConn.query(query,[patient_id,booking_type_name,appointment_time,internal_notes,date_created],(error,result)=>{
 				if(error){
 					reject(error)
 					return
