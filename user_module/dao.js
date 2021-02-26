@@ -2444,10 +2444,12 @@ export class Dao{
 
 				if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
+						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						return{
 							id:rowDataPacket.id,
-							start_time:rowDataPacket.start_time,
-							end_time:rowDataPacket.end_time,
+							start_time:startTime,
+							end_time:endTime,
 							proof_of_payment:rowDataPacket.proof_of_payment,
 							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
@@ -2484,10 +2486,12 @@ export class Dao{
 
 				if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
+						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						return{
 							id:rowDataPacket.id,
-							start_time:rowDataPacket.start_time,
-							end_time:rowDataPacket.end_time,
+							start_time:startTime,
+							end_time:endTime,
 							proof_of_payment:rowDataPacket.proof_of_payment,
 							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
@@ -2523,10 +2527,12 @@ export class Dao{
 
 				if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
+						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						return{
 							id:rowDataPacket.id,
-							start_time:rowDataPacket.start_time,
-							end_time:rowDataPacket.end_time,
+							start_time:startTime,
+							end_time:endTime,
 							proof_of_payment:rowDataPacket.proof_of_payment,
 							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
@@ -2560,6 +2566,52 @@ export class Dao{
 				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "
 			this.mysqlConn.query(query,[start_time,end_time,doctor_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					const schedule=result.map(rowDataPacket=>{
+						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						return{
+							id:rowDataPacket.id,
+							start_time:startTime,
+							end_time:endTime,
+							proof_of_payment:rowDataPacket.proof_of_payment,
+							description:rowDataPacket.description,
+							additional_storage:rowDataPacket.additional_storage,
+							status:rowDataPacket.status,
+							doctor_id:rowDataPacket.doctor_id,
+							doctor_name:rowDataPacket.doctor_name,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							customer_id:rowDataPacket.pet_owner_id,
+							customer_name:rowDataPacket.user_name,
+							booking_type_name:rowDataPacket.booking_type_name,
+							duration:rowDataPacket.duration
+						}
+					})
+					resolve(schedule)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	retrieveAppointmentScheduleByStartTimeEndTime(start_time,end_time){
+		return new Promise((resolve,reject)=>{
+			if	( !moment(start_time,"YYYY-MM-DD HH:mm:ss", true).isValid() || !moment(end_time,"YYYY-MM-DD HH:mm:ss", true).isValid()){
+				reject("WRONG DATETIME FORMAT")
+				return
+			}
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
+				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
+				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ?"
+			this.mysqlConn.query(query,[start_time,end_time],(error,result)=>{
 				if(error){
 					reject(error)
 					return
