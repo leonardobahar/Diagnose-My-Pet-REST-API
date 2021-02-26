@@ -2093,10 +2093,10 @@ export class Dao{
 	}
 
 	// Start of v2 Development
-	addBookingType(booking_type_name, duration){
+	addBookingType(booking_type_name, duration, payment_proof_required){
 		return new Promise((resolve, reject)=>{
-			const query = "INSERT INTO `v2_booking_type`(`booking_type_name`, `duration`) VALUES (?,?)";
-			this.mysqlConn.query(query, [booking_type_name, duration], (err, res)=>{
+			const query = "INSERT INTO `v2_booking_type`(`booking_type_name`, `duration`, `payment_proof_required`) VALUES (?,?,?)";
+			this.mysqlConn.query(query, [booking_type_name, duration, payment_proof_required], (err, res)=>{
 				if(!err){
 					resolve(res)
 				}else{

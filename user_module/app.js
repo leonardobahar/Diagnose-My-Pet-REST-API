@@ -2903,7 +2903,7 @@ DIAGNOSA-SENDIRI/SELF-DIAGNOSE, TERJADWAL DENGAN KLINIK/SCHEDULED WITH CLINIC, T
 // Start of v2 Development
 app.post("/api/user/add-booking-type", (req, res)=>{
     if(typeof req.body.booking_type_name==='undefined' ||
-        typeof req.body.duration==='undefined'){
+        typeof req.body.duration==='undefined' ){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2911,8 +2911,9 @@ app.post("/api/user/add-booking-type", (req, res)=>{
         return
     }
 
+    const paymentProofRequired = req.body.payment_proof_required ? req.body.payment_proof_required : false;
 
-    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration).then(result=>{
+    dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, paymentProofRequired).then(result=>{
         res.status(200).send({
             success: true,
             result : result
