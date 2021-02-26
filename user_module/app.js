@@ -3479,7 +3479,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
                             message: ERROR_FOREIGN_KEY
                         })
                     }else{
-                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes,'NOW()').then(result=>{
+                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
                             res.status(200).send({
                                 success: true
                             })
@@ -3536,7 +3536,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
                         message: ERROR_FOREIGN_KEY
                     })
                 }else{
-                    dao.addAppointmentLog(req.body.patient_id, appointmentResult[0].booking_type_name, result[0].start_time, req.body.notes, 'NOW()').then(result=>{
+                    dao.addAppointmentLog(req.body.patient_id, appointmentResult[0].booking_type_name, result[0].start_time, req.body.notes).then(result=>{
                         res.status(200).send({
                             success: true
                         })
@@ -3599,9 +3599,24 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
                 })
             }else{
                 dao.freeAppointmentSlot(req.body.previous_appointment_id).then(result=>{
-                    res.status(200).send({
-                        success: true,
-                        result:result
+                    dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
+                        res.status(200).send({
+                            success: true,
+                            result:result
+                        })
+                    }).catch(error=>{
+                        if(error===NO_SUCH_CONTENT){
+                            res.status(204).send({
+                                success:false,
+                                error:NO_SUCH_CONTENT
+                            })
+                            return
+                        }
+                        console.error(error)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
                     })
                 }).catch(error=>{
                     console.error(error)
@@ -3651,11 +3666,19 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
     }
 
     dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-        if(appointmentResult.proof_of_payment===null){
+        if(appointmentResult[0].proof_of_payment===null){
             dao.unbindAppointment(req.body.appointment_id).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
+                dao.addAppointmentLog(appointmentResult[0].patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:result
+                    })
+                }).catch(error=>{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
                 })
             }).catch(error=>{
                 console.error(error)
@@ -3669,9 +3692,17 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
 
         fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
         dao.unbindAppointment(req.body.appointment_id).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
+            dao.addAppointmentLog(appointmentResult[0].patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
         }).catch(error=>{
             console.error(error)

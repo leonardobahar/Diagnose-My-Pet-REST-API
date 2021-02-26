@@ -2673,11 +2673,11 @@ export class Dao{
 		})
 	}
 
-	addAppointmentLog(patient_id,booking_type_name,appointment_time,internal_notes,date_created){
+	addAppointmentLog(patient_id,booking_type_name,appointment_time,internal_notes){
 		return new Promise((resolve,reject)=>{
 			const query="INSERT INTO `v2_appointment_log` (`patient_id`,`booking_type_name`,`appointment_time`,`internal_notes`,`date_created`) " +
-				"VALUES(?,?,?,?,?) "
-			this.mysqlConn.query(query,[patient_id,booking_type_name,appointment_time,internal_notes,date_created],(error,result)=>{
+				"VALUES(?,?,?,?,NOW()) "
+			this.mysqlConn.query(query,[patient_id,booking_type_name,appointment_time,internal_notes],(error,result)=>{
 				if(error){
 					reject(error)
 					return
