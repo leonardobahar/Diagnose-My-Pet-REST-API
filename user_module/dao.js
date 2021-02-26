@@ -2286,6 +2286,33 @@ export class Dao{
 		})
 	}
 
+	retrieveBookingTypeByName(booking_type_name){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT * FROM v2_booking_type WHERE booking_type_name=? "
+			this.mysqlConn.query(query,booking_type_name,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+
+				if(result.length>0){
+					const booking_type=result.map(rdp=>{
+						return{
+							id:rdp.id,
+							booking_type_name:rdp.booking_type_name,
+							duration:rdp.duration,
+							payment_proof_required:rdp.payment_proof_required
+						}
+					})
+					resolve(booking_type)
+				}else {
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	retrieveBookedAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
