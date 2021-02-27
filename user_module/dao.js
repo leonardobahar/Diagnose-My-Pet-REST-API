@@ -635,15 +635,28 @@ export class Dao{
 	registerPatient(patient){
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
-				const query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`patient_gender`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?,?)"
-				this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
-					if(err){
+				let query = "SELECT 'x' FROM patients WHERE patient_name = ? AND breed = ? AND animal_type = ? AND pet_owner_id = ?"
+				this.mysqlConn.query(query, [patient.patient_name, patient.breed, patient.animal_type, patient.pet_owner], (err, res)=>{
+					if	(err){
 						reject(err)
 						return
-					}
+					}else{
+						if (res.length>0){
+							reject(ERROR_DUPLICATE_ENTRY)
+							return
+						}else{
+							query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`patient_gender`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?,?)"
+							this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
+								if(err){
+									reject(err)
+									return
+								}
 
-					patient.id=res.insertId
-					resolve(patient)
+								patient.id=res.insertId
+								resolve(patient)
+							})
+						}
+					}
 				})
 			} else{
 				reject(MISMATCH_OBJ_TYPE)
