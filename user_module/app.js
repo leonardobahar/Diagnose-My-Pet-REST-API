@@ -3500,13 +3500,13 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
             dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
                 if(bookingResult[0].payment_proof_required ===1){
-                    if(typeof req.file==='undefined'){
-                        res.status(400).send({
-                            success:false,
-                            error:'Proof of payment is required for this booking type'
-                        })
-                        return
-                    }
+                    // if(typeof req.file==='undefined'){
+                    //     res.status(400).send({
+                    //         success:false,
+                    //         error:'Proof of payment is required for this booking type'
+                    //     })
+                    //     return
+                    // }
                     if(error instanceof multer.MulterError){
                         return res.send(error)
                     } else if(error){
