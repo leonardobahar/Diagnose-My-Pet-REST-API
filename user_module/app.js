@@ -2911,7 +2911,7 @@ app.post("/api/user/add-booking-type", (req, res)=>{
         return
     }
 
-    const paymentProofRequired = req.body.payment_proof_required === "true" ? true : false;
+    const paymentProofRequired = req.body.payment_proof_required === true ? true : false;
 
     dao.addBookingType(req.body.booking_type_name.toUpperCase(), req.body.duration, paymentProofRequired).then(result=>{
         res.status(200).send({
