@@ -2765,7 +2765,7 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
 })
 
 app.post("/api/user/cancel-appointment",(req,res)=>{
-    if(typeof req.body.appointment_id==='undefined'){
+    if(typeof req.body.id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2773,9 +2773,9 @@ app.post("/api/user/cancel-appointment",(req,res)=>{
         return
     }
 
-    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
+    dao.retrieveOneAppointmentSchedule(req.body.id).then(appointmentResult=>{
         if(appointmentResult[0].proof_of_payment===null){
-            dao.unbindAppointment(req.body.appointment_id).then(result=>{
+            dao.unbindAppointment(req.body.id).then(result=>{
                 dao.addAppointmentLog(appointmentResult[0].patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
                     res.status(200).send({
                         success:true,
@@ -2799,7 +2799,7 @@ app.post("/api/user/cancel-appointment",(req,res)=>{
         }
 
         fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
-        dao.unbindAppointment(req.body.appointment_id).then(result=>{
+        dao.unbindAppointment(req.body.id).then(result=>{
             dao.addAppointmentLog(appointmentResult[0].patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
                 res.status(200).send({
                     success:true,
