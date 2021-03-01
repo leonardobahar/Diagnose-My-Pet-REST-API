@@ -2754,8 +2754,8 @@ export class Dao{
 
 	deleteAppointmentSlot(appointment_id){
 		return new Promise((resolve,reject)=>{
-			const query="DELETE v2_appointment_schedule WHERE id=?"
-			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+			const query="DELETE FROM v2_appointment_schedule WHERE id=?"
+			this.mysqlConn.query(query,[appointment_id],(error,result)=>{
 				if(error){
 					reject(error)
 					return
