@@ -2733,6 +2733,44 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
     })
 })
 
+app.post("/api/user/approve-appointment-schedule",(req,res)=>{
+    if(typeof req.body.appointment_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
+        dao.approveAppointmentSlot(req.body.appointment_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/cancel-appointment-slot",(req,res)=>{
     if(typeof req.body.appointment_id==='undefined'){
         res.status(400).send({

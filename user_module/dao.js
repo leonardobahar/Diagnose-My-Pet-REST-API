@@ -2506,7 +2506,6 @@ export class Dao{
 					})
 					resolve(schedule)
 				}else{
-					console.log(rowDataPacket)
 					reject(NO_SUCH_CONTENT)
 				}
 			})
@@ -2722,6 +2721,20 @@ export class Dao{
 				}else{
 					reject(err)
 				}
+			})
+		})
+	}
+
+	approveAppointmentSlot(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET status='APPROVED' WHERE id=? "
+			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
 			})
 		})
 	}
