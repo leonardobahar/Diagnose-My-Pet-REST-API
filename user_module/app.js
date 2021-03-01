@@ -2782,7 +2782,7 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
 
     dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=> {
         if (appointmentResult[0].patient_id === null) {
-            dao.deleteAppointmentSlot(req.body.id).then(deleteResult => {
+            dao.deleteAppointmentSlot(req.body.appointment_id).then(deleteResult => {
                 res.status(200).send({
                     success: true
                 })
