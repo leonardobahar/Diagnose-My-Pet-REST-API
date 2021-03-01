@@ -2733,7 +2733,7 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
     })
 })
 
-app.post("/api/user/delete-appointment-slot",(req,res)=>{
+app.post("/api/user/cancel-appointment-slot",(req,res)=>{
     if(typeof req.body.appointment_id==='undefined'){
         res.status(400).send({
             success:false,
