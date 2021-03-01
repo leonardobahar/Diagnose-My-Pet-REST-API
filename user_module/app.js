@@ -2749,7 +2749,7 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
                     success: true
                 })
             }).catch(error => {
-                console.error(err)
+                console.error(error)
                 res.status(500).send({
                     success: false,
                     error: SOMETHING_WENT_WRONG
