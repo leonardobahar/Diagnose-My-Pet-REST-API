@@ -2734,7 +2734,7 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
 })
 
 app.post("/api/user/cancel-appointment-slot",(req,res)=>{
-    if(typeof req.body.id==='undefined'){
+    if(typeof req.body.appointment_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2742,7 +2742,7 @@ app.post("/api/user/cancel-appointment-slot",(req,res)=>{
         return
     }
 
-    dao.retrieveOneAppointmentSchedule(req.body.id).then(appointmentResult=> {
+    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=> {
         if (appointmentResult[0].patient_id === null) {
             dao.deleteAppointmentSlot(req.body.id).then(deleteResult => {
                 res.status(200).send({
