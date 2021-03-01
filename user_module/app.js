@@ -2639,52 +2639,52 @@ app.post("/api/user/finish-appointment",(req,res)=>{
     })
 })
 
-app.post("/api/user/cancel-appointment", (req,res)=>{
-    if(typeof req.body.id==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
-        if(appointmentResult[0].appointment_status !== 'APPROVED' &&
-            appointmentResult[0].appointment_status !== 'DECLINED' &&
-            appointmentResult[0].appointment_status !== 'FINISHED'){
-            dao.cancelAppointment(new Appointment(req.body.id)).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(error=>{
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-            return
-        }
-        res.status(204).send({
-            success:false,
-            error:NO_SUCH_CONTENT
-        })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
-            return
-        }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
-})
+// app.post("/api/user/cancel-appointment", (req,res)=>{
+//     if(typeof req.body.id==='undefined'){
+//         res.status(400).send({
+//             success:false,
+//             error:WRONG_BODY_FORMAT
+//         })
+//         return
+//     }
+//
+//     dao.retrieveOneAppointment(new Appointment(req.body.id)).then(appointmentResult=>{
+//         if(appointmentResult[0].appointment_status !== 'APPROVED' &&
+//             appointmentResult[0].appointment_status !== 'DECLINED' &&
+//             appointmentResult[0].appointment_status !== 'FINISHED'){
+//             dao.cancelAppointment(new Appointment(req.body.id)).then(result=>{
+//                 res.status(200).send({
+//                     success:true,
+//                     result:result
+//                 })
+//             }).catch(error=>{
+//                 console.error(error)
+//                 res.status(500).send({
+//                     success:false,
+//                     error:SOMETHING_WENT_WRONG
+//                 })
+//             })
+//             return
+//         }
+//         res.status(204).send({
+//             success:false,
+//             error:NO_SUCH_CONTENT
+//         })
+//     }).catch(error=>{
+//         if(error===NO_SUCH_CONTENT){
+//             res.status(204).send({
+//                 success:false,
+//                 error:NO_SUCH_CONTENT
+//             })
+//             return
+//         }
+//         console.error(error)
+//         res.status(500).send({
+//             success:false,
+//             error:SOMETHING_WENT_WRONG
+//         })
+//     })
+// })
 
 app.delete("/api/user/delete-appointment", (req,res)=>{
     if(typeof req.query.id==='undefined'){
@@ -3724,7 +3724,37 @@ app.post("/api/user/switch-appointment-slot",(req,res)=>{
     })
 })
 
-app.post("/api/user/cancel-appointment-slot",(req,res)=>{
+app.post("/api/user/delete-appointment-slot",(req,res)=>{
+    if(typeof req.body.appointment_id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
+        if  (appointmentResult[0].patient_id===null){
+            dao.deleteAppointmentSlot(req.body.appointment_id).then(deleteResult=>{
+                res.status(200).send({
+                    success: true
+                })
+            }).catch(error=>{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            })
+        }else{
+            res.status(500).send({
+                success: false,
+                error: "APPOINTMENT SLOT HAS BEEN BOOKED BY A PATIENT"
+            })
+        }
+})
+
+app.post("/api/user/cancel-appointment",(req,res)=>{
     if(typeof req.body.appointment_id==='undefined'){
         res.status(400).send({
             success:false,
