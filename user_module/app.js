@@ -2742,25 +2742,26 @@ app.post("/api/user/delete-appointment-slot",(req,res)=>{
         return
     }
 
-    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-        if  (appointmentResult[0].patient_id===null){
-            dao.deleteAppointmentSlot(req.body.appointment_id).then(deleteResult=>{
+    dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=> {
+        if (appointmentResult[0].patient_id === null) {
+            dao.deleteAppointmentSlot(req.body.appointment_id).then(deleteResult => {
                 res.status(200).send({
                     success: true
                 })
-            }).catch(error=>{
+            }).catch(error => {
                 console.error(err)
                 res.status(500).send({
                     success: false,
                     error: SOMETHING_WENT_WRONG
                 })
             })
-        }else{
+        } else {
             res.status(500).send({
                 success: false,
                 error: "APPOINTMENT SLOT HAS BEEN BOOKED BY A PATIENT"
             })
         }
+    })
 })
 
 app.post("/api/user/cancel-appointment",(req,res)=>{
