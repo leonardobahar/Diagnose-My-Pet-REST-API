@@ -316,9 +316,6 @@ export class Dao{
 					}else{
 						reject(AUTH_ERROR_LOGIN)
 					}
-					}else{
-						reject(AUTH_ERROR_LOGIN)
-					}
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
