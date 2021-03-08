@@ -271,7 +271,6 @@ export class Dao{
 
 						if (user[0].role === "DOCTOR"){
 							const doctorDetails = await this.retrieveDoctorWithUserId(user[0].user_id)
-							console.log(`${user[0].user_name} is a doctor with id of ${doctorDetails.id}`)
 							user[0].doctor_id = doctorDetails.id
 						}
 						resolve(user)
