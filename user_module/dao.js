@@ -284,40 +284,38 @@ export class Dao{
 		})
 	}
 
-	loginWithEmail(user){
-		return new Promise((resolve,reject)=>{
-			if(!user instanceof User){
+	loginWithEmail(user) {
+		return new Promise((resolve, reject) => {
+			if (!user instanceof User) {
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
-			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE email=?"
-			this.mysqlConn.query(query,[user.email], async(error,result)=>{
-				if(error){
+			const query = "SELECT id, user_name, email, salt, password, role FROM users WHERE email=?"
+			this.mysqlConn.query(query, [user.email], async (error, result) => {
+				if (error) {
 					reject(error)
 					return
-				}else if(result.length === 1){
+				} else if (result.length === 1) {
 					const salt = result[0].salt
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
-					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
-					if (bcryptedPassword){
+					const bcryptedPassword = hashedClientInput === result[0].password ? true : false
+					if (bcryptedPassword) {
 						let user = [{
-							user_id:result[0].id,
-							user_name:result[0].user_name,
-							email:result[0].email,
-							role:result[0].role
+							user_id: result[0].id,
+							user_name: result[0].user_name,
+							email: result[0].email,
+							role: result[0].role
 						}]
 
-						if (user[0].role === "DOCTOR"){
+						if (user[0].role === "DOCTOR") {
 							const doctorDetails = await this.retrieveDoctorWithUserId(user[0].user_id)
 							user[0].doctor_id = doctorDetails.id
 						}
 						resolve(user)
-					}else{
+					} else {
 						reject(AUTH_ERROR_LOGIN)
 					}
-				}else{
-					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})
@@ -791,6 +789,40 @@ export class Dao{
 				"FROM medical_records m LEFT OUTER JOIN patients p ON p.id=m.patient_id " +
 				"WHERE m.id=? "
 			this.mysqlConn.query(query,record.id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length===1){
+					const records=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							description:rowDataPacket.description,
+							medication:rowDataPacket.medication,
+							date_created:rowDataPacket.date_created,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							breed:rowDataPacket.breed,
+							pet_owner_id:rowDataPacket.pet_owner_id,
+							appointment_id:rowDataPacket.appointment_id,
+							file_attachment:rowDataPacket.file
+						}
+					})
+					resolve(records)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
+	retrieveMedicalRecordByPatientId(patient_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, m.file " +
+				"FROM medical_records m LEFT OUTER JOIN patients p ON p.id=m.patient_id " +
+				"WHERE m.patient_id=? "
+			this.mysqlConn.query(query,patient_id,(error,result)=>{
 				if(error){
 					reject(error)
 					return

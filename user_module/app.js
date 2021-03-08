@@ -1136,7 +1136,7 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
 })
 
 app.get("/api/user/retrieve-medical-record",(req,res)=>{
-    if(typeof req.query.patient_id==='undefined'){
+    if(typeof req.query.id==='undefined'){
         dao.retrieveMedicalRecord().then(result=>{
             res.status(200).send({
                 success:true,
@@ -1150,7 +1150,7 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
             })
         })
     }else {
-        const record=new MedicalRecords(null,req.query.patient_id,null,null)
+        const record=new MedicalRecords(req.query.id)
         dao.retrieveOneMedicalRecord(record).then(result=>{
             res.status(200).send({
                 success:true,
