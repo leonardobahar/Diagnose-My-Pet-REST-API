@@ -1136,7 +1136,8 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
 })
 
 app.get("/api/user/retrieve-medical-record",(req,res)=>{
-    if(typeof req.query.id==='undefined'){
+    if(typeof req.query.id==='undefined' &&
+       typeof req.query.patient_id==='undefined'){
         dao.retrieveMedicalRecord().then(result=>{
             res.status(200).send({
                 success:true,
@@ -1149,7 +1150,26 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-    }else {
+    }else if(typeof req.query.patient_id!=='undefined'){
+        dao.retrieveMedicalRecordByPatientId(req.query.patient_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    } else {
         const record=new MedicalRecords(req.query.id)
         dao.retrieveOneMedicalRecord(record).then(result=>{
             res.status(200).send({
