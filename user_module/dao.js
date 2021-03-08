@@ -439,14 +439,9 @@ export class Dao{
 					return
 				}
 
-				const doctors=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						doctor_name:rowDataPacket.doctor_name,
-						user_id:rowDataPacket.user_id
-					}
-				})
-				resolve(doctors)
+				resolve({id:result.id,
+					doctor_name:result.doctor_name,
+					user_id:result.user_id})
 			})
 		})
 	}
