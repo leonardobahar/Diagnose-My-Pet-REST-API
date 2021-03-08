@@ -438,10 +438,11 @@ export class Dao{
 					reject(error)
 					return
 				}
+				console.log(result)
 
-				resolve({id:result.id,
-					doctor_name:result.doctor_name,
-					user_id:result.user_id})
+				resolve({id:result[0].id,
+					doctor_name:result[0].doctor_name,
+					user_id:result[0].user_id})
 			})
 		})
 	}
