@@ -262,9 +262,9 @@ export class Dao{
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
-						const user=result.map(rowDatapacket=>{
+						const user=result.map(async rowDatapacket=>{
 							if (rowDatapacket.role === "DOCTOR"){
-								const doctorDetails = this.retrieveDoctorWithUserId(rowDatapacket.id)
+								const doctorDetails = await this.retrieveDoctorWithUserId(rowDatapacket.id)
 								console.log(`${rowDatapacket.user_name} is a doctor with id of ${doctorDetails.id}`)
 								return{
 									user_id:rowDatapacket.id,
@@ -438,7 +438,6 @@ export class Dao{
 					reject(error)
 					return
 				}
-				console.log(result)
 
 				resolve({id:result[0].id,
 					doctor_name:result[0].doctor_name,
