@@ -257,7 +257,7 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
-				}else if(result.length > 0){
+				}else if(result.length === 1){
 					const salt = result[0].salt
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
@@ -296,20 +296,26 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
-				}else if(result.length > 0){
+				}else if(result.length === 1){
 					const salt = result[0].salt
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
-						const user=result.map(rowDatapacket=>{
-							return{
-								user_id:rowDatapacket.id,
-								user_name:rowDatapacket.user_name,
-								email:rowDatapacket.email,
-								role:rowDatapacket.role
-							}
-						})
+						let user = [{
+							user_id:result[0].id,
+							user_name:result[0].user_name,
+							email:result[0].email,
+							role:result[0].role
+						}]
+
+						if (user[0].role === "DOCTOR"){
+							const doctorDetails = await this.retrieveDoctorWithUserId(user[0].user_id)
+							user[0].doctor_id = doctorDetails.id
+						}
 						resolve(user)
+					}else{
+						reject(AUTH_ERROR_LOGIN)
+					}
 					}else{
 						reject(AUTH_ERROR_LOGIN)
 					}
