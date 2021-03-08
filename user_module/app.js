@@ -322,12 +322,11 @@ app.post("/api/user/user-login",(req,res)=>{
                     message:'Invalid User Name/Password'
                 })
             } else{
-                    console.error(error)
-                    res.status(500).send({
-                        success:false,
-                        error:SOMETHING_WENT_WRONG
-                    })
-                }
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             }
         })
     }else {
