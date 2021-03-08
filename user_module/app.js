@@ -315,12 +315,19 @@ app.post("/api/user/user-login",(req,res)=>{
                     authentication_approval: false,
                     message:'Invalid User Name/Password'
                 })
-            }else{
-                console.error(error)
-                res.status(500).send({
+            }else if(error===NO_SUCH_CONTENT) {
+                res.status(200).send({
                     success:false,
-                    error:SOMETHING_WENT_WRONG
+                    authentication_approval: false,
+                    message:'Invalid User Name/Password'
                 })
+            } else{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                }
             }
         })
     }else {
@@ -347,7 +354,13 @@ app.post("/api/user/user-login",(req,res)=>{
                     authentication_approval: false,
                     message: 'Invalid User Name/Password'
                 })
-            }else{
+            }else if(error===NO_SUCH_CONTENT) {
+                res.status(200).send({
+                    success:false,
+                    authentication_approval: false,
+                    message:'Invalid User Name/Password'
+                })
+            } else{
                 console.error(error)
                 res.status(500).send({
                     success: false,
