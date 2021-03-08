@@ -759,9 +759,8 @@ export class Dao{
 
 	retrieveMedicalRecord(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
-				"FROM medical_records m LEFT OUTER JOIN patient p ON p.id=m.patient_id " +
-				"LEFT OUTER JOIN v2_appointment_schedule as ON as.id=m.appointment_id "
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, m.file " +
+				"FROM medical_records m LEFT OUTER JOIN patients p ON p.id=m.patient_id "
 			this.mysqlConn.query(query,(error,result)=>{
 				if(error){
 					reject(error)
@@ -794,9 +793,8 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
-				"FROM medical_records m LEFT OUTER JOIN patient p ON p.id=m.patient_id " +
-				"LEFT OUTER JOIN v2_appointment_schedule as ON as.id=m.appointment_id " +
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, m.file " +
+				"FROM medical_records m LEFT OUTER JOIN patients p ON p.id=m.patient_id " +
 				"WHERE m.id=? "
 			this.mysqlConn.query(query,record.id,(error,result)=>{
 				if(error){
@@ -804,21 +802,25 @@ export class Dao{
 					return
 				}
 
-				const records=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						description:rowDataPacket.description,
-						medication:rowDataPacket.medication,
-						date_created:rowDataPacket.date_created,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name,
-						breed:rowDataPacket.breed,
-						pet_owner_id:rowDataPacket.pet_owner_id,
-						appointment_id:rowDataPacket.appointment_id,
-						file_attachment:rowDataPacket.file
-					}
-				})
-				resolve(records)
+				if(result.length>0){
+					const records=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							description:rowDataPacket.description,
+							medication:rowDataPacket.medication,
+							date_created:rowDataPacket.date_created,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name,
+							breed:rowDataPacket.breed,
+							pet_owner_id:rowDataPacket.pet_owner_id,
+							appointment_id:rowDataPacket.appointment_id,
+							file_attachment:rowDataPacket.file
+						}
+					})
+					resolve(records)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
@@ -826,8 +828,8 @@ export class Dao{
 	addMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
-				const query="INSERT INTO `medical_records` (`description`, `medication`, `date_created`, `patient_id`, `appointment_id`, `file`) VALUES(?, ?, ?, ?, ?, ?)"
-				this.mysqlConn.query(query, [record.description, record.medication, 'NOW()', record.patient_id, record.appointment_id, record.file],(error, result)=>{
+				const query="INSERT INTO `medical_records` (`description`, `medication`, `date_created`, `patient_id`, `appointment_id`, `file`) VALUES(?, ?, NOW(), ?, ?, ?)"
+				this.mysqlConn.query(query, [record.description, record.medication, record.patient_id, record.appointment_id, record.file],(error, result)=>{
 					if(error){
 						reject(error)
 						return
@@ -847,8 +849,8 @@ export class Dao{
 	updateMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
-				const query="UPDATE medical_records SET description=?, medication=?, date_created=?, patient_id=?, appointment_id=?, file=? WHERE id=?"
-				this.mysqlConn.query(query, [record.description,record.medication, 'NOW()',record.patient_id, record.appointment_id, record.file, record.id], (error,result)=>{
+				const query="UPDATE medical_records SET description=?, medication=?, date_created=NOW(), patient_id=?, appointment_id=?, file=? WHERE id=?"
+				this.mysqlConn.query(query, [record.description,record.medication, record.patient_id, record.appointment_id, record.file, record.id], (error,result)=>{
 					if(error){
 						reject(error)
 						return
