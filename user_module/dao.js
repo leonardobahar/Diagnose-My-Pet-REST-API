@@ -265,6 +265,7 @@ export class Dao{
 						const user=result.map(rowDatapacket=>{
 							if (rowDatapacket.role === "DOCTOR"){
 								const doctorDetails = this.retrieveDoctorWithUserId(rowDatapacket.id)
+								console.log(`${rowDatapacket.user_name} is a doctor with id of ${doctorDetails.id}`)
 								return{
 									user_id:rowDatapacket.id,
 									user_name:rowDatapacket.user_name,
