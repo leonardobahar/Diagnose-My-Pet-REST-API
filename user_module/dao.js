@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import moment from 'moment'
 import {
 	ADMIN_VALIDATED,
-	ALL, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
+	ALL, AUTH_ERROR_LOGIN, CANCELLED, ERROR_DUPLICATE_ENTRY, INVALID, INVALID_FINAL,
 	MISMATCH_OBJ_TYPE,
 	NO_AFFECTED_ROWS,
 	NO_SUCH_CONTENT,
@@ -273,7 +273,7 @@ export class Dao{
 						})
 						resolve(user)
 					}else{
-						reject("WRONG USERNAME/PASSWORD")
+						reject()
 					}
 				}else{
 					reject(NO_SUCH_CONTENT)
@@ -309,7 +309,7 @@ export class Dao{
 						})
 						resolve(user)
 					}else{
-						reject(NO_SUCH_CONTENT)
+						reject(AUTH_ERROR_LOGIN)
 					}
 				}else{
 					reject(NO_SUCH_CONTENT)

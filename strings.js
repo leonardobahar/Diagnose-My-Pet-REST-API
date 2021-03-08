@@ -7,6 +7,7 @@ export const ERROR_FOREIGN_KEY = "There was a foreign key error. Please check th
 export const NO_SUCH_CONTENT = "No Such Content"
 export const MISMATCH_OBJ_TYPE = "Mismatch Object Type Passed"
 export const ERROR_DUPLICATE_ENTRY = "Duplicate Entry Error"
+export const AUTH_ERROR_LOGIN = "WRONG USERNAME/PASSWORD"
 
 // CONSTANTS
 export const SUCCESS = "SUCCESS"

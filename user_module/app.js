@@ -8,6 +8,7 @@ import multer from "multer";
 import moment from "moment";
 import {Dao} from "./dao";
 import {
+    AUTH_ERROR_LOGIN,
     ERROR_DUPLICATE_ENTRY, ERROR_FOREIGN_KEY, NO_SUCH_CONTENT,
     SOMETHING_WENT_WRONG, SUCCESS,
     WRONG_BODY_FORMAT
@@ -308,7 +309,7 @@ app.post("/api/user/user-login",(req,res)=>{
                 })
             })
         }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
+            if(error===AUTH_ERROR_LOGIN){
                 res.status(200).send({
                     success:false,
                     authentication_approval: false,
@@ -340,18 +341,19 @@ app.post("/api/user/user-login",(req,res)=>{
                 })
             })
         }).catch(error => {
-            if (error === NO_SUCH_CONTENT) {
+            if (error === AUTH_ERROR_LOGIN) {
                 res.status(200).send({
                     success: false,
                     authentication_approval: false,
                     message: 'Invalid User Name/Password'
                 })
+            }else{
+                console.error(error)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
             }
-            console.error(error)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
         })
     }
 })
