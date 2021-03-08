@@ -254,6 +254,7 @@ export class Dao{
 
 			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE user_name=?"
 			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
+				console.log(query)
 				if(error){
 					reject(error)
 					return
