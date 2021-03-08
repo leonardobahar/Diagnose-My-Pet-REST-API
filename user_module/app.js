@@ -2335,7 +2335,8 @@ app.post("/api/user/unbind-doctor-to-booking-type", (req, res)=>{
 })
 
 app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
-    if(typeof req.query.booking_type_name==='undefined'){
+    if(typeof req.query.booking_type_name==='undefined' &&
+       typeof req.query.booking_type_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -2343,6 +2344,34 @@ app.get("/api/user/retrieve-doctor-by-booking-type",(req,res)=>{
         return
     }
 
+    if(typeof req.query.booking_type_id !=='undefined' &&
+       typeof req.query.booking_type_name==='undefined'){
+        dao.retrieveDoctorsByBookingTypeId(req.query.booking_type_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            if (err===ERROR_DUPLICATE_ENTRY){
+                res.status(500).send({
+                    success: false,
+                    error: ERROR_DUPLICATE_ENTRY
+                })
+            }else if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+            } else {
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+        return
+    }
     dao.retrieveDoctorsBasedOnBookingType(req.query.booking_type_name.toUpperCase()).then(result=>{
         res.status(200).send({
             success:true,
