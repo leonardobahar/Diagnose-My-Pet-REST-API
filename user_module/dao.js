@@ -253,7 +253,7 @@ export class Dao{
 			}
 
 			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE user_name=?"
-			this.mysqlConn.query(query,[user.user_name], (error,result)=>{
+			this.mysqlConn.query(query,[user.user_name], async(error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -262,26 +262,18 @@ export class Dao{
 					const hashedClientInput = bcrypt.hashSync(user.password, salt)
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
-						const user=result.map(async rowDatapacket=>{
-							if (rowDatapacket.role === "DOCTOR"){
-								const doctorDetails = await this.retrieveDoctorWithUserId(rowDatapacket.id)
-								console.log(`${rowDatapacket.user_name} is a doctor with id of ${doctorDetails.id}`)
-								return{
-									user_id:rowDatapacket.id,
-									user_name:rowDatapacket.user_name,
-									email:rowDatapacket.email,
-									role:rowDatapacket.role,
-									doctor_id:doctorDetails.id
-								}
-							}else{
-								return{
-									user_id:rowDatapacket.id,
-									user_name:rowDatapacket.user_name,
-									email:rowDatapacket.email,
-									role:rowDatapacket.role
-								}
-							}
-						})
+						let user = [{
+							user_id:result[0].id,
+							user_name:result[0].user_name,
+							email:result[0].email,
+							role:result[0].role
+						}]
+
+						if (user.role === "DOCTOR"){
+							const doctorDetails = await this.retrieveDoctorWithUserId(rowDatapacket.id)
+							console.log(`${rowDatapacket.user_name} is a doctor with id of ${doctorDetails.id}`)
+							user[0].doctor_id = doctorDetails.id
+						}
 						resolve(user)
 					}else{
 						reject(AUTH_ERROR_LOGIN)
