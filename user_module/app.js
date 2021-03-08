@@ -1158,8 +1158,7 @@ app.post("/api/user/add-medical-record", (req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
 
     upload(req,res,async(error)=>{
-        if(typeof req.body.medication === 'undefined' ||
-            typeof req.body.patient_id ==='undefined' ||
+        if(typeof req.body.patient_id ==='undefined' ||
             typeof req.body.appointment_id ==='undefined'){
             res.status(400).send({
                 success:false,
@@ -1169,8 +1168,79 @@ app.post("/api/user/add-medical-record", (req,res)=>{
         }
 
         if(req.file==='undefined'){
-            const medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.patient_id, req.body.appointment_id,'No Attachment')
+            const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,'No Attachment')
             dao.addMedicalRecord(medical).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                if(err.code==='ER_DUP_ENTRY'){
+                    res.status(500).send({
+                        success:false,
+                        error:ERROR_DUPLICATE_ENTRY
+                    })
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                }
+            })
+            return
+        }
+        /*
+        make a if statement to check whether description, medication, and file are empty
+        */
+
+        if(error instanceof multer.MulterError){
+            return res.send(error)
+        }
+
+        else if(error){
+            return res.send(error)
+        }
+
+        const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,req.file.filename)
+        dao.addMedicalRecord(medical).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:ERROR_DUPLICATE_ENTRY
+                })
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    })
+})
+
+app.post("/api/user/update-medical-record",(req,res)=>{
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
+
+    upload(req,res,async(error)=>{
+        if( typeof req.body.patient_id === 'undefined' ||
+            typeof req.body.appointment_id === 'undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        if(req.file==='undefined'){
+            const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,'No Attachment')
+            dao.updateMedicalRecord(medical).then(result=>{
                 res.status(200).send({
                     success:true,
                     result:result
@@ -1200,8 +1270,8 @@ app.post("/api/user/add-medical-record", (req,res)=>{
             return res.send(error)
         }
 
-        const medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.patient_id, req.body.appointment_id,req.file.filename)
-        dao.addMedicalRecord(medical).then(result=>{
+        const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,req.file.filename)
+        dao.updateMedicalRecord(medical).then(result=>{
             res.status(200).send({
                 success:true,
                 result:result
@@ -1220,38 +1290,6 @@ app.post("/api/user/add-medical-record", (req,res)=>{
                 })
             }
         })
-    })
-})
-
-app.post("/api/user/update-medical-record",(req,res)=>{
-    if( typeof req.body.id === 'undefined' ||
-        typeof req.body.patient_id === 'undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
-
-    const medical=new MedicalRecords(req.body.id,req.body.patient_id,'NOW','UPDATED')
-    dao.updateMedicalRecord(medical).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        if(err.code==='ER_DUP_ENTRY'){
-            res.status(500).send({
-                success:false,
-                error:ERROR_DUPLICATE_ENTRY
-            })
-        }else{
-            console.error(err)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        }
     })
 })
 

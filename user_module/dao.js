@@ -732,7 +732,7 @@ export class Dao{
 
 	retrieveMedicalRecord(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT m.id, m.description, m.medication, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
 				"FROM medical_records m LEFT OUTER JOIN patient p ON p.id=m.patient_id " +
 				"LEFT OUTER JOIN v2_appointment_schedule as ON as.id=m.appointment_id "
 			this.mysqlConn.query(query,(error,result)=>{
@@ -746,6 +746,7 @@ export class Dao{
 						id:rowDataPacket.id,
 						description:rowDataPacket.description,
 						medication:rowDataPacket.medication,
+						date_created:rowDataPacket.date_created,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
 						breed:rowDataPacket.breed,
@@ -766,7 +767,7 @@ export class Dao{
 				return
 			}
 
-			const query="SELECT m.id, m.description, m.medication, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.patient_id, p.patient_name, p.breed, p.pet_owner_id, m.appointment_id, p.file " +
 				"FROM medical_records m LEFT OUTER JOIN patient p ON p.id=m.patient_id " +
 				"LEFT OUTER JOIN v2_appointment_schedule as ON as.id=m.appointment_id " +
 				"WHERE m.id=? "
@@ -781,6 +782,7 @@ export class Dao{
 						id:rowDataPacket.id,
 						description:rowDataPacket.description,
 						medication:rowDataPacket.medication,
+						date_created:rowDataPacket.date_created,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
 						breed:rowDataPacket.breed,
@@ -797,8 +799,8 @@ export class Dao{
 	addMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
-				const query="INSERT INTO `medical_records` (`description`, `medication`, `patient_id`, `appointment_id`, `file`) VALUES(?, ?, ?, ?, ?)"
-				this.mysqlConn.query(query, [record.description, record.medication, record.patient_id, record.appointment_id, record.file],(error, result)=>{
+				const query="INSERT INTO `medical_records` (`description`, `medication`, `date_created`, `patient_id`, `appointment_id`, `file`) VALUES(?, ?, ?, ?, ?, ?)"
+				this.mysqlConn.query(query, [record.description, record.medication, 'NOW()', record.patient_id, record.appointment_id, record.file],(error, result)=>{
 					if(error){
 						reject(error)
 						return
@@ -818,8 +820,8 @@ export class Dao{
 	updateMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
-				const query="UPDATE medical_records SET description=? medication=? patient_id=?, appointment_id=?, file=? WHERE id=?"
-				this.mysqlConn.query(query, [record.description,record.medication,record.patient_id, record.appointment_id, record.file, record.id], (error,result)=>{
+				const query="UPDATE medical_records SET description=?, medication=?, date_created=?, patient_id=?, appointment_id=?, file=? WHERE id=?"
+				this.mysqlConn.query(query, [record.description,record.medication, 'NOW()',record.patient_id, record.appointment_id, record.file, record.id], (error,result)=>{
 					if(error){
 						reject(error)
 						return

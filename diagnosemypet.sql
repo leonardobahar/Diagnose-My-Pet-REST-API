@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `medical_records`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	description VARCHAR(255),
 	medication VARCHAR(255),
+	date_created TIMESTAMP,
 	patient_id INT(11) NOT NULL,
 	appointment_id INT(11) NOT NULL,
 	file LONGTEXT,
