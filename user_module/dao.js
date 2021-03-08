@@ -2781,6 +2781,20 @@ export class Dao{
 		})
 	}
 
+	finishAppointmentSchedule(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="UPDATE v2_appointment_schedule SET status='DONE' WHERE id=? "
+			this.mysqlConn.query(query,appointment_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	unbindAppointment(appointment_id){
 		return new Promise((resolve,reject)=>{
 			const query="UPDATE v2_appointment_schedule SET status='AVAILABLE', patient_id=?, proof_of_payment=? WHERE id = ?"

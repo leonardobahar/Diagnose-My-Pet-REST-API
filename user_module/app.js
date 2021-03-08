@@ -1201,10 +1201,11 @@ app.post("/api/user/add-medical-record", (req,res)=>{
                 }
             })
             return
+        }else if(typeof req.body.description==='undefined' &&
+                 typeof req.body.medication==='undefined' &&
+                 req.file==='undefined'){
+
         }
-        /*
-        make a if statement to check whether description, medication, and file are empty
-        */
 
         if(error instanceof multer.MulterError){
             return res.send(error)
