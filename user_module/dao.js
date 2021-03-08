@@ -269,7 +269,7 @@ export class Dao{
 							role:result[0].role
 						}]
 
-						if (user.role === "DOCTOR"){
+						if (user[0].role === "DOCTOR"){
 							const doctorDetails = await this.retrieveDoctorWithUserId(rowDatapacket.id)
 							console.log(`${rowDatapacket.user_name} is a doctor with id of ${doctorDetails.id}`)
 							user[0].doctor_id = doctorDetails.id
