@@ -432,7 +432,7 @@ export class Dao{
 
 	retrieveDoctorWithUserId(user_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT d.id, d.doctor_name, d.user_id FROM doctor d WHERE d.user_id = ? "
+			const query="SELECT id, doctor_name, user_id FROM doctor WHERE user_id = ?"
 			this.mysqlConn.query(query,[user_id],(error,result)=>{
 				if(error){
 					reject(error)
