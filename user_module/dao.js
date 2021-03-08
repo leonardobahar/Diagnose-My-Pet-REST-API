@@ -292,7 +292,7 @@ export class Dao{
 			}
 
 			const query="SELECT id, user_name, email, salt, password, role FROM users WHERE email=?"
-			this.mysqlConn.query(query,[user.email], (error,result)=>{
+			this.mysqlConn.query(query,[user.email], async(error,result)=>{
 				if(error){
 					reject(error)
 					return
