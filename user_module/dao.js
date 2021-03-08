@@ -264,11 +264,22 @@ export class Dao{
 					const bcryptedPassword = hashedClientInput===result[0].password ? true : false
 					if (bcryptedPassword){
 						const user=result.map(rowDatapacket=>{
-							return{
-								user_id:rowDatapacket.id,
-								user_name:rowDatapacket.user_name,
-								email:rowDatapacket.email,
-								role:rowDatapacket.role
+							if (rowDatapacket.role === "DOCTOR"){
+								const doctorDetails = this.retrieveDoctorWithUserId(rowDatapacket.id)
+								return{
+									user_id:rowDatapacket.id,
+									user_name:rowDatapacket.user_name,
+									email:rowDatapacket.email,
+									role:rowDatapacket.role,
+									doctor_id:doctorDetails.id
+								}
+							}else{
+								return{
+									user_id:rowDatapacket.id,
+									user_name:rowDatapacket.user_name,
+									email:rowDatapacket.email,
+									role:rowDatapacket.role
+								}
 							}
 						})
 						resolve(user)
@@ -412,6 +423,27 @@ export class Dao{
 						email:rowDataPacket.email,
 						birthdate:rowDataPacket.birthdate,
 						role:rowDataPacket.role
+					}
+				})
+				resolve(doctors)
+			})
+		})
+	}
+
+	retrieveDoctorWithUserId(user_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT d.id, d.doctor_name, d.user_id FROM doctor d WHERE d.user_id = ? "
+			this.mysqlConn.query(query,[user_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const doctors=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						doctor_name:rowDataPacket.doctor_name,
+						user_id:rowDataPacket.user_id
 					}
 				})
 				resolve(doctors)
