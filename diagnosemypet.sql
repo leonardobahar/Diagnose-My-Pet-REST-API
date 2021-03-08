@@ -92,10 +92,13 @@ CREATE TABLE IF NOT EXISTS `patients`(
 
 CREATE TABLE IF NOT EXISTS `medical_records`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+	description VARCHAR(255),
+	medication VARCHAR(255),
 	patient_id INT(11) NOT NULL,
-	case_open_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	status TEXT,
-	FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+	appointment_id INT(11) NOT NULL,
+	file LONGTEXT,
+	FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (appointment_id) REFERENCES v2_appointment_schedule(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `medical_records_symptoms`(
