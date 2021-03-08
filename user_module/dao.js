@@ -273,7 +273,7 @@ export class Dao{
 						})
 						resolve(user)
 					}else{
-						reject(NO_SUCH_CONTENT)
+						reject("WRONG USERNAME/PASSWORD")
 					}
 				}else{
 					reject(NO_SUCH_CONTENT)
