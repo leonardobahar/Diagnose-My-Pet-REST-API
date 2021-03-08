@@ -324,7 +324,7 @@ app.post("/api/user/user-login",(req,res)=>{
         })
     }else {
         const user = new User(null, req.body.user_name, null, null, null, null, req.body.password, null)
-        dao.loginCustomer(user).then(loginResult => {
+        dao.loginWithUsername(user).then(loginResult => {
             dao.userLastSignIn(loginResult[0].user_id).then(result => {
                 res.status(200).send({
                     success: true,

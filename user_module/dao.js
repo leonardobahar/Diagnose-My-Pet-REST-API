@@ -245,7 +245,7 @@ export class Dao{
 		})
 	}
 
-	loginCustomer(user){
+	loginWithUsername(user){
 		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
