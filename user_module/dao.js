@@ -273,7 +273,7 @@ export class Dao{
 						})
 						resolve(user)
 					}else{
-						reject()
+						reject(AUTH_ERROR_LOGIN)
 					}
 				}else{
 					reject(NO_SUCH_CONTENT)
