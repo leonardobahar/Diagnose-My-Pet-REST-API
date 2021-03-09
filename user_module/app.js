@@ -1177,6 +1177,13 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
                 result:result
             })
         }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
             console.error(err)
             res.status(500).send({
                 success:false,
@@ -1190,8 +1197,7 @@ app.post("/api/user/add-medical-record", (req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
 
     upload(req,res,async(error)=>{
-        if(typeof req.body.patient_id ==='undefined' ||
-            typeof req.body.appointment_id ==='undefined'){
+        if(typeof req.body.appointment_id ==='undefined'){
             res.status(400).send({
                 success:false,
                 error:WRONG_BODY_FORMAT
@@ -1200,7 +1206,7 @@ app.post("/api/user/add-medical-record", (req,res)=>{
         }
 
         if(typeof req.file==='undefined'){
-            const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,'No Attachment')
+            const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
             dao.addMedicalRecord(medical).then(result=>{
                 dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
                     res.status(200).send({
@@ -1253,7 +1259,7 @@ app.post("/api/user/add-medical-record", (req,res)=>{
                 return res.send(error)
             }
 
-            const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,req.file.filename)
+            const medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
             dao.addMedicalRecord(medical).then(result=>{
                 dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
                     res.status(200).send({
@@ -1299,7 +1305,7 @@ app.post("/api/user/update-medical-record",(req,res)=>{
         }
 
         if(req.file==='undefined'){
-            const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,'No Attachment')
+            const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
             dao.updateMedicalRecord(medical).then(result=>{
                 res.status(200).send({
                     success:true,
@@ -1330,7 +1336,7 @@ app.post("/api/user/update-medical-record",(req,res)=>{
             return res.send(error)
         }
 
-        const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()',req.body.patient_id, req.body.appointment_id,req.file.filename)
+        const medical=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
         dao.updateMedicalRecord(medical).then(result=>{
             res.status(200).send({
                 success:true,

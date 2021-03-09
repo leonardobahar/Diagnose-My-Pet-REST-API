@@ -47,12 +47,11 @@ export class Anatomy{
 }
 
 export class MedicalRecords{
-	constructor(id, description, medication, date_created, patient_id, appointment_id, file){
+	constructor(id, description, medication, date_created, appointment_id, file){
 		this.id=id
 		this.description=description
 		this.medication=medication
 		this.date_created=date_created
-		this.patient_id=patient_id
 		this.appointment_id=appointment_id
 		this.file=file
 	}

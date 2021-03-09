@@ -95,10 +95,8 @@ CREATE TABLE IF NOT EXISTS `medical_records`(
 	description VARCHAR(255),
 	medication VARCHAR(255),
 	date_created TIMESTAMP,
-	patient_id INT(11) NOT NULL,
 	appointment_id INT(11) NOT NULL,
 	file LONGTEXT,
-	FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (appointment_id) REFERENCES v2_appointment_schedule(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
