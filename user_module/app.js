@@ -171,7 +171,7 @@ app.post("/api/user/reset-user", (req, res)=>{
             null,
             req.body.password,
             null,
-            'CUSTOMER')
+            null)
 
         dao.resetPassword(user).then(result=>{
             res.status(200).send({
