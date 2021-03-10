@@ -607,6 +607,41 @@ app.post("/api/user/register-doctor",(req,res)=>{
     }
 })
 
+app.post("/api/user/update-doctor",(req,res)=>{
+    if(typeof req.body.mobile==='undefined' ||
+       typeof req.body.email==='undefined' ||
+       typeof req.body.birthdate==='undefined' ||
+       typeof req.body.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.getDoctorUserId(new User(req.body.id)).then(result=>{
+        dao.updateDoctor(new User(req.body.id,req.body.user_name,req.body.mobile,req.body.email,req.body.birthdate)).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.delete("/api/user/delete-doctor",(req,res)=>{
     if(typeof req.query.id==='undefined'){
         res.status(400).send({

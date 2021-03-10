@@ -472,6 +472,24 @@ export class Dao{
 		})
 	}
 
+	getDoctorUserId(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query="SELECT id FROM users WHERE role='DOCTOR' AND id=? "
+			this.mysqlConn.query(query,user.id,(error,result)=>{
+				if(result.length===1){
+					resolve(result)
+					return
+				}
+				reject(NO_SUCH_CONTENT)
+			})
+		})
+	}
+
 	registerDoctor(doctor){
 		return new Promise((resolve,reject)=>{
 			if(!doctor instanceof Doctor){
@@ -499,7 +517,7 @@ export class Dao{
 				return
 			}
 
-			if(user.user_name===null){
+			if(typeof user.user_name==='undefined'){
 				const query="UPDATE users SET mobile=?, email=?, birthdate=? WHERE id=? "
 				this.mysqlConn.query(query,[user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
 					resolve(SUCCESS)
@@ -508,8 +526,11 @@ export class Dao{
 			}
 
 			const query="UPDATE users SET user_name=?, mobile=?, email=?, birthdate=? WHERE id=? "
-			this.mysqlConn.query(query,[user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
-				resolve(SUCCESS)
+			this.mysqlConn.query(query,[user.user_name,user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
+				const updateNameQuery="UPDATE doctor SET doctor_name=? WHERE user_id=? "
+				this.mysqlConn.query(updateNameQuery,[user.user_name,user.id],(error,result)=>{
+					resolve(SUCCESS)
+				})
 			})
 		})
 	}
