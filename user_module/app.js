@@ -6,6 +6,8 @@ import cors from 'cors';
 import path from 'path';
 import multer from "multer";
 import moment from "moment";
+import jwt from 'jsonwebtoken';
+import {generateAccessToken} from "../util/util";
 import {Dao} from "./dao";
 import {
     AUTH_ERROR_LOGIN,
@@ -72,6 +74,29 @@ const medicalRecordFilter = (req, file, cb)=>{
         return cb(new Error('Only jpg, png, gif, doc, pdf, txt, xls, csv files are allowed!'), false);
     }
     cb(null, true);
+}
+
+const authenticateToken = (req, res, next)=>{
+    // Gather the jwt access token from the request header
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401) // if there isn't any token
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err , userInfo) => {
+        if (err) {
+            console.log(err)
+            return res.sendStatus(403)
+        }
+
+        if (req.originalUrl === "/api/user/reset-user"){
+            if (userInfo.role === "ADMIN"){
+                return res.sendStatus(403)
+            }
+        }
+        req.user = userInfo
+        console.log(userInfo)
+        next() // pass the execution off to whatever request the client intended
+    })
 }
 
 app.get("/api/user/retrieve-users", (req, res)=>{
@@ -294,10 +319,15 @@ app.post("/api/user/user-login",(req,res)=>{
     if(typeof req.body.email!=='undefined'){
         const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
         dao.loginWithEmail(user).then(LoginResult=>{
+            const token = generateAccessToken({
+                user: req.body.email,
+                role: LoginResult.role
+            }, process.env.ACCESS_TOKEN_SECRET)
             dao.userLastSignIn(LoginResult[0].user_id).then(result=>{
                 res.status(200).send({
                     success: true,
                     authentication_approval: true,
+                    token:token,
                     message: 'Log in Successful',
                     result:LoginResult
                 })
@@ -332,10 +362,15 @@ app.post("/api/user/user-login",(req,res)=>{
     }else {
         const user = new User(null, req.body.user_name, null, null, null, null, req.body.password, null)
         dao.loginWithUsername(user).then(loginResult => {
+            const token = generateAccessToken({
+                user: req.body.user_name,
+                role: loginResult.role
+            }, process.env.ACCESS_TOKEN_SECRET)
             dao.userLastSignIn(loginResult[0].user_id).then(result => {
                 res.status(200).send({
                     success: true,
                     authentication_approval: true,
+                    token:token,
                     message: 'Log in Successful',
                     result: loginResult
                 })
