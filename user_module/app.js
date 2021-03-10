@@ -1368,25 +1368,58 @@ app.delete("/api/user/delete-medical-record", (req,res)=>{
         return
     }
 
-    const medical=new MedicalRecords(req.query.id, null, null,null)
-    dao.deleteMedicalRecord(medical).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(err=>{
-        if(err.code==='ER_DUP_ENTRY'){
-            res.status(500).send({
-                success:false,
-                error:ERROR_DUPLICATE_ENTRY
+    const medical=new MedicalRecords(req.query.id)
+    dao.retrieveOneMedicalRecord(medical).then(reportResult=>{
+        if(reportResult[0].file_attachment===null ||
+            reportResult[0].file_attachment==='No Attachment'){
+            dao.deleteMedicalRecord(medical).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(error=>{
+                console.error(error)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
             })
-        }else{
-            console.error(err)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+            return
         }
+
+        dao.deleteMedicalRecord(medical).then(result=>{
+            fs.unlinkSync('./Uploads/'+reportResult[0].file_attachment)
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err.code==='ER_DUP_ENTRY'){
+                res.status(500).send({
+                    success:false,
+                    error:ERROR_DUPLICATE_ENTRY
+                })
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success:false,
+                    error:SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
     })
 })
 

@@ -893,7 +893,7 @@ export class Dao{
 						return
 					}
 
-					resolve(record)
+					resolve(SUCCESS)
 				})
 			}
 
