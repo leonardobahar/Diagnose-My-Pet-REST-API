@@ -99,7 +99,48 @@ const authenticateToken = (req, res, next)=>{
     })
 }
 
-app.get("/api/user/retrieve-users", (req, res)=>{
+app.get("/api/user/retrieve-customers", (req, res)=>{
+    if (typeof req.query.id === 'undefined'){
+        // RETRIEVE ALL
+        dao.retrieveCustomers().then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
+        // RETRIEVE WITH ID
+        const user=new User(req.query.id,null,null,null,null,null,null,null)
+
+        dao.retrieveOneCustomer(user).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(err=>{
+            if(err===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }
+})
+
+app.get("/api/user/retrieve-users",(req,res)=>{
     if (typeof req.query.id === 'undefined'){
         // RETRIEVE ALL
         dao.retrieveUsers().then(result=>{

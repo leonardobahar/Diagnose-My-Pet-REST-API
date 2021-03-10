@@ -70,7 +70,7 @@ export class Dao{
 		handleConnection()
 	}
 
-	retrieveUsers(){
+	retrieveCustomers(){
 		return new Promise((resolve, reject)=>{
 			const query = "SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE role='CUSTOMER' "
 			this.mysqlConn.query(query, (error, result)=>{
@@ -115,7 +115,7 @@ export class Dao{
 		})
 	}
 
-	retrieveOneUser(user){
+	retrieveOneCustomer(user){
 		return new Promise((resolve,reject)=>{
 			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
@@ -177,6 +177,60 @@ export class Dao{
 			const query = `DELETE FROM forgot_password_token WHERE token = ?`
 			this.mysqlConn.query(query, [token], (err, res)=>{
 				resolve()
+			})
+		})
+	}
+
+	retrieveUsers(){
+		return new Promise((resolve, reject)=>{
+			const query = "SELECT id,user_name,mobile,email,birthdate,address,role FROM users "
+			this.mysqlConn.query(query, (error, result)=>{
+				if (error){
+					reject(error)
+				}else{
+					const user=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							user_name:rowDataPacket.user_name,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							address:rowDataPacket.address,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(user)
+				}
+			})
+		})
+	}
+
+	retrieveOneUser(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+			const query= user.id === null ? `SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE email='${user.email}'; ` : `SELECT id,user_name,mobile,email,birthdate,address,role FROM users WHERE id=${user.id}`
+			this.mysqlConn.query(query, (error,result)=>{
+				if(error){
+					reject(error)
+				}else if(result.length>0){
+					const customer=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							user_name:rowDataPacket.user_name,
+							mobile:rowDataPacket.mobile,
+							email:rowDataPacket.email,
+							birthdate:rowDataPacket.birthdate,
+							address:rowDataPacket.address,
+							role:rowDataPacket.role
+						}
+					})
+					resolve(customer)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
 			})
 		})
 	}
