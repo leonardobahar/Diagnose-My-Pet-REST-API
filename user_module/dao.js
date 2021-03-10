@@ -492,6 +492,28 @@ export class Dao{
 		})
 	}
 
+	updateDoctor(user){
+		return new Promise((resolve,reject)=>{
+			if(!user instanceof User){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			if(user.user_name===null){
+				const query="UPDATE users SET mobile=?, email=?, birthdate=? WHERE id=? "
+				this.mysqlConn.query(query,[user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
+					resolve(SUCCESS)
+				})
+				return
+			}
+
+			const query="UPDATE users SET user_name=?, mobile=?, email=?, birthdate=? WHERE id=? "
+			this.mysqlConn.query(query,[user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	deleteDoctor(doctor){
 		return new Promise((resolve,reject)=>{
 			if(!doctor instanceof Doctor){
