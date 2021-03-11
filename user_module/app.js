@@ -877,104 +877,68 @@ app.post("/api/user/add-patient",async (req,res)=>{
             return
         }
 
+        if (!req.body.age.toString().includes(".")){
+            req.body.age = `${req.body.age}.0`
+        }
+        const splittedAge = (req.body.age.toString()).split(".") // Array 0 -> year Array 1 -> month
+
+        let birthDate=new Date()
+        birthDate.setFullYear(birthDate.getFullYear()-splittedAge[0])
+        birthDate.setMonth(birthDate.getMonth()-splittedAge[1])
+
+        let patient;
         if(typeof req.file==='undefined'){
-
-            let birthDate=new Date()
-            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
-
-            const patient = new Patient(
+            patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
                 req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
                 birthDate,req.body.pet_owner,'No Attachment')
-
-            dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
-                dao.registerPatient(patient).then(result=>{
-                    res.status(200).send({
-                        success: true,
-                        result: result
-                    })
-                }).catch(err=>{
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        res.status(500).send({
-                            success: false,
-                            error: 'DUPLICATE-ENTRY'
-                        })
-                        res.end()
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success: false,
-                            error: SOMETHING_WENT_WRONG
-                        })
-                    }
-                })
-            }).catch(error=>{
-                if(error===NO_SUCH_CONTENT){
-                    res.status(204).send({
-                        success:false,
-                        error:NO_SUCH_CONTENT
-                    })
-                    return
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-
         }else{
-            if(error instanceof multer.MulterError){
-                return res.send(error)
-            } else if(error){
+            if(error instanceof multer.MulterError || error){
                 return res.send(error)
             }
 
-            let birthDate=new Date()
-            birthDate.setFullYear(birthDate.getFullYear()-req.body.age)
-
-            const patient = new Patient(
+            patient = new Patient(
                 null,req.body.patient_name.toUpperCase(),
                 req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
                 birthDate,req.body.pet_owner,req.file.filename)
 
-            dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
-                dao.registerPatient(patient).then(result=>{
-                    res.status(200).send({
-                        success: true,
-                        result: result
-                    })
-                }).catch(err=>{
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        res.status(500).send({
-                            success: false,
-                            error: 'DUPLICATE-ENTRY'
-                        })
-                        res.end()
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success: false,
-                            error: SOMETHING_WENT_WRONG
-                        })
-                    }
-                })
-            }).catch(error=>{
-                if(error===NO_SUCH_CONTENT){
-                    res.status(204).send({
-                        success:false,
-                        error:NO_SUCH_CONTENT
-                    })
-                    return
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-
         }
+
+        dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
+            dao.registerPatient(patient).then(result=>{
+                res.status(200).send({
+                    success: true,
+                    result: result
+                })
+            }).catch(err=>{
+                if (err.code === 'ER_DUP_ENTRY') {
+                    res.status(500).send({
+                        success: false,
+                        error: 'DUPLICATE-ENTRY'
+                    })
+                    res.end()
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success: false,
+                        error: SOMETHING_WENT_WRONG
+                    })
+                }
+            })
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     })
 })
 
