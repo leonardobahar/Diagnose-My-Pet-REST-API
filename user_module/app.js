@@ -220,7 +220,7 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
-app.post("/api/user/reset-user", (req, res)=>{
+app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
     if (typeof req.body.email === 'undefined' ||
         typeof req.body.password === 'undefined'){
         res.status(400).send({
