@@ -228,38 +228,38 @@ app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
             error: WRONG_BODY_FORMAT
         })
         return
-    }else{
-        const user = new User(null,
-            null,
-            null,
-            req.body.email,
-            null,
-            null,
-            req.body.password,
-            null,
-            null)
-
-        dao.resetPassword(user).then(result=>{
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(err=>{
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    success: false,
-                    error: 'DUPLICATE-ENTRY'
-                })
-                res.end()
-            }else{
-                console.error(err)
-                res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
-                })
-            }
-        })
     }
+
+    const user = new User(null,
+        null,
+        null,
+        req.body.email,
+        null,
+        null,
+        req.body.password,
+        null,
+        null)
+
+    dao.resetPassword(user).then(result=>{
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
+    })
 })
 
 app.post("/api/user/register-admin",(req,res)=>{
