@@ -20,6 +20,7 @@ import {
 	Patient, Schedule, Symptoms, TreatmentPlan,
 	User
 } from "../model";
+import {AgeFormatter, monthDiff} from "../util/util";
 
 export class Dao{
 	constructor(host, user, password, dbname){
@@ -620,11 +621,8 @@ export class Dao{
 				}
 
 				const patients=result.map(rowDataPacket=>{
-					const date=new Date()
-					const year=date.getFullYear()
-					const birthDate=new Date(rowDataPacket.birthdate)
-					const bdYear=birthDate.getFullYear()
-					const age=year-bdYear
+					const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+					const ageFormatter = new AgeFormatter(d1, new Date());
 
 					return{
 						id:rowDataPacket.id,
@@ -632,9 +630,11 @@ export class Dao{
 						animal_type_id:rowDataPacket.animal_type_id,
 						animal_name:rowDataPacket.animal_name,
 						breed:rowDataPacket.breed,
-						birthdate:rowDataPacket.birthdate,
 						gender:rowDataPacket.patient_gender,
-						age:age,
+						birthdate:d1,
+						age:ageFormatter.getAgeYear(),
+						age_month:ageFormatter.getAgeMonth(),
+						age_string:ageFormatter.getAgeString(),
 						pet_owner_id:rowDataPacket.pet_owner_id,
 						pet_owner_name:rowDataPacket.user_name,
 						picture:rowDataPacket.patient_picture
@@ -661,11 +661,10 @@ export class Dao{
 					return
 				}else if(result.length>0){
 					const patients=result.map(rowDataPacket=>{
-						const date=new Date()
-						const year=date.getFullYear()
-						const birthDate=new Date(rowDataPacket.birthdate)
-						const bdYear=birthDate.getFullYear()
-						const age=year-bdYear
+
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
+
 						return{
 							id:rowDataPacket.id,
 							patient_name:rowDataPacket.patient_name,
@@ -673,8 +672,10 @@ export class Dao{
 							animal_name:rowDataPacket.animal_name,
 							breed:rowDataPacket.breed,
 							gender:rowDataPacket.patient_gender,
-							birthdate:rowDataPacket.birthdate,
-							age:age,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name,
 							picture:rowDataPacket.patient_picture
@@ -700,11 +701,8 @@ export class Dao{
 					return
 				}else if(result.length>0){
 					const patients=result.map(rowDataPacket=>{
-						const date=new Date()
-						const year=date.getFullYear()
-						const birthDate=new Date(rowDataPacket.birthdate)
-						const bdYear=birthDate.getFullYear()
-						const age=year-bdYear
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
 							patient_name:rowDataPacket.patient_name,
@@ -713,7 +711,9 @@ export class Dao{
 							breed:rowDataPacket.breed,
 							gender:rowDataPacket.patient_gender,
 							birthdate:rowDataPacket.birthdate,
-							age:age,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							pet_owner_id:rowDataPacket.pet_owner_id,
 							pet_owner_name:rowDataPacket.user_name,
 							picture:rowDataPacket.patient_picture
@@ -1328,7 +1328,7 @@ export class Dao{
 	retrieveAppointment(){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, p.birthdate, a.doctor_id, d.doctor_name, a.description, " +
 				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
@@ -1341,6 +1341,10 @@ export class Dao{
 
 				const schedule=result.map(rowDataPacket=>{
 					const appointmentTime =  moment(rowDataPacket.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+
+					const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+					const ageMonths=monthDiff(d1,new Date());
+
 					return{
 						id:rowDataPacket.id,
 						appointment_name:rowDataPacket.appointment_name,
@@ -1352,6 +1356,8 @@ export class Dao{
 						is_real_appointment:rowDataPacket.is_real_appointment,
 						patient_id:rowDataPacket.patient_id,
 						pet_name:rowDataPacket.patient_name,
+						birthdate:d1,
+						age:ageMonths,
 						doctor_id:rowDataPacket.doctor_id,
 						doctor_name:rowDataPacket.doctor_name,
 						description:rowDataPacket.description,
@@ -1370,7 +1376,7 @@ export class Dao{
 				return
 			}
 			const query="SELECT a.id, a.appointment_name, a.appointment_time, a.duration, a.appointment_status, a.user_id, " +
-				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, a.doctor_id, d.doctor_name, a.description, " +
+				"a.is_real_appointment, u.user_name, a.patient_id, p.patient_name, p.birthdate, a.doctor_id, d.doctor_name, a.description, " +
 				"a.proof_of_payment " +
 				"FROM appointment a LEFT OUTER JOIN users u ON a.user_id=u.id " +
 				"LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
@@ -1383,6 +1389,10 @@ export class Dao{
 				}else if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
 						const appointmentTime =  moment(rowDataPacket.appointment_time, 'YYYY/MM/DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
+
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageMonths=monthDiff(d1,new Date());
+
 						return{
 							id:rowDataPacket.id,
 							appointment_name:rowDataPacket.appointment_name,
@@ -1394,6 +1404,8 @@ export class Dao{
 							is_real_appointment:rowDataPacket.is_real_appointment,
 							patient_id:rowDataPacket.patient_id,
 							pet_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageMonths,
 							doctor_id:rowDataPacket.doctor_id,
 							doctor_name:rowDataPacket.doctor_name,
 							description:rowDataPacket.description,
@@ -2514,7 +2526,7 @@ export class Dao{
 
 	retrieveBookedAppointmentSchedule(){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
 				"FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN users u ON u.id=p.pet_owner_id WHERE a.patient_id IS NOT NULL "+
 				"ORDER BY a.start_time ASC "
 			this.mysqlConn.query(query, (error,result)=>{
@@ -2524,6 +2536,9 @@ export class Dao{
 				}
 
 				const schedule=result.map(rowDataPacket=>{
+					const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+					const ageMonths=monthDiff(d1,new Date());
+
 					return{
 						id:rowDataPacket.id,
 						start_time:rowDataPacket.start_time,
@@ -2536,6 +2551,8 @@ export class Dao{
 						doctor_name:rowDataPacket.doctor_name,
 						patient_id:rowDataPacket.patient_id,
 						patient_name:rowDataPacket.patient_name,
+						birthdate:d1,
+						age:ageMonths,
 						customer_id:rowDataPacket.pet_owner_id,
 						customer_name:rowDataPacket.user_name,
 						booking_type_name:rowDataPacket.booking_type_name,
@@ -2549,7 +2566,7 @@ export class Dao{
 
 	retrieveBookedAppointmentScheduleByDoctorId(doctor_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, b.duration " +
 				"FROM v2_appointment_schedule a INNER JOIN v2_booking_type b ON a.booking_type_name = b.booking_type_name INNER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id IS NOT NULL AND a.doctor_id = ? "+
 				"ORDER BY a.start_time ASC "
@@ -2561,6 +2578,8 @@ export class Dao{
 
 				if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageMonths=monthDiff(d1,new Date());
 						return{
 							id:rowDataPacket.id,
 							start_time:rowDataPacket.start_time,
@@ -2573,6 +2592,8 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageMonths,
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
@@ -2663,7 +2684,7 @@ export class Dao{
 
 	retrieveOneAppointmentSchedule(id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.id = ? "+
 				"ORDER BY a.start_time ASC "
@@ -2677,6 +2698,9 @@ export class Dao{
 					const schedule=result.map(rowDataPacket=>{
 						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
+
 						return{
 							id:rowDataPacket.id,
 							start_time:startTime,
@@ -2689,6 +2713,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
@@ -2705,7 +2733,7 @@ export class Dao{
 
 	retrieveAppointmentScheduleByUserId(user_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id " +
 				"LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE p.pet_owner_id = ? "+
@@ -2720,6 +2748,8 @@ export class Dao{
 					const schedule=result.map(rowDataPacket=>{
 						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
 							start_time:startTime,
@@ -2732,6 +2762,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
@@ -2748,7 +2782,7 @@ export class Dao{
 
 	retrieveAppointmentScheduleByPatientId(patient_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id=? "+
 				"ORDER BY a.start_time ASC "
@@ -2762,6 +2796,8 @@ export class Dao{
 					const schedule=result.map(rowDataPacket=>{
 						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
 							start_time:startTime,
@@ -2774,6 +2810,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
@@ -2794,7 +2834,7 @@ export class Dao{
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
 				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "+
@@ -2809,6 +2849,8 @@ export class Dao{
 					const schedule=result.map(rowDataPacket=>{
 						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
 							start_time:startTime,
@@ -2821,6 +2863,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
@@ -2841,7 +2887,7 @@ export class Dao{
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
+			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.patient_id, p.patient_name, p.birthdate, p.pet_owner_id, u.user_name, a.booking_type_name, bt.duration " +
 				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
 				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? " +
@@ -2856,6 +2902,8 @@ export class Dao{
 					const schedule=result.map(rowDataPacket=>{
 						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
+						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
 							start_time:startTime,
@@ -2868,6 +2916,10 @@ export class Dao{
 							doctor_name:rowDataPacket.doctor_name,
 							patient_id:rowDataPacket.patient_id,
 							patient_name:rowDataPacket.patient_name,
+							birthdate:d1,
+							age:ageFormatter.getAgeYear(),
+							age_month:ageFormatter.getAgeMonth(),
+							age_string:ageFormatter.getAgeString(),
 							customer_id:rowDataPacket.pet_owner_id,
 							customer_name:rowDataPacket.user_name,
 							booking_type_name:rowDataPacket.booking_type_name,
