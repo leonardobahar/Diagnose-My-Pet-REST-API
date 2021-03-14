@@ -368,7 +368,7 @@ app.post("/api/user/user-login",(req,res)=>{
                 res.status(200).send({
                     success: true,
                     authentication_approval: true,
-                    token:token,
+                    // token:token,
                     message: 'Log in Successful',
                     result:LoginResult
                 })
@@ -2708,19 +2708,25 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
             dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
                 if(bookingResult[0].payment_proof_required ===1){
-                    if(typeof req.file==='undefined'){
-                        res.status(400).send({
-                            success:false,
-                            error:'Proof of payment is required for this booking type'
-                        })
-                        return
-                    }
+                    // if(typeof req.file==='undefined'){
+                    //     res.status(400).send({
+                    //         success:false,
+                    //         error:'Proof of payment is required for this booking type'
+                    //     })
+                    //     return
+                    // }
                     if(error instanceof multer.MulterError){
                         return res.send(error)
                     } else if(error){
                         return res.send(error)
                     }
-                    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result=>{
+                    let filename;
+                    if  (typeof req.file === 'undefined'){
+                        filename = null
+                    }else{
+                        filename = req.file.filename
+                    }
+                    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, filename, req.body.description, req.body.additional_question).then(result=>{
                         if (result.affectedRows === 0){
                             res.status(404).send({
                                 success: false,
