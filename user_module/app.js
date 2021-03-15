@@ -997,7 +997,10 @@ app.post("/api/user/update-patient",async (req,res)=>{
                     return
                 }
 
-                fs.unlinkSync(UPLOADPATH+pictureResult)
+                if(patient.picture!=='No Attachment'){
+                    fs.unlinkSync(UPLOADPATH+pictureResult)
+                }
+
                 dao.updatePatient(patient).then(result=>{
                     res.status(200).send({
                         success:true,
