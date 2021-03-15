@@ -6,6 +6,7 @@ export const generateAccessToken = (userInfo, token_secret)=>{
 
 export class AgeFormatter{
     constructor(date1, date2){
+        console.log(date1+" "+date2)
         this.ageMonths = monthDiff(date1, date2)
     }
 
