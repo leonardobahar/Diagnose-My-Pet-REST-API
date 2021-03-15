@@ -6,22 +6,26 @@ export const generateAccessToken = (userInfo, token_secret)=>{
 
 export class AgeFormatter{
     constructor(date1, date2){
-        console.log(date1+" "+date2)
+        if (!date1 instanceof Date || !date2 instanceof Date){
+            this.fckedUp = true
+        }else{
+            this.fckedUp = false
+        }
         this.ageMonths = monthDiff(date1, date2)
     }
 
     getAgeYear(){
-        return parseInt(this.ageMonths/12);
+        return this.fckedUp == true ? 0 : parseInt(this.ageMonths/12);
     }
 
     getAgeMonth(){
-        return this.ageMonths;
+        return this.fckedUp == true ? 0 : this.ageMonths;
     }
 
     getAgeString(){
         const ageYear = parseInt(this.ageMonths/12)
         const remainingMonths = this.ageMonths%(ageYear*12)
-        return `${parseInt(this.ageMonths/12)} year(s) and ${remainingMonths} month(s) old`;
+        return this.fckedUp == true ? 'Age was not input during registration' : `${parseInt(this.ageMonths/12)} year(s) and ${remainingMonths} month(s) old`;
     }
 }
 
