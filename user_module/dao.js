@@ -939,6 +939,37 @@ export class Dao{
 		})
 	}
 
+	retrieveMedicalRecordByAppointmentId(appointment_id){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT m.id, m.description, m.medication, m.date_created, m.appointment_id, a.patient_id, m.file " +
+				"FROM medical_records m LEFT OUTER JOIN v2_appointment_schedule a ON a.id=m.appointment_id " +
+				"WHERE m.appointment_id=? "
+			this.mysqlConn.query(query,patient_id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					const records=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							description:rowDataPacket.description,
+							medication:rowDataPacket.medication,
+							date_created:rowDataPacket.date_created,
+							appointment_id:rowDataPacket.appointment_id,
+							patient_id:rowDataPacket.patient_id,
+							file_attachment:rowDataPacket.file
+						}
+					})
+					resolve(records)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	addMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
