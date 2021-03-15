@@ -1179,6 +1179,7 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
                     success:false,
                     error:NO_SUCH_CONTENT
                 })
+                return
             }
             console.error(error)
             res.status(500).send({
@@ -1198,6 +1199,7 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
                     success:false,
                     error:NO_SUCH_CONTENT
                 })
+                return
             }
             console.error(error)
             res.status(500).send({
