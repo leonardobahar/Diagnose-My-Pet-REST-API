@@ -11,6 +11,7 @@ export class AgeFormatter{
         }else{
             this.fckedUp = false
         }
+        console.log(this.fckedUp)
         this.ageMonths = monthDiff(date1, date2)
     }
 
