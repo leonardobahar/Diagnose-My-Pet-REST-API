@@ -546,7 +546,7 @@ app.post("/api/user/change-password",(req,res)=>{
     }
 
     dao.retrieveUserIdFromToken(req.body.token).then(userId=>{
-        const user = new User(userId,null,null,null,null,null,req.body.password,null)
+        const user = new User(userId,null,null,null,null,null,req.body.password,null, null)
         dao.changeCustomerPassword(user).then(result=>{
             dao.removeToken(req.body.token)
             res.status(200).send({
