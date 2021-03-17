@@ -2905,14 +2905,14 @@ export class Dao{
 
 				if(result.length>0){
 					const schedule=result.map(rowDataPacket=>{
-						const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
-						const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						// const startTime=moment(rowDataPacket.start_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+						// const endTime=moment(rowDataPacket.end_time,'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 						const d1=moment(rowDataPacket.birthdate, 'YYYY-MM-DDTHH:mm:ss').toDate()
 						const ageFormatter = new AgeFormatter(d1, new Date());
 						return{
 							id:rowDataPacket.id,
-							start_time:startTime,
-							end_time:endTime,
+							start_time:rowDataPacket.start_time,
+							end_time:rowDataPacket.end_time,
 							proof_of_payment:rowDataPacket.proof_of_payment,
 							description:rowDataPacket.description,
 							additional_storage:rowDataPacket.additional_storage,
