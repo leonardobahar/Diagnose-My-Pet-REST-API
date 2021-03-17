@@ -100,7 +100,7 @@ export const sendResetPasswordMail = (username, email, token) =>{
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td class="button" style="font-family: Geneva, Tahoma, Verdana, sans-serif; font-size: 16px; padding-top: 26px;" width="640" align="left">
-                                                                                            <a href="https://klinikhewanrajanti.com/forgot-password/${token}"  style="background: #0c99d5; color: #fff; text-decoration: none; border: 14px solid #0c99d5; border-left-width: 50px; border-right-width: 50px; text-transform: uppercase; display: inline-block;">
+                                                                                            <a href="https://klinikhewanrajanti.com/pages/forgot-password/${token}"  style="background: #0c99d5; color: #fff; text-decoration: none; border: 14px solid #0c99d5; border-left-width: 50px; border-right-width: 50px; text-transform: uppercase; display: inline-block;">
                                                                                                 Confirm
                                                                                             </a>
                                                                                         </td>
