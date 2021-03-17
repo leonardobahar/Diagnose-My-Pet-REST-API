@@ -220,7 +220,8 @@ app.post("/api/user/register-user", (req, res)=>{
 })
 
 app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
-    if (typeof req.body.email === 'undefined' ||
+    if (typeof req.body.id==='undefined' &&
+        typeof req.body.email === 'undefined' &&
         typeof req.body.password === 'undefined'){
         res.status(400).send({
             success: false,
@@ -229,36 +230,61 @@ app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
         return
     }
 
-    const user = new User(null,
-        null,
-        null,
-        req.body.email,
-        null,
-        null,
-        req.body.password,
-        null,
-        null)
+    if(typeof req.body.id==='undefined' && typeof req.body.email!=='undefined'){
+        const user = new User(null,
+            null,
+            null,
+            req.body.email,
+            null,
+            null,
+            req.body.password,
+            null,
+            null)
 
-    dao.resetPassword(user).then(result=>{
-        res.status(200).send({
-            success: true,
-            result: result
+        dao.resetPassword(user).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
         })
-    }).catch(err=>{
-        if (err.code === 'ER_DUP_ENTRY') {
-            res.status(500).send({
-                success: false,
-                error: 'DUPLICATE-ENTRY'
+    }else if(typeof req.body.email==='undefined' && typeof req.body.id!=='undefined'){
+        const user = new User(req.body.id,
+            null,
+            null,
+            null,
+            null,
+            null,
+            req.body.password,
+            null,
+            null)
+
+        dao.resetPasswordById(user).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
             })
-            res.end()
-        }else{
-            console.error(err)
+        }).catch(error=>{
+            console.error(error)
             res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
+                success:false,
+                error:SOMETHING_WENT_WRONG
             })
-        }
-    })
+        })
+    }
 })
 
 app.post("/api/user/register-admin",(req,res)=>{
@@ -366,7 +392,7 @@ app.post("/api/user/user-login",(req,res)=>{
                 res.status(200).send({
                     success: true,
                     authentication_approval: true,
-                    // token:token,
+                    token:token,
                     message: 'Log in Successful',
                     result:LoginResult
                 })
