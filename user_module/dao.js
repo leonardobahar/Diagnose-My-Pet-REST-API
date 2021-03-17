@@ -956,8 +956,8 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			const query="SELECT m.id, m.description, m.medication, m.date_created, m.appointment_id, a.patient_id, m.file " +
 				"FROM medical_records m LEFT OUTER JOIN v2_appointment_schedule a ON a.id=m.appointment_id " +
-				"WHERE m.appointment_id=? "
-			this.mysqlConn.query(query,patient_id,(error,result)=>{
+				"WHERE a.status='DONE' AND m.appointment_id=? "
+			this.mysqlConn.query(query,appointment_id,(error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -2549,7 +2549,6 @@ export class Dao{
 					reject(error)
 					return
 				}
-
 
 				if(result.length>0){
 					const booking_type=result.map(rdp=>{

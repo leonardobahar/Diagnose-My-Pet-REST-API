@@ -1154,7 +1154,8 @@ app.post("/api/user/bind-user-to-pet", (req,res)=>{
 
 app.get("/api/user/retrieve-medical-record",(req,res)=>{
     if(typeof req.query.id==='undefined' &&
-       typeof req.query.patient_id==='undefined'){
+       typeof req.query.patient_id==='undefined' &&
+       typeof req.query.appointment_id==='undefined'){
         dao.retrieveMedicalRecord().then(result=>{
             res.status(200).send({
                 success:true,
