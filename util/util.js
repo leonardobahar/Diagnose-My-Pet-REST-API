@@ -25,7 +25,7 @@ export class AgeFormatter{
 
     getAgeString(){
         const ageYear = parseInt(this.ageMonths/12)
-        const remainingMonths = this.ageMonths%(ageYear*12)
+        const remainingMonths = ageYear > 0 ? this.ageMonths%(ageYear*12) : this.ageMonths
         return this.fckedUp == true ? 'Age was not input during registration' : `${parseInt(this.ageMonths/12)} year(s) and ${remainingMonths} month(s) old`;
     }
 }
