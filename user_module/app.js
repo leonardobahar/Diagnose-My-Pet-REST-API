@@ -219,6 +219,16 @@ app.post("/api/user/register-user", (req, res)=>{
 })
 
 app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
+    if (typeof req.body.id==='undefined' &&
+        typeof req.body.email === 'undefined' &&
+        typeof req.body.password === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
     if(typeof req.body.id==='undefined' && typeof req.body.email!=='undefined'){
         const user = new User(null,
             null,
@@ -274,11 +284,28 @@ app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
             })
         })
     }else{
-        res.status(400).send({
-            success: false,
-            error: WRONG_BODY_FORMAT
+        const user = new User(req.body.id,
+            null,
+            null,
+            null,
+            null,
+            null,
+            req.body.password,
+            null,
+            null)
+
+        dao.resetPasswordById(user).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
-        return
     }
 })
 
