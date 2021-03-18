@@ -89,12 +89,11 @@ const authenticateToken = (req, res, next)=>{
         }
 
         if (req.originalUrl === "/api/user/reset-user"){
-            if (userInfo.role === "ADMIN"){
+            if (!userInfo.role){
                 return res.sendStatus(403)
             }
         }
         req.user = userInfo
-        console.log(userInfo)
         next() // pass the execution off to whatever request the client intended
     })
 }
@@ -385,8 +384,9 @@ app.post("/api/user/user-login",(req,res)=>{
         const user=new User(null,null,null,req.body.email,null,null,req.body.password,null)
         dao.loginWithEmail(user).then(LoginResult=>{
             const token = generateAccessToken({
-                user: req.body.email,
-                role: LoginResult.role
+                user_id:LoginResult[0].id,
+                user_email: LoginResult[0].email,
+                role: LoginResult[0].role
             }, process.env.ACCESS_TOKEN_SECRET)
             dao.userLastSignIn(LoginResult[0].user_id).then(result=>{
                 res.status(200).send({
@@ -428,8 +428,9 @@ app.post("/api/user/user-login",(req,res)=>{
         const user = new User(null, req.body.user_name, null, null, null, null, req.body.password, null)
         dao.loginWithUsername(user).then(loginResult => {
             const token = generateAccessToken({
-                user: req.body.user_name,
-                role: loginResult.role
+                user_id: loginResult[0].user_id,
+                user_email: loginResult[0].email,
+                role: loginResult[0].role
             }, process.env.ACCESS_TOKEN_SECRET)
             dao.userLastSignIn(loginResult[0].user_id).then(result => {
                 res.status(200).send({

@@ -275,8 +275,7 @@ export class Dao{
 					return
 				}
 
-				user.id = res.insertId
-				resolve(user)
+				resolve(SUCCESS)
 			})
 		})
 	}
@@ -297,7 +296,7 @@ export class Dao{
 					return
 				}
 
-				resolve(user)
+				resolve(SUCCESS)
 			})
 		})
 	}
