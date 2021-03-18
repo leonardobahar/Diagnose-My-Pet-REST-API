@@ -2994,6 +2994,44 @@ app.post("/api/user/cancel-appointment",(req,res)=>{
     })
 })
 
+app.get("/api/user/retrieve-visit-reminder",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        dao.retrieveVisitReminder().then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+        return
+    }
+
+    dao.retrieveOneVisitReminder(req.query.id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 app.post("/api/user/add-visit-reminder",(req,res)=>{
     if(typeof req.body.booking_type_name==='undefined' ||
        typeof req.body.target_send_date==='undefined' ||
