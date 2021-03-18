@@ -219,16 +219,6 @@ app.post("/api/user/register-user", (req, res)=>{
 })
 
 app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
-    if (typeof req.body.id==='undefined' &&
-        typeof req.body.email === 'undefined' &&
-        typeof req.body.password === 'undefined'){
-        res.status(400).send({
-            success: false,
-            error: WRONG_BODY_FORMAT
-        })
-        return
-    }
-
     if(typeof req.body.id==='undefined' && typeof req.body.email!=='undefined'){
         const user = new User(null,
             null,
@@ -283,6 +273,12 @@ app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
+    }else{
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
     }
 })
 
