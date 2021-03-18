@@ -3190,5 +3190,21 @@ export class Dao{
 			})
 		})
 	}
+
+	addVisitReminder(booking_type_name,create_date,target_send_date,patient_id){
+		return new Promise((resolve,reject)=>{
+			const query="INSERT INTO `visit_reminder`(`booking_type_name`,`create_date`,`target_send_date`,`patient_id`) " +
+				"VALUES(?,?,?,?) "
+			this.mysqlConn.query(query,[booking_type_name,create_date,target_send_date,patient_id],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(result)
+			})
+		})
+	}
+
 	// End of v2 Development
 }
