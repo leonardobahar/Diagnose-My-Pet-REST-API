@@ -18,7 +18,7 @@ import {
 	MedicalRecordAttachment,
 	MedicalRecords, MedicalRecordSymptoms, MedicalRecordTreatmentPlan, Participant,
 	Patient, Schedule, Symptoms, TreatmentPlan,
-	User
+	User, VisitReminder
 } from "../model";
 import {AgeFormatter, monthDiff} from "../util/util";
 
@@ -3191,17 +3191,23 @@ export class Dao{
 		})
 	}
 
-	addVisitReminder(booking_type_name,create_date,target_send_date,patient_id){
+	addVisitReminder(visitReminder){
 		return new Promise((resolve,reject)=>{
+			if(!visitReminder instanceof VisitReminder){
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
 			const query="INSERT INTO `visit_reminder`(`booking_type_name`,`create_date`,`target_send_date`,`patient_id`) " +
-				"VALUES(?,?,?,?) "
-			this.mysqlConn.query(query,[booking_type_name,create_date,target_send_date,patient_id],(error,result)=>{
+				"VALUES(?,NOW(),?,?) "
+			this.mysqlConn.query(query,[visitReminder.booking_type_name,visitReminder.target_send_date,visitReminder.patient_id],(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				resolve(result)
+				visitReminder.id=result.insertId
+				resolve(visitReminder)
 			})
 		})
 	}
