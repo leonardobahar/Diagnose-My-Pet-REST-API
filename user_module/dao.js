@@ -3135,5 +3135,29 @@ export class Dao{
 			})
 		})
 	}
+
+	retrieveVisitReminder(){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT v.id, v.booking_type_name, v.create_date, v.target_send_date, v.patient_id, p.patient_name " +
+				"FROM visit_reminder v LEFT OUTER JOIN patient p ON p.id=v.patient_id "
+			this.mysqlConn(query,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const visit=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						booking_type_name:rowDataPacket.booking_type_name,
+						create_date:rowDataPacket.create_date,
+						target_send_date:rowDataPacket.target_send_date,
+						patient_id:rowDataPacket.patient_id,
+						patient_name:rowDataPacket.patient_name
+					}
+				})
+			})
+		})
+	}
 	// End of v2 Development
 }

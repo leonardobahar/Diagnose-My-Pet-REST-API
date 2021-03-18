@@ -238,3 +238,13 @@ CREATE TABLE IF NOT EXISTS `v2_appointment_log`(
     internal_notes longtext,
     date_created timestamp
 );
+
+CREATE TABLE IF NOT EXISTS `visit_reminder`(
+    id int auto_increment primary key,
+    booking_type_name VARCHAR(255),
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   	target_send_date DATE,
+   	patient_id int,
+   	FOREIGN KEY (booking_type_name) REFERENCES v2_booking_type(booking_type_name),
+   	FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
