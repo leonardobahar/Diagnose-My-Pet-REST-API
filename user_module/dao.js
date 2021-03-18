@@ -3206,5 +3206,19 @@ export class Dao{
 		})
 	}
 
+	deleteVisitReminder(id){
+		return new Promise((resolve,reject)=>{
+			const query="DELETE FROM visit_reminder WHERE id=? "
+			this.mysqlConn.query(query,id,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 	// End of v2 Development
 }
