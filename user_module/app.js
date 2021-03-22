@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import multer from "multer";
+import nodecron from 'node-cron';
 import moment from "moment";
 import jwt from 'jsonwebtoken';
 import {generateAccessToken} from "../util/util";
@@ -3087,6 +3088,9 @@ app.post("/api/user/add-visit-reminder",(req,res)=>{
     })
 })
 
+nodecron.schedule("0 7 * * *", ()=>{
+    
+})
 // End of v2 Development
 
 // LISTEN SERVER | PRODUCTION DEPRECATION AFTER 9TH MARCH 2020, USE ONLY FOR DEVELOPMENT

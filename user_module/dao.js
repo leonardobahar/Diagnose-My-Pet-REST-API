@@ -3191,6 +3191,36 @@ export class Dao{
 		})
 	}
 
+	retrieveVisitReminderByDate(date){
+		return new Promise((resolve,reject)=>{
+			const query="SELECT v.id, v.booking_type_name, v.create_date, v.target_send_date, v.patient_id, p.patient_name " +
+				"FROM visit_reminder v LEFT OUTER JOIN patients p ON p.id=v.patient_id " +
+				"WHERE v.target_send_date = ? "
+			this.mysqlConn.query(query,[date],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				if(result.length>0){
+					const visit=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							booking_type_name:rowDataPacket.booking_type_name,
+							create_date:rowDataPacket.create_date,
+							target_send_date:rowDataPacket.target_send_date,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name
+						}
+					})
+					resolve(visit)
+				}else{
+					reject(NO_SUCH_CONTENT)
+				}
+			})
+		})
+	}
+
 	addVisitReminder(visitReminder){
 		return new Promise((resolve,reject)=>{
 			if(!visitReminder instanceof VisitReminder){
