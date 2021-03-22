@@ -219,7 +219,7 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
-app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
+app.post("/api/user/reset-user", (req, res)=>{
     if (typeof req.body.id==='undefined' &&
         typeof req.body.email === 'undefined' &&
         typeof req.body.password === 'undefined'){
