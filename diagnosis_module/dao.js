@@ -977,6 +977,7 @@ export class Dao{
 				"FROM disease_symptoms_animal dsa INNER JOIN disease d ON dsa.disease_id = d.id " +
 				"INNER JOIN symptoms s ON s.id = dsa.symptoms_id " +
 				"INNER JOIN animal_type a ON dsa.animal_id=a.id " +
+				"LEFT OUTER JOIN anatomy antm ON dsa.anatomy_id=antm.id " +
 				"WHERE dsa.symptoms_id IN (?)";
 
 			this.mysqlConn.query(query, [symptoms], async(err, res)=>{
@@ -992,6 +993,7 @@ export class Dao{
 						diagnoseResult.push({
 							disease_id: diseaseResult.disease_id,
 							key: diseaseResult.disease_name,
+							anatomy_part: diseaseResult.part_name,
 							symptoms: [diseaseResult]
 						})
 					}else{
@@ -1003,6 +1005,7 @@ export class Dao{
 							diagnoseResult.push({
 								disease_id: diseaseResult.disease_id,
 								key: diseaseResult.disease_name,
+								anatomy_part: diseaseResult.part_name,
 								symptoms: [diseaseResult]
 							})
 						}else{
