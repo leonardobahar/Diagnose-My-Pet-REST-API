@@ -57,12 +57,8 @@ const user = process.env.MY_SQL_USER
 const password = typeof process.env.MY_SQL_PASSWORD === 'undefined' ? '' : process.env.MY_SQL_PASSWORD
 const dbname = process.env.MY_SQL_DBNAME
 const dao = new Dao(host, user, password, dbname)
-const ejs=require('ejs')
 
-//EJS
-app.set('view engine', 'ejs')
 app.use(express.static('./Uploads'))
-app.get("/",(req,res) => res.render('diagnose'))
 
 app.get("/api/diagnosis/retrieve-animal-category", (req, res)=>{
     if (typeof req.query.id === 'undefined'){
