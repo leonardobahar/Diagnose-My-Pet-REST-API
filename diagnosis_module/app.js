@@ -1,3 +1,4 @@
+require("../util/logger")();
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import express from 'express';
