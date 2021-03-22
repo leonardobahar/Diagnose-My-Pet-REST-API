@@ -3088,6 +3088,38 @@ app.post("/api/user/add-visit-reminder",(req,res)=>{
     })
 })
 
+app.delete("/api/user/delete-visit-reminder",(req,res)=>{
+    if(typeof req.query.id==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneVisitReminder(req.query.id).then(visitResult=>{
+        dao.deleteVisitReminder(req.query.id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                result:NO_SUCH_CONTENT
+            })
+            return
+        }
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
+})
+
 nodecron.schedule("0 7 * * *", ()=>{
 
 })
