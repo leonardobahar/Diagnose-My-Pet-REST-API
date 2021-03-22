@@ -1119,10 +1119,65 @@ app.get("/api/diagnosis/retrieve-medicine-of-symptoms",(req,res)=>{
     })
 })
 
-app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
-    if(typeof req.body.treatment_plan_name === 'undefined' ||
-        typeof req.body.disease_id === 'undefined' ||
-        typeof req.body.medicine_id_array === 'undefined'){
+// app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
+//     if(typeof req.body.treatment_plan_name === 'undefined' ||
+//         typeof req.body.disease_id === 'undefined' ||
+//         typeof req.body.medicine_id_array === 'undefined'){
+//         res.status(400).send({
+//             success:false,
+//             error:WRONG_BODY_FORMAT
+//         })
+//         return
+//     }
+//
+//     const medicineArray=JSON.parse(req.body.medicine_id_array)
+//     for(let i=0; i<medicineArray.length; i++){
+//         dao.retrieveOneMedicine(new Medicine(medicineArray[i].medicine_id)).then(result=>{
+//             dao.bindTreatmentToDisease(new TreatmentPlan(null,req.body.treatment_plan_name,req.body.disease_id,JSON.stringify(req.body.medicine_id_array))).then(result=>{
+//                 res.status(200).send({
+//                     success: true,
+//                     result: result
+//                 })
+//             }).catch(err=>{
+//                 if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY){
+//                     res.status(500).send({
+//                         success:false,
+//                         error: 'DUPLICATE-ENTRY'
+//                     })
+//                     res.end()
+//                 }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
+//                     res.status(500).send({
+//                         success:false,
+//                         error:ERROR_FOREIGN_KEY
+//                     })
+//                 }else{
+//                     console.error(err)
+//                     res.status(500).send({
+//                         success:false,
+//                         error:SOMETHING_WENT_WRONG
+//                     })
+//                 }
+//             })
+//         }).catch(error=>{
+//             if(error===NO_SUCH_CONTENT){
+//                 res.status(204).send({
+//                     success:false,
+//                     error:NO_SUCH_CONTENT
+//                 })
+//                 return
+//             }
+//             console.error(error)
+//             res.status(500).send({
+//                 success:false,
+//                 error:SOMETHING_WENT_WRONG
+//             })
+//         })
+//     }
+// })
+
+app.post("/api/diagnosis/bind-disease-with-medicine",(req,res)=>{
+    if(typeof req.body.disease_symptoms_animal_id==='undefined'||
+       typeof req.body.medicine_id==='undefined'){
         res.status(400).send({
             success:false,
             error:WRONG_BODY_FORMAT
@@ -1130,51 +1185,19 @@ app.post("/api/diagnosis/bind-medicine-to-disease", (req,res)=>{
         return
     }
 
-    const medicineArray=JSON.parse(req.body.medicine_id_array)
-    for(let i=0; i<medicineArray.length; i++){
-        dao.retrieveOneMedicine(new Medicine(medicineArray[i].medicine_id)).then(result=>{
-            dao.bindTreatmentToDisease(new TreatmentPlan(null,req.body.treatment_plan_name,req.body.disease_id,JSON.stringify(req.body.medicine_id_array))).then(result=>{
-                res.status(200).send({
-                    success: true,
-                    result: result
-                })
-            }).catch(err=>{
-                if(err.code === 'ER_DUP_ENTRY' || err === ERROR_DUPLICATE_ENTRY){
-                    res.status(500).send({
-                        success:false,
-                        error: 'DUPLICATE-ENTRY'
-                    })
-                    res.end()
-                }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
-                    res.status(500).send({
-                        success:false,
-                        error:ERROR_FOREIGN_KEY
-                    })
-                }else{
-                    console.error(err)
-                    res.status(500).send({
-                        success:false,
-                        error:SOMETHING_WENT_WRONG
-                    })
-                }
-            })
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+    dao.bindTreatmentToDisease(req.body.disease_symptoms_animal_id,req.body.medicine_id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
-    }
+    }).catch(error=>{
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
+        })
+    })
 })
-
 app.delete("/api/diagnosis/delete-bind-medicine-to-disease", (req, res)=>{
     if (typeof req.query.bind_id === 'undefined' ){
         res.status(400).send({

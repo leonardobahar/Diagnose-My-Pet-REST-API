@@ -884,30 +884,26 @@ export class Dao{
 		})
 	}
 
-	bindTreatmentToDisease(treatmentPlan){
+	bindTreatmentToDisease(disease_symptoms_animal_id, medicine_id){
 		return new Promise((resolve,reject)=>{
-			if(!treatmentPlan instanceof TreatmentPlan){
-				reject(MISMATCH_OBJ_TYPE)
-				return
-			}
 
-			const query="INSERT INTO `treatment_plan`(`plan_name`, `disease_id`, `medicine_ids`) VALUES(?, ?, ?)"
-			this.mysqlConn.query(query,[treatmentPlan.plan_name,treatmentPlan.disease_id,treatmentPlan.medicine_ids],(error,result)=>{
+			const query="INSERT INTO `medicine_for_disease_symptoms`(`disease_symptoms_animal_id`,`medicine_id`) VALUES(?, ?)"
+			this.mysqlConn.query(query,[disease_symptoms_animal_id,medicine_id],(error,result)=>{
 				if(error){
 					reject(error)
 				}
 
-				treatmentPlan.id=result.insertId
-				resolve(treatmentPlan)
+				resolve(SUCCESS)
 			})
 		})
 	}
 
 	retrieveMedicineForDisease(disease){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT tp.id, tp.plan_name, tp.disease_id, d.disease_name, tp.medicine_ids " +
-				"FROM treatment_plan tp LEFT OUTER JOIN disease d ON tp.disease_id=d.id " +
-				"WHERE tp.disease_id=? "
+			const query="SELECT mds.medicine_id, m.medicine_name, dsa.disease_id, d.disease_name " +
+				"FROM medicine_for_disease_symptoms mds LEFT OUTER JOIN disease_symptoms_animal dsa ON dsa.id=mds.disease_symptoms_animal_id " +
+				"LEFT OUTER JOIN medicine m ON m.id=mds.medicine_id LEFT OUTER JOIN disease d ON d.id=dsa.disease_id " +
+				"WHERE dsa.disease_id=? "
 			this.mysqlConn.query(query, disease.id, (error,result)=>{
 				if(error){
 					reject(error)
@@ -916,11 +912,10 @@ export class Dao{
 
 				const medicines=result.map(rowDataPacket=>{
 					return{
-						id:rowDataPacket.id,
-						plan_name:rowDataPacket.plan_name,
+						medicine_id:rowDataPacket.medicine_id,
+						medicine_name:rowDataPacket.medicine_name,
 						disease_id:rowDataPacket.disease_id,
-						disease_name:rowDataPacket.disease_name,
-						medicine_ids:rowDataPacket.medicine_ids
+						disease_name:rowDataPacket.disease_name
 					}
 				})
 				resolve(medicines)
@@ -955,7 +950,7 @@ export class Dao{
 						return
 					}
 
-					const query = anatomy.id === "" ? "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`) VALUES (?, ?, ?)" : "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)";
+					const query = anatomy.id === "" ? "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)" : "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`) VALUES (?, ?, ?, ?)";
 					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
 						if (err){
 							reject(err)
