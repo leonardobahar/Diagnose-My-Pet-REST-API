@@ -3215,7 +3215,7 @@ export class Dao{
 					})
 					resolve(visit)
 				}else{
-					reject(NO_SUCH_CONTENT)
+					resolve([])
 				}
 			})
 		})

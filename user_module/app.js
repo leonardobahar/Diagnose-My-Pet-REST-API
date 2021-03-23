@@ -8,6 +8,7 @@ import path from 'path';
 import multer from "multer";
 import nodecron from 'node-cron';
 import jwt from 'jsonwebtoken';
+import moment from 'moment';
 import {generateAccessToken} from "../util/util";
 import {Dao} from "./dao";
 import {
@@ -3120,10 +3121,12 @@ app.delete("/api/user/delete-visit-reminder",(req,res)=>{
     })
 })
 
-nodecron.schedule("0 17 * * *", ()=>{
+nodecron.schedule("30 9 * * *", async()=>{
     console.info("Cron job running")
     dao.retrieveVisitReminderByDate(moment(new Date()).format("YYYY-MM-DD")).then(result=>{
         console.log(result.length+" reminders found today")
+    }).catch(err=>{
+        console.error(err)
     })
 })
 // End of v2 Development
