@@ -356,6 +356,42 @@ app.post("/api/user/register-admin",(req,res)=>{
     }
 })
 
+app.post("/api/user/edit-user", (req,res)=>{
+    if (typeof req.body.id === "undefined" ||
+       typeof req.body.mobile === "undefined" ||
+        typeof req.body.email === "undefined" ||
+        typeof req.body.birthdate === "undefined" ||
+        typeof req.body.address === "undefined" ||
+        typeof req.body.user_name === "undefined" ){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.updateUserInfo(new User(
+        req.body.id,
+        req.body.user_name,
+        req.body.mobile,
+        req.body.email,
+        req.body.birthdate,
+        req.body.address,
+        null,
+        null,
+        null
+    )).then(result=>{
+        res.status(200).send({
+            success: true
+        })
+    }).catch(err=>{
+        console.error(err)
+        res.status(400).send({
+            success: false
+        })
+    })
+})
+
 app.post("/api/user/confirm-user-email",(req,res)=>{
     if(typeof req.body.id==='undefined'){
         res.status(400).send({

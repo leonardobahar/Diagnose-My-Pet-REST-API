@@ -259,6 +259,25 @@ export class Dao{
 		})
 	}
 
+	updateUserInfo(user){
+		return new Promise(async (resolve, reject) => {
+			if (!user instanceof User) {
+				reject(MISMATCH_OBJ_TYPE)
+				return
+			}
+
+			const query = "UPDATE `users` SET `mobile` = ?, `email` = ?, `birthdate` = ?, `address`= ? WHERE `user_name` = ? "
+			this.mysqlConn.query(query, [user.mobile, user.email, user.birthdate, user.address, user.user_name], (err, res)=>{
+				if (err){
+					reject(err)
+					return
+				}
+
+				resolve(user)
+			})
+		})
+	}
+
 	resetPassword(user){
 		return new Promise(async (resolve, reject) => {
 			if (!user instanceof User) {
