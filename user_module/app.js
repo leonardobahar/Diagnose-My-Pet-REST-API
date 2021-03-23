@@ -91,9 +91,9 @@ const authenticateToken = (req, res, next)=>{
         }
 
         if (req.originalUrl === "/api/user/reset-user"){
-            // if (!userInfo.role){
-            //     return res.sendStatus(403)
-            // }
+            if (!userInfo.role){
+                return res.sendStatus(403)
+            }
         }
         req.user = userInfo
         next() // pass the execution off to whatever request the client intended
@@ -220,7 +220,7 @@ app.post("/api/user/register-user", (req, res)=>{
     }
 })
 
-app.post("/api/user/reset-user", (req, res)=>{
+app.post("/api/user/reset-user", authenticateToken, (req, res)=>{
     if (typeof req.body.id==='undefined' &&
         typeof req.body.email === 'undefined' &&
         typeof req.body.password === 'undefined'){
