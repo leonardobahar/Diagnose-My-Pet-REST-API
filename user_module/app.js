@@ -3120,8 +3120,11 @@ app.delete("/api/user/delete-visit-reminder",(req,res)=>{
     })
 })
 
-nodecron.schedule("37 11 * * *", ()=>{
+nodecron.schedule("0 17 * * *", ()=>{
     console.info("Cron job running")
+    dao.retrieveVisitReminderByDate(moment(new Date()).format("YYYY-MM-DD")).then(result=>{
+        console.log(result.length+" reminders found today")
+    })
 })
 // End of v2 Development
 
