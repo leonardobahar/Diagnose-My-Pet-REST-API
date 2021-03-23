@@ -623,7 +623,7 @@ app.post("/api/user/request-password-reset", (req, res)=>{
     })
 })
 
-app.post("/api/user/change-password",(req,res)=>{
+app.post("/api/user/change-password",authenticateToken, (req,res)=>{
     if(typeof req.body.token==='undefined' ||
        typeof req.body.password==='undefined'){
         res.status(400).send({
@@ -3055,13 +3055,6 @@ app.get("/api/user/retrieve-visit-reminder",(req,res)=>{
             result:result
         })
     }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
-            return
-        }
         console.error(error)
         res.status(500).send({
             success:false,

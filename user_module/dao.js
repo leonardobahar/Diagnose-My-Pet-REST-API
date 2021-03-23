@@ -3183,8 +3183,6 @@ export class Dao{
 				
 				if(result.length>0){
 					resolve(result)
-				}else{
-					reject(NO_SUCH_CONTENT)
 				}
 			})
 		})
