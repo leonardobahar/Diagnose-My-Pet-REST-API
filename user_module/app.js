@@ -3073,25 +3073,16 @@ app.delete("/api/user/delete-visit-reminder",(req,res)=>{
         return
     }
 
-    dao.retrieveOneVisitReminder(req.query.id).then(visitResult=>{
-        dao.deleteVisitReminder(req.query.id).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
+    dao.deleteVisitReminder(req.query.id).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                result:NO_SUCH_CONTENT
-            })
-            return
-        }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
+    }).catch(err=>{
+        console.error(err)
+        res.status(400).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
         })
     })
 })
