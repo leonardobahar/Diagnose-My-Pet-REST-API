@@ -3146,17 +3146,7 @@ export class Dao{
 					return
 				}
 
-				const visit=result.map(rowDataPacket=>{
-					return{
-						id:rowDataPacket.id,
-						booking_type_name:rowDataPacket.booking_type_name,
-						create_date:rowDataPacket.create_date,
-						target_send_date:rowDataPacket.target_send_date,
-						patient_id:rowDataPacket.patient_id,
-						patient_name:rowDataPacket.patient_name
-					}
-				})
-				resolve(visit)
+				resolve(result)
 			})
 		})
 	}
@@ -3173,17 +3163,7 @@ export class Dao{
 				}
 				
 				if(result.length>0){
-					const visit=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							booking_type_name:rowDataPacket.booking_type_name,
-							create_date:rowDataPacket.create_date,
-							target_send_date:rowDataPacket.target_send_date,
-							patient_id:rowDataPacket.patient_id,
-							patient_name:rowDataPacket.patient_name
-						}
-					})
-					resolve(visit)
+					resolve(result)
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
@@ -3203,17 +3183,7 @@ export class Dao{
 				}
 
 				if(result.length>0){
-					const visit=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							booking_type_name:rowDataPacket.booking_type_name,
-							create_date:rowDataPacket.create_date,
-							target_send_date:rowDataPacket.target_send_date,
-							patient_id:rowDataPacket.patient_id,
-							patient_name:rowDataPacket.patient_name
-						}
-					})
-					resolve(visit)
+					resolve(result)
 				}else{
 					resolve([])
 				}
@@ -3228,9 +3198,9 @@ export class Dao{
 				return
 			}
 
-			const query="INSERT INTO `visit_reminder`(`booking_type_name`,`create_date`,`target_send_date`,`patient_id`) " +
-				"VALUES(?,NOW(),?,?) "
-			this.mysqlConn.query(query,[visitReminder.booking_type_name,visitReminder.target_send_date,visitReminder.patient_id],(error,result)=>{
+			const query="INSERT INTO `visit_reminder`(`booking_type_name`,`description`,`create_date`,`target_send_date`,`patient_id`) " +
+				"VALUES(?,?,NOW(),?,?) "
+			this.mysqlConn.query(query,[visitReminder.booking_type_name,visitReminder.description,visitReminder.target_send_date,visitReminder.patient_id],(error,result)=>{
 				if(error){
 					reject(error)
 					return

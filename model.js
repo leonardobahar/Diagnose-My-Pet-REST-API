@@ -231,11 +231,12 @@ export class Participant{
 }
 
 export class VisitReminder{
-	constructor(id, booking_type_name, create_date, target_send_date, patient_id) {
+	constructor(id, booking_type_name, description, create_date, target_send_date, patient_id) {
 		this.id=id
 		this.booking_type_name=booking_type_name
 		this.create_date=create_date
 		this.target_send_date=target_send_date
 		this.patient_id=patient_id
+		this.description=description
 	}
 }

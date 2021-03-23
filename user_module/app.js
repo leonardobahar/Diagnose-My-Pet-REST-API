@@ -3037,6 +3037,7 @@ app.get("/api/user/retrieve-visit-reminder",(req,res)=>{
 app.post("/api/user/add-visit-reminder",(req,res)=>{
     if(typeof req.body.booking_type_name==='undefined' ||
        typeof req.body.target_send_date==='undefined' ||
+        typeof req.body.description==='undefined' ||
         typeof req.body.patient_id==='undefined'){
         res.status(400).send({
             success:false,
@@ -3045,48 +3046,22 @@ app.post("/api/user/add-visit-reminder",(req,res)=>{
         return
     }
 
-    dao.retrieveBookingTypeByName(req.body.booking_type_name.toUpperCase()).then(result=>{
-        dao.retrieveOnePatient(new Patient(req.body.patient_id)).then(patientResult=>{
-            dao.addVisitReminder(new VisitReminder(null,req.body.booking_type_name,null,req.body.target_send_date,req.body.patient_id)).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(error=>{
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+    if (req.body.description === ""){
+        req.body.description = null
+    }
+    dao.addVisitReminder(new VisitReminder(null,req.body.booking_type_name,req.body.description,null,req.body.target_send_date,req.body.patient_id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
-            return
-        }
         console.error(error)
         res.status(500).send({
             success:false,
             error:SOMETHING_WENT_WRONG
         })
     })
+
 })
 
 app.delete("/api/user/delete-visit-reminder",(req,res)=>{
