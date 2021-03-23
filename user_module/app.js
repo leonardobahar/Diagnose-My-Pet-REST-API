@@ -532,7 +532,7 @@ app.post("/api/user/user-login",(req,res)=>{
     }
 })
 
-app.post("/api/user/update-user",(req,res)=>{
+app.post("/api/user/update-user", authenticateToken,(req,res)=>{
     if(typeof req.body.id ==='undefined' ||
         typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
@@ -2645,7 +2645,7 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
     })
 })
 
-app.post("/api/user/use-appointment-slot", (req, res)=>{
+app.post("/api/user/use-appointment-slot", authenticateToken,(req, res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
     upload(req,res,async(error)=>{
@@ -2815,7 +2815,7 @@ app.post("/api/user/use-appointment-slot", (req, res)=>{
     })
 })
 
-app.post("/api/user/switch-appointment-slot",(req,res)=>{
+app.post("/api/user/switch-appointment-slot",authenticateToken,(req,res)=>{
     if(typeof req.body.previous_appointment_id==='undefined' ||
         typeof req.body.appointment_id==='undefined' ||
         typeof req.body.patient_id==='undefined'){
