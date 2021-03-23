@@ -3120,8 +3120,8 @@ app.delete("/api/user/delete-visit-reminder",(req,res)=>{
     })
 })
 
-nodecron.schedule("0 7 * * *", ()=>{
-
+nodecron.schedule("30 11 * * *", ()=>{
+    console.info("Cron job running")
 })
 // End of v2 Development
 
