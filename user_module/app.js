@@ -3033,7 +3033,20 @@ app.post("/api/user/cancel-appointment",(req,res)=>{
 })
 
 app.get("/api/user/retrieve-visit-reminder",(req,res)=>{
-    if(typeof req.query.id==='undefined'){
+    if(typeof req.query.id!=='undefined'){
+        dao.retrieveOneVisitReminder(req.query.id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
+            })
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
+    }else{
         dao.retrieveVisitReminder().then(result=>{
             res.status(200).send({
                 success:true,
@@ -3046,21 +3059,7 @@ app.get("/api/user/retrieve-visit-reminder",(req,res)=>{
                 error:SOMETHING_WENT_WRONG
             })
         })
-        return
     }
-
-    dao.retrieveOneVisitReminder(req.query.id).then(result=>{
-        res.status(200).send({
-            success:true,
-            result:result
-        })
-    }).catch(error=>{
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
-        })
-    })
 })
 
 app.post("/api/user/add-visit-reminder",(req,res)=>{
