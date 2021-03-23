@@ -356,7 +356,7 @@ app.post("/api/user/register-admin",(req,res)=>{
     }
 })
 
-app.post("/api/user/edit-user", (req,res)=>{
+app.post("/api/user/edit-user", authenticateToken, (req,res)=>{
     if (typeof req.body.id === "undefined" ||
        typeof req.body.mobile === "undefined" ||
         typeof req.body.email === "undefined" ||
