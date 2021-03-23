@@ -3173,7 +3173,7 @@ export class Dao{
 	retrieveOneVisitReminder(id){
 		return new Promise((resolve,reject)=>{
 			const query="SELECT v.id, v.booking_type_name, v.create_date, v.target_send_date, v.patient_id, p.patient_name " +
-				"FROM visit_reminder v LEFT OUTER JOIN patients p ON p.id=v.patient_id INNER JOIN users u ON p.pet_owner_id = u.id" +
+				"FROM visit_reminder v LEFT OUTER JOIN patients p ON p.id=v.patient_id INNER JOIN users u ON p.pet_owner_id = u.id " +
 				"WHERE v.id=? "
 			this.mysqlConn.query(query,id,(error,result)=>{
 				if(error){
