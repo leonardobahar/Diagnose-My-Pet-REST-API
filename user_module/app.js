@@ -90,11 +90,6 @@ const authenticateToken = (req, res, next)=>{
             return res.sendStatus(403)
         }
 
-        if (req.originalUrl === "/api/user/reset-user"){
-            if (!userInfo.role){
-                return res.sendStatus(403)
-            }
-        }
         req.user = userInfo
         next() // pass the execution off to whatever request the client intended
     })
