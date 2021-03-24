@@ -3196,7 +3196,7 @@ export class Dao{
 				}
 
 				if(result.length>0){
-					resolve(reminder)
+					resolve(result)
 				}else{
 					resolve([])
 				}
