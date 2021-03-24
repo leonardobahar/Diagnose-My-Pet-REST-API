@@ -242,6 +242,7 @@ CREATE TABLE IF NOT EXISTS `v2_appointment_log`(
 CREATE TABLE IF NOT EXISTS `visit_reminder`(
     id int auto_increment primary key,
     booking_type_name VARCHAR(255),
+    description VARCHAR(255),
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    	target_send_date DATE,
    	patient_id int,

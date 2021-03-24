@@ -3165,7 +3165,18 @@ export class Dao{
 					return
 				}
 
-				resolve(result)
+				const reminder=result.map(rowDataPacket=>{
+					return{
+						id:rowDataPacket.id,
+						booking_type_name:rowDataPacket.booking_type_name,
+						description:rowDataPacket.description,
+						create_date:rowDataPacket.create_date,
+						target_send_date:rowDataPacket.target_send_date,
+						patient_id:rowDataPacket.patient_id,
+						patient_name:rowDataPacket.patient_name
+					}
+				})
+				resolve(reminder)
 			})
 		})
 	}
@@ -3182,7 +3193,18 @@ export class Dao{
 				}
 				
 				if(result.length>0){
-					resolve(result)
+					const reminder=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							booking_type_name:rowDataPacket.booking_type_name,
+							description:rowDataPacket.description,
+							create_date:rowDataPacket.create_date,
+							target_send_date:rowDataPacket.target_send_date,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name
+						}
+					})
+					resolve(reminder)
 				}
 			})
 		})
@@ -3200,7 +3222,18 @@ export class Dao{
 				}
 
 				if(result.length>0){
-					resolve(result)
+					const reminder=result.map(rowDataPacket=>{
+						return{
+							id:rowDataPacket.id,
+							booking_type_name:rowDataPacket.booking_type_name,
+							description:rowDataPacket.description,
+							create_date:rowDataPacket.create_date,
+							target_send_date:rowDataPacket.target_send_date,
+							patient_id:rowDataPacket.patient_id,
+							patient_name:rowDataPacket.patient_name
+						}
+					})
+					resolve(reminder)
 				}else{
 					resolve([])
 				}
