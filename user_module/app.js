@@ -1951,18 +1951,10 @@ app.delete("/api/user/delete-participant",(req,res)=>{
         return
     }
 
-    dao.retrieveOneParticipant(new Participant(req.query.id)).then(result=>{
-        dao.deleteParticipant(new Participant(req.query.id)).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:flase,
-                error:SOMETHING_WENT_WRONG
-            })
+    dao.deleteParticipant(new Participant(req.query.id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){

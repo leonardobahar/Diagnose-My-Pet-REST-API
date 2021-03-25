@@ -2351,9 +2351,11 @@ export class Dao{
 				if(error){
 					reject(error)
 					return
+				}else if(result.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(SUCCESS)
 				}
-
-				resolve(SUCCESS)
 			})
 		})
 	}
