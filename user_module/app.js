@@ -802,26 +802,10 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
         return
     }
 
-    dao.retrieveOneDoctor(new Doctor(req.query.id)).then(result=>{
-        dao.deleteDoctor(new Doctor(req.query.id)).then(result=>{
-            dao.deleteCustomer(new User(req.query.id)).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(error=>{
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+    dao.deleteDoctor(new Doctor(req.query.id)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
@@ -831,7 +815,6 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
             })
             return
         }
-
         console.error(error)
         res.status(500).send({
             success:false,

@@ -621,21 +621,22 @@ export class Dao{
 		})
 	}
 
-	deleteDoctor(doctor){
+	deleteDoctor(user){
 		return new Promise((resolve,reject)=>{
-			if(!doctor instanceof Doctor){
+			if(!user instanceof User){
 				reject(MISMATCH_OBJ_TYPE)
 				return
 			}
 
-			const query="DELETE FROM doctor WHERE id=? "
-			this.mysqlConn.query(query,doctor.id,(error,result)=>{
+			const query="DELETE FROM users WHERE role='DOCTOR' AND id=? "
+			this.mysqlConn.query(query,user.id,(error,result)=>{
 				if(error){
 					reject(error)
-					return
+				}else if(result.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(SUCCESS)
 				}
-
-				resolve(doctor)
 			})
 		})
 	}
