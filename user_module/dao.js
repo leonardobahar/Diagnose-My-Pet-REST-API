@@ -2378,10 +2378,12 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			const query = "UPDATE `v2_booking_type` SET `duration` = ? WHERE `booking_type_name` = ?";
 			this.mysqlConn.query(query, [duration, booking_type_name], (err, res)=>{
-				if(!err){
-					resolve(res)
-				}else{
+				if(err){
 					reject(err)
+				}else if(res.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(SUCCESS)
 				}
 			})
 		})
