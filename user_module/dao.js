@@ -188,20 +188,9 @@ export class Dao{
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
-				}else{
-					const user=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							user_name:rowDataPacket.user_name,
-							mobile:rowDataPacket.mobile,
-							email:rowDataPacket.email,
-							birthdate:rowDataPacket.birthdate,
-							address:rowDataPacket.address,
-							role:rowDataPacket.role
-						}
-					})
-					resolve(user)
+					return
 				}
+				resolve(result)
 			})
 		})
 	}
@@ -216,22 +205,10 @@ export class Dao{
 			this.mysqlConn.query(query, (error,result)=>{
 				if(error){
 					reject(error)
-				}else if(result.length>0){
-					const customer=result.map(rowDataPacket=>{
-						return{
-							id:rowDataPacket.id,
-							user_name:rowDataPacket.user_name,
-							mobile:rowDataPacket.mobile,
-							email:rowDataPacket.email,
-							birthdate:rowDataPacket.birthdate,
-							address:rowDataPacket.address,
-							role:rowDataPacket.role
-						}
-					})
-					resolve(customer)
-				}else{
-					reject(NO_SUCH_CONTENT)
+					return
 				}
+
+				resolve(result)
 			})
 		})
 	}
