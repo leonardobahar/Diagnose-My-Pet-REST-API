@@ -722,7 +722,7 @@ export class Dao{
 					})
 					resolve(patients)
 				}else {
-					reject(NO_SUCH_CONTENT)
+					resolve([])
 				}
 			})
 		})
@@ -760,7 +760,7 @@ export class Dao{
 					})
 					resolve(patients)
 				}else {
-					reject(NO_SUCH_CONTENT)
+					resolve([])
 				}
 			})
 		})
