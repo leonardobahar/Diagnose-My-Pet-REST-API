@@ -352,8 +352,7 @@ app.post("/api/user/register-admin",(req,res)=>{
 })
 
 app.post("/api/user/edit-user", authenticateToken, (req,res)=>{
-    if (typeof req.body.id === "undefined" ||
-       typeof req.body.mobile === "undefined" ||
+    if (typeof req.body.mobile === "undefined" ||
         typeof req.body.email === "undefined" ||
         typeof req.body.birthdate === "undefined" ||
         typeof req.body.address === "undefined" ||
@@ -366,7 +365,7 @@ app.post("/api/user/edit-user", authenticateToken, (req,res)=>{
     }
 
     dao.updateUserInfo(new User(
-        req.body.id,
+        null,
         req.body.user_name,
         req.body.mobile,
         req.body.email,
@@ -548,32 +547,23 @@ app.post("/api/user/update-user", authenticateToken,(req,res)=>{
         req.body.birthdate,
         req.body.address)
 
-    dao.retrieveOneUser(new User(req.body.id)).then(result=>{
-        dao.updateCustomer(user).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                result: SOMETHING_WENT_WRONG
-            })
+    dao.updateCustomer(user).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
+    }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
             res.status(204).send({
                 success:false,
                 error:NO_SUCH_CONTENT
             })
             return
         }
-
-        console.error(error)
+        console.error(err)
         res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
+            success: false,
+            result: SOMETHING_WENT_WRONG
         })
     })
 })

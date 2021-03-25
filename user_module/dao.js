@@ -418,10 +418,11 @@ export class Dao{
 			this.mysqlConn.query(query, [user.user_name,user.mobile, user.email,user.birthdate, user.address, user.id], (err,res)=>{
 				if(err){
 					reject(err)
-					return
+				}else if(res.affectedRows<1) {
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(SUCCESS)
 				}
-
-				resolve(user)
 			})
 		})
 	}
