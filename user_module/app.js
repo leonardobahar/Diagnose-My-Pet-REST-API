@@ -654,6 +654,13 @@ app.delete("/api/user/delete-user",(req,res)=>{
             result:result
         })
     }).catch(err=>{
+        if(err===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
+            })
+            return
+        }
         console.error(err)
         res.status(500).send({
             success: false,

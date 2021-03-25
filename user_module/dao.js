@@ -459,11 +459,13 @@ export class Dao{
 				if(err){
 					reject(err)
 					return
+				}else if(res.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					user.id=res.insertId
+					delete(user.salt)
+					resolve(SUCCESS)
 				}
-
-				user.id=res.insertId
-				delete(user.salt)
-				resolve(user)
 			})
 		})
 	}
