@@ -2439,10 +2439,12 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			const query = "DELETE FROM v2_booking_type WHERE booking_type_name = ?"
 			this.mysqlConn.query(query, [booking_type_name], (err, res)=>{
-				if(!err){
-					resolve(res)
-				}else{
+				if(err){
 					reject(err)
+				}else if(res.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(SUCCESS)
 				}
 			})
 		})

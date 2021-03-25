@@ -2119,38 +2119,29 @@ app.post("/api/user/delete-booking-type", (req, res)=>{
         return
     }
 
-    dao.retrieveOneBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
-        dao.deleteBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
-            res.status(200).send({
-                success: true
-            })
-        }).catch(err=>{
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    success: false,
-                    error: ERROR_DUPLICATE_ENTRY
-                })
-            }else {
-                console.error(err)
-                res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
-                })
-            }
+    dao.deleteBookingType(req.body.booking_type_name.toUpperCase()).then(result=>{
+        res.status(200).send({
+            success: true,
+            result:result
         })
-    }).catch(error=>{
-        if(error===NO_SUCH_CONTENT){
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: ERROR_DUPLICATE_ENTRY
+            })
+        }else if(err===NO_SUCH_CONTENT){
             res.status(204).send({
                 success:false,
                 error:NO_SUCH_CONTENT
             })
-            return
+        } else {
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         }
-        console.error(error)
-        res.status(500).send({
-            success:false,
-            error:NO_SUCH_CONTENT
-        })
     })
 })
 
