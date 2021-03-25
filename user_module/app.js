@@ -1599,9 +1599,7 @@ app.post("/api/user/update-medical-attachment",async(req,res)=>{
 
         if(err instanceof multer.MulterError){
             return res.send(err)
-        }
-
-        else if(err){
+        } else if(err){
             return res.send(err)
         }
 
@@ -1923,18 +1921,10 @@ app.post("/api/user/update-participant",(req,res)=>{
     }
     const participant=new Participant(req.body.id,req.body.full_name,req.body.youtube_name,req.body.youtube_email,req.body.phone_number)
 
-    dao.retrieveOneParticipant(new Participant(req.body.id)).then(result=>{
-        dao.updateParticipant(participant).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(error=>{
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+    dao.updateParticipant(participant).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){

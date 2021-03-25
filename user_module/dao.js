@@ -2331,10 +2331,11 @@ export class Dao{
 			this.mysqlConn.query(query,[participant.full_name,participant.youtube_name,participant.youtube_email,participant.phone_number,participant.id],(error,result)=>{
 				if(error){
 					reject(error)
-					return
+				}else if(result.affectedRows<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(participant)
 				}
-
-				resolve(participant)
 			})
 		})
 	}
