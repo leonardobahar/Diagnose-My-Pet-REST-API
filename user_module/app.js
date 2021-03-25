@@ -772,12 +772,10 @@ app.post("/api/user/update-doctor",(req,res)=>{
         return
     }
 
-    dao.getDoctorUserId(new User(req.body.id)).then(result=>{
-        dao.updateDoctor(new User(req.body.id,req.body.user_name,req.body.mobile,req.body.email,req.body.birthdate)).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
+    dao.updateDoctor(new User(req.body.id,req.body.user_name,req.body.mobile,req.body.email,req.body.birthdate)).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){

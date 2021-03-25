@@ -594,7 +594,13 @@ export class Dao{
 			if(typeof user.user_name==='undefined'){
 				const query="UPDATE users SET mobile=?, email=?, birthdate=? WHERE id=? "
 				this.mysqlConn.query(query,[user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
-					resolve(SUCCESS)
+					if(error){
+						reject(error)
+					}else if(result.affectedRows<1){
+						reject(NO_SUCH_CONTENT)
+					}else{
+						resolve(SUCCESS)
+					}
 				})
 				return
 			}
@@ -603,7 +609,13 @@ export class Dao{
 			this.mysqlConn.query(query,[user.user_name,user.mobile,user.email,user.birthdate,user.id],(error,result)=>{
 				const updateNameQuery="UPDATE doctor SET doctor_name=? WHERE user_id=? "
 				this.mysqlConn.query(updateNameQuery,[user.user_name,user.id],(error,result)=>{
-					resolve(SUCCESS)
+					if(error){
+						reject(error)
+					}else if(result.affectedRows<1){
+						reject(NO_SUCH_CONTENT)
+					}else{
+						resolve(SUCCESS)
+					}
 				})
 			})
 		})
