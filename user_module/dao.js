@@ -856,10 +856,11 @@ export class Dao{
 			this.mysqlConn.query(query,[patient.id],(err,res)=>{
 				if(err){
 					reject(err)
-					return
+				}else if(res.length<1){
+					reject(NO_SUCH_CONTENT)
+				}else{
+					resolve(patient)
 				}
-
-				resolve(patient)
 			})
 		})
 	}
