@@ -931,7 +931,12 @@ app.post("/api/diagnosis/register-anatomy",(req,res)=>{
         return
     }
 
-    const anatomy=new Anatomy(null,req.body.part_name.toUpperCase(),req.body.animal_type_id)
+    if(typeof req.body.parent==='undefined'){
+        var anatomy=new Anatomy(null,req.body.part_name.toUpperCase(),req.body.animal_type_id,null)
+    }else{
+        var anatomy=new Anatomy(null,req.body.part_name.toUpperCase(),req.body.animal_type_id,req.body.parent)
+    }
+
     dao.registerAnatomy(anatomy).then(result=>{
         res.status(200).send({
             success:true,
@@ -965,33 +970,26 @@ app.post("/api/diagnosis/update-anatomy", (req,res)=>{
         return
     }
 
-    const anatomy= new Anatomy(req.body.id, req.body.part_name.toUpperCase(), req.body.animal_type_id)
+    if(typeof req.body.parent==='undefined'){
+        var anatomy= new Anatomy(req.body.id, req.body.part_name.toUpperCase(), req.body.animal_type_id, null)
+    }else{
+        var anatomy= new Anatomy(req.body.id, req.body.part_name.toUpperCase(), req.body.animal_type_id, req.body.parent)
+    }
 
-    dao.getAnatomyId(new Anatomy(req.body.id)).then(result=>{
-        dao.updateAnatomy(anatomy).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+    dao.updateAnatomy(anatomy).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(err=>{
         if(err===NO_SUCH_CONTENT){
-            res.status(204).send({
-                success:false,
-                error:NO_SUCH_CONTENT
-            })
+            reject(NO_SUCH_CONTENT)
             return
         }
         console.error(err)
         res.status(500).send({
-            success:false,
-            error:SOMETHING_WENT_WRONG
+            success: false,
+            error: SOMETHING_WENT_WRONG
         })
     })
 })
@@ -1007,18 +1005,10 @@ app.delete("/api/diagnosis/delete-anatomy",(req,res)=>{
 
     const anatomy=new Anatomy(req.query.id,null,null)
 
-    dao.getAnatomyId(new Anatomy(req.query.id)).then(result=>{
-        dao.deleteAnatomy(anatomy).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            console.error(err)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+    dao.deleteAnatomy(anatomy).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
         })
     }).catch(err=>{
         if(err===NO_SUCH_CONTENT){

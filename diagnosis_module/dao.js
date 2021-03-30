@@ -694,43 +694,27 @@ export class Dao{
 
 	retrieveAnatomy(){
 		return new Promise((resolve, reject)=>{
-			const query = "SELECT a.id, a.part_name, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id"
+			const query = "SELECT a.id, a.part_name, a.parent, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id ORDER BY a.animal_type_id"
 			this.mysqlConn.query(query, (error, result)=>{
 				if (error){
 					reject(error)
 					return
 				}
 
-				let parts = []
-				for	(let i=0; i<result.length; i++){
-					parts.push(new Anatomy(
-						result[i].id,
-						result[i].part_name,
-						new AnimalType(result[i].animal_type_id, result[i].animal_name, result[i].animal_category)
-					))
-				}
-				resolve(parts)
+				resolve(result)
 			})
 		})
 	}
 
 	retrieveOneAnatomy(anatomy){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT a.id, a.part_name, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ?"
+			const query = "SELECT a.id, a.part_name, a.parent, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ? ORDER BY a.animal_type_id "
 			this.mysqlConn.query(query, anatomy.id, (error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}else if(result.length>0){
-					let parts=[]
-					for(let i=0; i<result.length; i++){
-						parts.push(new Anatomy(
-							result[i].id,
-							result[i].part_name,
-							new AnimalType(result[i].animal_type_id,result[i].animal_name,result[i].animal_category)
-						))
-					}
-					resolve(parts)
+					resolve(result)
 				}else{
 					reject(NO_SUCH_CONTENT)
 				}
@@ -756,8 +740,8 @@ export class Dao{
 	registerAnatomy(anatomy){
 		return new Promise((resolve,reject)=>{
 			if(anatomy instanceof Anatomy){
-				const query="INSERT INTO `anatomy` (`part_name`, `animal_type_id`) VALUES (?, ?)"
-				this.mysqlConn.query(query,[anatomy.part_name,anatomy.animal_type_id],(error,result)=>{
+				const query="INSERT INTO `anatomy` (`part_name`, `animal_type_id`, `parent`) VALUES (?, ?, ?)"
+				this.mysqlConn.query(query,[anatomy.part_name,anatomy.animal_type_id,anatomy.parent],(error,result)=>{
 					if(error){
 						reject(error)
 						return
@@ -766,9 +750,7 @@ export class Dao{
 					anatomy.id=result.insertId
 					resolve(anatomy)
 				})
-			}
-
-			else {
+			} else {
 				reject(MISMATCH_OBJ_TYPE)
 			}
 		})
@@ -778,18 +760,17 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(!anatomy instanceof Anatomy){
 				reject(MISMATCH_OBJ_TYPE)
-			}
-
-			else{
-				const query="UPDATE anatomy SET part_name = ?, animal_type_id = ? WHERE id = ?"
-				this.mysqlConn.query(query,[anatomy.part_name, anatomy.animal_type_id, anatomy.id],(error,result)=>{
+			} else{
+				const query="UPDATE anatomy SET part_name = ?, animal_type_id = ?, parent = ? WHERE id = ?"
+				this.mysqlConn.query(query,[anatomy.part_name,anatomy.animal_type_id, anatomy.parent, anatomy.id],(error,result)=>{
 					if(error){
 						reject(error)
 						return
+					}else if(result.affectedRows<1){
+						reject(NO_SUCH_CONTENT)
+					}else{
+						resolve(anatomy)
 					}
-
-					anatomy.id=result.insertId
-					resolve(anatomy)
 				})
 			}
 		})
@@ -799,18 +780,16 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(!anatomy instanceof Anatomy){
 				reject(MISMATCH_OBJ_TYPE)
-			}
-
-			else{
+			} else{
 				const query="DELETE FROM anatomy WHERE id = ?"
 				this.mysqlConn.query(query, anatomy.id, (error,result)=>{
 					if(error){
 						reject(error)
-						return
+					}else if(result.affectedRows<1){
+						reject(NO_SUCH_CONTENT)
+					}else{
+						resolve(SUCCESS)
 					}
-
-					anatomy.id=result.insertId
-					resolve(anatomy)
 				})
 			}
 		})
