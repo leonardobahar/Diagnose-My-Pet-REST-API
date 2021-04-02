@@ -351,7 +351,7 @@ app.post("/api/user/register-admin",(req,res)=>{
     }
 })
 
-app.post("/api/user/edit-user", authenticateToken, (req,res)=>{
+app.post("/api/user/edit-user", (req,res)=>{
     if (typeof req.body.mobile === "undefined" ||
         typeof req.body.email === "undefined" ||
         typeof req.body.birthdate === "undefined" ||
@@ -952,7 +952,8 @@ app.post("/api/user/add-patient",async (req,res)=>{
                 birthDate,req.body.pet_owner,'No Attachment')
         }else{
             if(error instanceof multer.MulterError || error){
-                return res.send(error)
+                res.send(error)
+                return
             }
 
             patient = new Patient(
@@ -962,6 +963,7 @@ app.post("/api/user/add-patient",async (req,res)=>{
 
         }
 
+        // Check if user id exists
         dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
             dao.registerPatient(patient).then(result=>{
                 res.status(200).send({
