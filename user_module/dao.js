@@ -3042,8 +3042,8 @@ export class Dao{
 				reject("WRONG DATETIME FORMAT")
 				return
 			}
-			let query = "SELECT * FROM `v2_appointment_schedule` WHERE start_time >= ? AND end_time <= ?"
-			this.mysqlConn.query(query, [start_time, end_time], (err, res)=>{
+			let query = "SELECT * FROM `v2_appointment_schedule` WHERE start_time >= ? AND end_time <= ? AND doctor_id = ?"
+			this.mysqlConn.query(query, [start_time, end_time, doctor_id], (err, res)=>{
 				if (res.length > 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
 				}else {
