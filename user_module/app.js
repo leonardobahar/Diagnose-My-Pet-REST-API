@@ -2562,7 +2562,7 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
         })
     }).catch(err=>{
         console.error(err)
-        res.status(400).send({
+        res.status(500).send({
             success:false,
             error:err
         })
