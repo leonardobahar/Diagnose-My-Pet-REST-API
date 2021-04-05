@@ -1040,15 +1040,27 @@ export class Dao{
 	updateMedicalRecord(record){
 		return new Promise((resolve,reject)=>{
 			if(record instanceof MedicalRecords){
-				const query="UPDATE medical_records SET description=?, medication=?, date_created=NOW(), appointment_id=?, file=? WHERE id=?"
-				this.mysqlConn.query(query, [record.description,record.medication, record.appointment_id, record.file, record.id], (error,result)=>{
-					if(error){
-						reject(error)
-						return
-					}
+				if(record.file==='No Attachment'){
+					const query="UPDATE medical_records SET description=?, medication=?, date_created=NOW(), appointment_id=? WHERE id=?"
+					this.mysqlConn.query(query, [record.description,record.medication, record.appointment_id, record.id], (error,result)=>{
+						if(error){
+							reject(error)
+							return
+						}
 
-					resolve(record)
-				})
+						resolve(record)
+					})
+				}else{
+					const query="UPDATE medical_records SET description=?, medication=?, date_created=NOW(), appointment_id=?, file=? WHERE id=?"
+					this.mysqlConn.query(query, [record.description,record.medication, record.appointment_id, record.file, record.id], (error,result)=>{
+						if(error){
+							reject(error)
+							return
+						}
+
+						resolve(record)
+					})
+				}
 			}
 
 			else{

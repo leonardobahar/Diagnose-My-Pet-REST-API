@@ -1378,7 +1378,7 @@ app.post("/api/user/update-medical-record",(req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
 
     upload(req,res,async(error)=>{
-        if( typeof req.body.patient_id === 'undefined' ||
+        if( typeof req.body.id === 'undefined' ||
             typeof req.body.appointment_id === 'undefined'){
             res.status(400).send({
                 success:false,
@@ -1387,36 +1387,84 @@ app.post("/api/user/update-medical-record",(req,res)=>{
             return
         }
 
-        let medic;
-        if(req.file==='undefined'){
-            medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
+        dao.retrieveOneMedicalRecord(new MedicalRecords(req.body.id)).then(medResult=>{
+            if(medResult[0].file_attachment===null || medResult[0].file_attachment==='No Attachment'){
+                let medic;
+                if(typeof req.file==='undefined'){
+                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
+                }else{
+                    if(error instanceof multer.MulterError || error){
+                        return res.send(error)
+                    }
 
-        }else{
-            if(error instanceof multer.MulterError || error){
-                return res.send(error)
-            }
+                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+                }
 
-            medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
-        }
-
-        dao.updateMedicalRecord(medic).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            if(err.code==='ER_DUP_ENTRY'){
-                res.status(500).send({
-                    success:false,
-                    error:ERROR_DUPLICATE_ENTRY
+                dao.updateMedicalRecord(medic).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:result
+                    })
+                }).catch(err=>{
+                    if(err.code==='ER_DUP_ENTRY'){
+                        res.status(500).send({
+                            success:false,
+                            error:ERROR_DUPLICATE_ENTRY
+                        })
+                    }else{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    }
                 })
             }else{
-                console.error(err)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
+                let medic;
+                if(typeof req.file==='undefined'){
+                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
+                }else{
+                    if(error instanceof multer.MulterError || error){
+                        return res.send(error)
+                    }
+
+                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+                    fs.unlinkSync('./Uploads/'+medResult[0].file_attachment)
+                }
+
+                dao.updateMedicalRecord(medic).then(result=>{
+                    res.status(200).send({
+                        success:true,
+                        result:result
+                    })
+                }).catch(err=>{
+                    if(err.code==='ER_DUP_ENTRY'){
+                        res.status(500).send({
+                            success:false,
+                            error:ERROR_DUPLICATE_ENTRY
+                        })
+                    }else{
+                        console.error(err)
+                        res.status(500).send({
+                            success:false,
+                            error:SOMETHING_WENT_WRONG
+                        })
+                    }
                 })
             }
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
+                res.status(204).send({
+                    success:false,
+                    error:NO_SUCH_CONTENT
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
         })
     })
 })
