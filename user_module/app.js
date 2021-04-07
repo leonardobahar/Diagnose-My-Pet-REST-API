@@ -808,7 +808,7 @@ app.delete("/api/user/delete-doctor",(req,res)=>{
         return
     }
 
-    dao.deleteDoctor(new Doctor(req.query.id)).then(result=>{
+    dao.deleteDoctor(new User(req.query.id)).then(result=>{
         res.status(200).send({
             success:true,
             result:result

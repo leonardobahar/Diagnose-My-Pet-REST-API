@@ -628,7 +628,7 @@ export class Dao{
 				return
 			}
 
-			const query="DELETE FROM users WHERE role='DOCTOR' AND id=? "
+			const query="DELETE FROM users WHERE role='DOCTOR' AND id=(SELECT user_id FROM doctor WHERE user_id=?) "
 			this.mysqlConn.query(query,user.id,(error,result)=>{
 				if(error){
 					reject(error)
