@@ -629,7 +629,7 @@ export class Dao{
 			}
 
 			const query="DELETE FROM users WHERE role='DOCTOR' AND id=(SELECT user_id FROM doctor WHERE user_id=?) "
-			this.mysqlConn.query(query,user.id,(error,result)=>{
+			const res = this.mysqlConn.query(query,user.id,(error,result)=>{
 				if(error){
 					reject(error)
 				}else if(result.affectedRows<1){
@@ -638,6 +638,7 @@ export class Dao{
 					resolve(SUCCESS)
 				}
 			})
+			console.log(res.sql)
 		})
 	}
 
