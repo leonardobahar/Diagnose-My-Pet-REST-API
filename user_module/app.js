@@ -713,7 +713,7 @@ app.get("/api/user/retrieve-doctor",(req,res)=>{
     })
 })
 
-app.post("/api/user/register-doctor",(req,res)=>{
+app.post("/api/user/register-doctor",authenticateToken,(req,res)=>{
     if (typeof req.body.user_name === 'undefined' ||
         typeof req.body.mobile === 'undefined' ||
         typeof req.body.email === 'undefined' ||
