@@ -2638,7 +2638,6 @@ app.post("/api/user/use-appointment-slot",(req, res)=>{
         }
 
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-            console.log(appointmentResult)
             if (appointmentResult[0].patient_id !== null ){
                 res.status(500).send({
                     success: false,
