@@ -2638,6 +2638,10 @@ app.post("/api/user/use-appointment-slot",(req, res)=>{
         }
 
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
+            if (appointmentResult.patient_id !== null){
+                res.status(204).send()
+                return
+            }
             dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
                 if(bookingResult[0].payment_proof_required ===1){
                     // if(typeof req.file==='undefined'){
