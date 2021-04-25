@@ -2638,8 +2638,8 @@ app.post("/api/user/use-appointment-slot",(req, res)=>{
         }
 
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-            console.log(appointmentResult.patient_id)
-            if (appointmentResult.patient_id !== null){
+            console.log(appointmentResult)
+            if (appointmentResult.patient_id !== null ){
                 res.status(500).send({
                     success: false,
                     error: "SLOT HAS BEEN TAKEN"
