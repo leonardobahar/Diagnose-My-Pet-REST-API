@@ -2949,10 +2949,10 @@ app.post("/api/user/update-appointment-slot",(req,res)=>{
                     filename = req.file.filename
                 }
 
-                if(appointmentResult[0].proof_of_payment != null){
-                    fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
-                    return
-                }
+                // if(appointmentResult[0].proof_of_payment != null){
+                //     fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
+                //     return
+                // }
 
                 dao.updateAppointmentSlot(req.body.appointment_id,req.body.patient_id,filename,req.body.description,req.body.additional_storage).then(result=>{
                     res.status(200).send({
