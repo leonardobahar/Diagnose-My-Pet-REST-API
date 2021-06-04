@@ -2892,94 +2892,31 @@ app.post("/api/user/update-appointment-slot",(req,res)=>{
             return
         }
 
-        dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-            dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
-                if(bookingResult[0].payment_proof_required===1){
-                    // if(typeof req.file==='undefined'){
-                    //     res.status(400).send({
-                    //         success:false,
-                    //         error:"PAYMENT PROOF IS REQUIRED"
-                    //     })
-                    //     return
-                    // }
 
-                    if(error instanceof multer.MulterError){
-                        return res.send(error)
-                    } else if(error){
-                        return res.send(error)
-                    }
+        if(error instanceof multer.MulterError){
+            return res.send(error)
+        } else if(error){
+            return res.send(error)
+        }
 
-                    if(appointmentResult[0].proof_of_payment != null){
-                        fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
-                        return
-                    }
+        if(appointmentResult[0].proof_of_payment != null && typeof req.file !== 'undefined'){
+            fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
+            return
+        }
 
-                    dao.updateAppointmentSlot(req.body.appointment_id,req.body.patient_id,req.file.filename,req.body.description,req.body.additional_storage).then(result=>{
-                        res.status(200).send({
-                            success:true,
-                            result:result
-                        })
-                    }).catch(error=>{
-                        console.error(error)
-                        res.status(500).send({
-                            success:false,
-                            error:SOMETHING_WENT_WRONG
-                        })
-                    })
-                    return
-                }
+        let filename;
+        if  (typeof req.file === 'undefined'){
+            filename = appointmentResult[0].proof_of_payment
+        }else{
+            filename = req.file.filename
+        }
 
-                if(error instanceof multer.MulterError){
-                    return res.send(error)
-                } else if(error){
-                    return res.send(error)
-                }
-                let filename;
-                if  (typeof req.file === 'undefined'){
-                    filename = appointmentResult[0].proof_of_payment
-                }else{
-                    filename = req.file.filename
-                }
-
-                if(req.file && appointmentResult[0].proof_of_payment != null){
-                    fs.unlinkSync(UPLOADPATH+appointmentResult[0].proof_of_payment)
-                    return
-                }
-
-                dao.updateAppointmentSlot(req.body.appointment_id,req.body.patient_id,filename,req.body.description,req.body.additional_storage).then(result=>{
-                    res.status(200).send({
-                        success:true,
-                        result:result
-                    })
-                }).catch(error=>{
-                    console.error(error)
-                    res.status(500).send({
-                        success:false,
-                        error:SOMETHING_WENT_WRONG
-                    })
-                })
-            }).catch(error=>{
-                if(error===NO_SUCH_CONTENT){
-                    res.status(204).send({
-                        success:false,
-                        error:NO_SUCH_CONTENT
-                    })
-                    return
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
+        dao.updateAppointmentSlot(req.body.appointment_id,req.body.patient_id,filename,req.body.description,req.body.additional_storage).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
             })
         }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
             console.error(error)
             res.status(500).send({
                 success:false,
