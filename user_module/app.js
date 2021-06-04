@@ -2878,27 +2878,31 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
 })
 
 app.post("/api/user/update-appointment-slot",(req,res)=>{
-    console.log(req.body)
-    if(typeof req.body.appointment_id==='undefined' ||
-        typeof req.body.description==='undefined' ||
-        typeof req.body.additional_storage==='undefined'){
-        res.status(400).send({
-            success:false,
-            error:WRONG_BODY_FORMAT
-        })
-        return
-    }
+    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
-        res.status(200).send({
-            success: true,
-            result: result
-        })
-    }).catch(error => {
-        console.error(error)
-        res.status(500).send({
-            success: false,
-            error: SOMETHING_WENT_WRONG
+    upload(req,res,async(error)=>{
+        if(typeof req.body.appointment_id==='undefined' ||
+            typeof req.body.patient_id==='undefined' ||
+            typeof req.body.description==='undefined' ||
+            typeof req.body.additional_storage==='undefined'){
+            res.status(400).send({
+                success:false,
+                error:WRONG_BODY_FORMAT
+            })
+            return
+        }
+
+        dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(error => {
+            console.error(error)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
         })
     })
 })
