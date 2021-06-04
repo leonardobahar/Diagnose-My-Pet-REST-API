@@ -3091,10 +3091,10 @@ export class Dao{
 		})
 	}
 
-	updateAppointmentSlot(appointment_id, patient_id, proof_of_payment, description, additional_storage){
+	updateAppointmentSlot(appointment_id, description, additional_storage){
 		return new Promise((resolve,reject)=>{
-			const query="UPDATE v2_appointment_schedule SET description=?, additional_storage=?, status='UPDATED', patient_id=?, proof_of_payment=? WHERE id=? "
-			this.mysqlConn.query(query,[description,additional_storage,patient_id,proof_of_payment,appointment_id],(err,res)=>{
+			const query="UPDATE v2_appointment_schedule SET description=?, additional_storage=?, status='UPDATED' WHERE id=? "
+			this.mysqlConn.query(query,[description,additional_storage,appointment_id],(err,res)=>{
 				if(!err){
 					resolve(SUCCESS)
 				}else{

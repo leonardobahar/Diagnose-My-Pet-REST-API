@@ -2878,63 +2878,27 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
 })
 
 app.post("/api/user/update-appointment-slot",(req,res)=>{
-    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    upload(req,res,async(error)=>{
-        if(typeof req.body.appointment_id==='undefined' ||
-            typeof req.body.patient_id==='undefined' ||
-            typeof req.body.description==='undefined' ||
-            typeof req.body.additional_storage==='undefined'){
-            res.status(400).send({
-                success:false,
-                error:WRONG_BODY_FORMAT
-            })
-            return
-        }
+    if(typeof req.body.appointment_id==='undefined' ||
+        typeof req.body.description==='undefined' ||
+        typeof req.body.additional_storage==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
 
-        dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=> {
-
-            if (error instanceof multer.MulterError) {
-                return res.send(error)
-            } else if (error) {
-                return res.send(error)
-            }
-
-            if (appointmentResult[0].proof_of_payment != null) {
-                fs.unlinkSync(UPLOADPATH + appointmentResult[0].proof_of_payment)
-                return
-            }
-
-            if (error instanceof multer.MulterError) {
-                return res.send(error)
-            } else if (error) {
-                return res.send(error)
-            }
-
-            if (appointmentResult[0].proof_of_payment != null && typeof req.file !== 'undefined') {
-                fs.unlinkSync(UPLOADPATH + appointmentResult[0].proof_of_payment)
-                return
-            }
-
-            let filename;
-            if (typeof req.file === 'undefined') {
-                filename = appointmentResult[0].proof_of_payment
-            } else {
-                filename = req.file.filename
-            }
-
-            dao.updateAppointmentSlot(req.body.appointment_id, req.body.patient_id, filename, req.body.description, req.body.additional_storage).then(result => {
-                res.status(200).send({
-                    success: true,
-                    result: result
-                })
-            }).catch(error => {
-                console.error(error)
-                res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
-                })
-            })
+    dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(error => {
+        console.error(error)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
         })
     })
 })
