@@ -2893,23 +2893,15 @@ app.post("/api/user/update-appointment-slot",(req,res)=>{
         }
 
         dao.retrieveOneAppointmentSchedule(req.body.appointment_id).then(appointmentResult=>{
-            if(appointmentResult[0].patient_id===null){
-                res.status(500).send({
-                    success:false,
-                    error:"SLOT HAS NOT BEEN TAKEN"
-                })
-                return
-            }
-
             dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
                 if(bookingResult[0].payment_proof_required===1){
-                    if(typeof req.file==='undefined'){
-                        res.status(400).send({
-                            success:false,
-                            error:"PAYMENT PROOF IS REQUIRED"
-                        })
-                        return
-                    }
+                    // if(typeof req.file==='undefined'){
+                    //     res.status(400).send({
+                    //         success:false,
+                    //         error:"PAYMENT PROOF IS REQUIRED"
+                    //     })
+                    //     return
+                    // }
 
                     if(error instanceof multer.MulterError){
                         return res.send(error)
