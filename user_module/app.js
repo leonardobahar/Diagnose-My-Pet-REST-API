@@ -2878,7 +2878,7 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
 })
 
 app.post("/api/user/update-appointment-slot",(req,res)=>{
-
+    console.log(req.body)
     if(typeof req.body.appointment_id==='undefined' ||
         typeof req.body.description==='undefined' ||
         typeof req.body.additional_storage==='undefined'){
