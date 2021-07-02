@@ -45,17 +45,11 @@ CREATE TABLE IF NOT EXISTS `disease_symptoms_animal`(
 	animal_id INT(11),
 	symptoms_id INT(11),
 	anatomy_id INT(11),
+	medicine_id INT(11),
 	FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (animal_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (symptoms_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (anatomy_id) REFERENCES anatomy(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS `medicine_for_disease_symptoms`(
-	id INT(11) PRIMARY KEY AUTO_INCREMENT,
-	disease_symptoms_animal_id INT(11),
-	medicine_id INT(11),
-	FOREIGN KEY (disease_symptoms_animal_id) REFERENCES disease_symptoms_animal(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (anatomy_id) REFERENCES anatomy(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (medicine_id) REFERENCES medicine(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
