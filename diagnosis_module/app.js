@@ -1234,13 +1234,11 @@ app.get("/api/diagnosis/retrieve-medicine-of-disease",(req,res)=>{
     })
 })
 
-//CODE STILL IN PROGRESS
 app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
     if (typeof req.body.symptom_id === 'undefined' ||
         typeof req.body.disease_id === 'undefined' ||
         typeof req.body.animal_id === 'undefined'  ||
-        typeof req.body.anatomy_id === 'undefined' ||
-        typeof req.body.medicine_id_array === 'undefined'){
+        typeof req.body.medicine_array === 'undefined'){
         res.status(400).send({
             success: false,
             error: WRONG_BODY_FORMAT
@@ -1248,30 +1246,9 @@ app.post("/api/diagnosis/bind-symptom-to-disease", (req, res)=>{
         return
     }
 
-    let bool=false
-    const medicineIdArray=JSON.parse(req.body.medicine_id_array)
+    const medicineArray=JSON.stringify(JSON.parse(req.body.medicine_array))
 
-    for(let i=0;i<medicineIdArray.length;i++){
-        dao.retrieveOneMedicine(new Medicine(medicineIdArray[i])).then(result=>{
-            bool=true;
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                bool=false
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
-        })
-    }
-
-    dao.bindSymptomMedicineToDisease(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id), new Anatomy(req.body.anatomy_id),medicineIdArray).then(result=>{
+    dao.bindSymptomMedicineToDisease(new Symptoms(req.body.symptom_id), new Disease(req.body.disease_id), new AnimalType(req.body.animal_id), new Anatomy(req.body.anatomy_id),medicineArray).then(result=>{
         res.status(200).send({
             success: true,
             result: result

@@ -920,16 +920,15 @@ export class Dao{
 		return new Promise((resolve, reject)=>{
 			if (symptom instanceof Symptoms &&
 				disease instanceof Disease &&
-				animal instanceof AnimalType &&
-				anatomy instanceof Anatomy ){
-				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ? AND anatomy_id = ? "
-				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id, anatomy.id], (err, res)=>{
+				animal instanceof AnimalType){
+				const checkQuery = "SELECT id FROM disease_symptoms_animal WHERE disease_id = ? AND animal_id = ? AND symptoms_id = ? "
+				this.mysqlConn.query(checkQuery, [disease.id, animal.id, symptom.id], (err, res)=>{
 					if (res.length > 1){
 						reject(ERROR_DUPLICATE_ENTRY)
 						return
 					}
 
-					const query = anatomy.id === "" ? "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`, `medicine_id`) VALUES (?, ?, ?, ?, ?)" : "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`,`medicine_id`) VALUES (?, ?, ?, ?, ?)";
+					const query = anatomy.id === "" ? "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`, `medicine_array`) VALUES (?, ?, ?, ?, ?)" : "INSERT INTO `disease_symptoms_animal`(`disease_id`, `animal_id`, `symptoms_id`, `anatomy_id`,`medicine_array`) VALUES (?, ?, ?, ?, ?)";
 					this.mysqlConn.query(query, [disease.id, animal.id, symptom.id, anatomy.id, medicine], (err, res)=>{
 						if (err){
 							reject(err)
