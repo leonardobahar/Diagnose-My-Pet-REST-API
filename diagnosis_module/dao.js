@@ -944,6 +944,26 @@ export class Dao{
 		})
 	}
 
+	bindDiseaseAnimalMedicine(disease,animal,medicine_array){
+		return new Promise((resolve,reject)=>{
+			if(disease instanceof Disease &&
+			   animal instanceof AnimalType){
+				const query="INSERT INTO `disease_animal_medicine`(`disease_id`,`animal_id`,`medicine_array`) VALUES(? ,? , ?)";
+				this.mysqlConn.query(query,[disease.id,animal.id,medicine_array],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(result.insertId,disease.id,animal.id,medicine_array)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+
 	diagnoseSymptoms(symptoms){
 		return new Promise((resolve, reject) => {
 			const query = "SELECT dsa.id, dsa.disease_id, d.disease_name, " +
