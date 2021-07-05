@@ -52,6 +52,25 @@ CREATE TABLE IF NOT EXISTS `disease_symptoms_animal`(
 	FOREIGN KEY (anatomy_id) REFERENCES anatomy(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS `disease_animal_medicine`(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    disease_id INT(11),
+    animal_id INT(11),
+    medicine_array LONGTEXT,
+    FOREIGN KEY (disease_id) REFERENCES disease(id),
+    FOREIGN KEY (animal_id) REFERENCES animal_type(id)
+);
+
+CREATE TABLE IF NOT EXISTS `disease_symptoms`(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    disease_animal_medicine_id INT(11),
+    symptom_id INT(11),
+    anatomy_id INT(11),
+    FOREIGN KEY (disease_animal_medicine_id) REFERENCES disease_animal_medicine(id),
+    FOREIGN KEY (symptom_id) REFERENCES symptoms(id),
+    FOREIGN KEY (anatomy_id) REFERENCES anatomy(id)
+);
+
 CREATE TABLE IF NOT EXISTS `users`(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
 	user_name VARCHAR(255) NOT NULL,
