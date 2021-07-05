@@ -963,6 +963,20 @@ export class Dao{
 		})
 	}
 
+	bindDiseaseAnimalMedicineWithSymptoms(disease_animal_medicine,symptom,anatomy){
+		return new Promise((resolve,reject)=>{
+			const query="INSERT INTO `disease_symptoms`(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?, ?, ?)";
+			this.mysqlConn.query(query,[disease_animal_medicine,symptom,anatomy],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
 
 	diagnoseSymptoms(symptoms){
 		return new Promise((resolve, reject) => {
