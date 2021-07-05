@@ -955,7 +955,7 @@ export class Dao{
 						return
 					}
 
-					resolve(result.insertId,disease.id,animal.id,medicine_array)
+					resolve(result.insertId)
 				})
 			}else{
 				reject(MISMATCH_OBJ_TYPE)
