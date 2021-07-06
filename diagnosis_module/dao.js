@@ -948,25 +948,6 @@ export class Dao{
 		})
 	}
 
-	bindDiseaseAnimalMedicine(disease,animal,medicine_array){
-		return new Promise((resolve,reject)=>{
-			if(disease instanceof Disease &&
-			   animal instanceof AnimalType){
-				const query="INSERT INTO `disease_animal_medicine`(`disease_id`,`animal_id`,`medicine_array`) VALUES(? ,? , ?)";
-				this.mysqlConn.query(query,[disease.id,animal.id,medicine_array],(error,result)=>{
-					if(error){
-						reject(error)
-						return
-					}
-
-					resolve(result.insertId)
-				})
-			}else{
-				reject(MISMATCH_OBJ_TYPE)
-			}
-		})
-	}
-
 	retrieveDiseaseWithAnimalDiseaseAnatomyMedicine(disease){
 		return new Promise((resolve,reject)=>{
 			if(disease instanceof Disease){
@@ -1003,10 +984,43 @@ export class Dao{
 		})
 	}
 
+	bindDiseaseAnimalMedicine(disease,animal,medicine_array){
+		return new Promise((resolve,reject)=>{
+			if(disease instanceof Disease &&
+				animal instanceof AnimalType){
+				const query="INSERT INTO `disease_animal_medicine`(`disease_id`,`animal_id`,`medicine_array`) VALUES(? ,? , ?)";
+				this.mysqlConn.query(query,[disease.id,animal.id,medicine_array],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(result.insertId)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
 	bindDiseaseAnimalMedicineWithSymptomsAnatomy(disease_animal_medicine,symptom,anatomy){
 		return new Promise((resolve,reject)=>{
 			const query="INSERT INTO `disease_symptoms`(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?, ?, ?)";
 			this.mysqlConn.query(query,[disease_animal_medicine,symptom,anatomy],(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				resolve(SUCCESS)
+			})
+		})
+	}
+
+	updateMedicineArray(disease,medicine){
+		return new Promise((resolve,reject)=>{
+			const updateQuery="UPDATE disease_animal_medicine SET medicine_array=? WHERE disease_id=? "
+			this.mysqlConn.query(updateQuery,[medicine,disease],(error,result)=>{
 				if(error){
 					reject(error)
 					return
