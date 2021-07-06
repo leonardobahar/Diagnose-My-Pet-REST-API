@@ -708,17 +708,21 @@ export class Dao{
 
 	retrieveOneAnatomy(anatomy){
 		return new Promise((resolve,reject)=>{
-			const query = "SELECT a.id, a.part_name, a.parent, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ? ORDER BY a.animal_type_id "
-			this.mysqlConn.query(query, anatomy.id, (error,result)=>{
-				if(error){
-					reject(error)
-					return
-				}else if(result.length>0){
-					resolve(result)
-				}else{
-					reject(NO_SUCH_CONTENT)
-				}
-			})
+			if(anatomy instanceof Anatomy){
+				const query = "SELECT a.id, a.part_name, a.parent, a.animal_type_id, t.animal_name FROM anatomy a LEFT OUTER JOIN animal_type t ON a.animal_type_id = t.id WHERE a.id = ? ORDER BY a.animal_type_id "
+				this.mysqlConn.query(query, [anatomy.id], (error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}else if(result.length>0){
+						resolve(result)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
 		})
 	}
 
@@ -956,6 +960,42 @@ export class Dao{
 					}
 
 					resolve(result.insertId)
+				})
+			}else{
+				reject(MISMATCH_OBJ_TYPE)
+			}
+		})
+	}
+
+	retrieveDiseaseWithAnimalDiseaseAnatomyMedicine(disease){
+		return new Promise((resolve,reject)=>{
+			if(disease instanceof Disease){
+				const query="SELECT dam.disease_id, d.disease_name, dam.animal_id, a.animal_name, ds.symptom_id, s.symptom_name, ds.anatomy_id, n.part_name, dam.medicine_array " +
+					"FROM disease_animal_medicine dam LEFT OUTER JOIN disease_symptoms ds ON ds.disease_animal_medicine_id=dam.id " +
+					"LEFT OUTER JOIN disease d ON d.id=dam.disease_id LEFT OUTER JOIN animal_type a ON a.id=dam.animal_id " +
+					"LEFT OUTER JOIN symptoms s ON s.id=ds.symptom_id LEFT OUTER JOIN anatomy n ON n.id=ds.anatomy_id " +
+					"WHERE dam.disease_id=? "
+				this.mysqlConn.query(query,disease.id,(error,result)=>{
+					if(error){
+						reject(error)
+					}else if(result.length>0){
+						const retrievedData=result.map(rowDataPacket=>{
+							return{
+								disease_id:rowDataPacket.disease_id,
+								disease_name:rowDataPacket.disease_name,
+								animal_type_id:rowDataPacket.animal_id,
+								animal_name:rowDataPacket.animal_name,
+								symptom_id:rowDataPacket.symptom_id,
+								symptom_name:rowDataPacket.symptom_name,
+								anatomy_id:rowDataPacket.anatomy_id,
+								part_name:rowDataPacket.part_name,
+								medicine_array:rowDataPacket.medicine_array
+							}
+						})
+						resolve(retrievedData)
+					}else{
+						reject(NO_SUCH_CONTENT)
+					}
 				})
 			}else{
 				reject(MISMATCH_OBJ_TYPE)

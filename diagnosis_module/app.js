@@ -417,23 +417,43 @@ app.get("/api/diagnosis/retrieve-disease", (req, res)=>{
             })
         })
     } else{
-        dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
+        // dao.retrieveSymptomsForDisease(new Disease(req.query.disease_id)).then(result=>{
+        //     res.status(200).send({
+        //         success: true,
+        //         result: result
+        //     })
+        // }).catch(err=>{
+        //     if(err===NO_SUCH_CONTENT){
+        //         res.status(204).send({
+        //             success:false,
+        //             error:NO_SUCH_CONTENT
+        //         })
+        //         return
+        //     }
+        //     console.error(err)
+        //     res.status(500).send({
+        //         success: false,
+        //         error: SOMETHING_WENT_WRONG
+        //     })
+        // })
+
+        dao.retrieveDiseaseWithAnimalDiseaseAnatomyMedicine(new Disease(req.query.disease_id)).then(result=>{
             res.status(200).send({
-                success: true,
-                result: result
+                success:true,
+                result:result
             })
-        }).catch(err=>{
-            if(err===NO_SUCH_CONTENT){
+        }).catch(error=>{
+            if(error===NO_SUCH_CONTENT){
                 res.status(204).send({
                     success:false,
                     error:NO_SUCH_CONTENT
                 })
                 return
             }
-            console.error(err)
+            console.error(error)
             res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
+                success:false,
+                error:SOMETHING_WENT_WRONG
             })
         })
     }
@@ -1320,7 +1340,6 @@ app.get("/api/diagnosis/retrieve-symptoms-of-disease", (req, res)=>{
     })
 })
 
-//CODE STILL IN PROGRESS
 app.post("/api/diagnosis/bind-disease-animal-medicine-symptoms-anatomy",(req,res)=>{
     if(typeof req.body.disease_id==='undefined' ||
        typeof req.body.animal_id==='undefined' ||
@@ -1336,27 +1355,25 @@ app.post("/api/diagnosis/bind-disease-animal-medicine-symptoms-anatomy",(req,res
     let medicineArray=JSON.stringify(JSON.parse(req.body.medicine_array));
     let symptomAnatomyArray=JSON.parse(req.body.symptom_anatomy_array);
     dao.bindDiseaseAnimalMedicine(new Disease(req.body.disease_id),new AnimalType(req.body.animal_id),medicineArray).then(bindResult=>{
-        for(let i=0;i<symptomAnatomyArray.length;i++){
-            dao.bindDiseaseAnimalMedicineWithSymptomsAnatomy(bindResult,symptomAnatomyArray[i].symptom_id,symptomAnatomyArray[i].anatomy_id).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(error=>{
-                if(error.code==="ER_NO_REFERENCED_ROW_2"){
-                    res.status(204).send({
-                        success:false,
-                        error:ERROR_FOREIGN_KEY
-                    })
-                    return
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
+        dao.bindDiseaseAnimalMedicineWithSymptomsAnatomy(bindResult,symptomAnatomyArray[i].symptom_id,symptomAnatomyArray[i].anatomy_id).then(result=>{
+            res.status(200).send({
+                success:true,
+                result:result
             })
-        }
+        }).catch(error=>{
+            if(error.code==="ER_NO_REFERENCED_ROW_2"){
+                res.status(204).send({
+                    success:false,
+                    error:ERROR_FOREIGN_KEY
+                })
+                return
+            }
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }).catch(error=>{
         if(error.code==="ER_NO_REFERENCED_ROW_2"){
             res.status(204).send({
