@@ -1017,10 +1017,10 @@ export class Dao{
 		})
 	}
 
-	updateMedicineArray(disease,medicine){
+	updateMedicineArray(diseaseAnimalMedicine,medicine){
 		return new Promise((resolve,reject)=>{
-			const query="UPDATE disease_animal_medicine SET medicine_array=? WHERE disease_id=? "
-			this.mysqlConn.query(query,[medicine,disease],(error,result)=>{
+			const query="UPDATE disease_animal_medicine SET medicine_array=? WHERE id=? "
+			this.mysqlConn.query(query,[medicine,diseaseAnimalMedicine],(error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -1031,7 +1031,7 @@ export class Dao{
 		})
 	}
 
-	updateAnatomyIdSymptomId(diseaseAnimalMedicine,anatomy,symptom){
+	updateAnatomyIdSymptomId(diseaseAnimalMedicine,symptom,anatomy){
 		return new Promise((resolve,reject)=>{
 			const deleteQuery="DELETE FROM disease_symptoms WHERE disease_animal_medicine_id=? "
 			this.mysqlConn.query(deleteQuery,diseaseAnimalMedicine,(error,result)=>{
@@ -1041,7 +1041,7 @@ export class Dao{
 				}
 
 				const updateQuery="INSERT INTO disease_symptoms(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?,?,?) "
-				this.mysqlConn.query(updateQuery,[diseaseAnimalMedicine,anatomy,symptom],(error,result)=>{
+				this.mysqlConn.query(updateQuery,[diseaseAnimalMedicine,symptom,anatomy],(error,result)=>{
 					if(error){
 						reject(error)
 						return
