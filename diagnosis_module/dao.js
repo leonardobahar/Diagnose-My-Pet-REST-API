@@ -1019,14 +1019,36 @@ export class Dao{
 
 	updateMedicineArray(disease,medicine){
 		return new Promise((resolve,reject)=>{
-			const updateQuery="UPDATE disease_animal_medicine SET medicine_array=? WHERE disease_id=? "
-			this.mysqlConn.query(updateQuery,[medicine,disease],(error,result)=>{
+			const query="UPDATE disease_animal_medicine SET medicine_array=? WHERE disease_id=? "
+			this.mysqlConn.query(query,[medicine,disease],(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
 				resolve(SUCCESS)
+			})
+		})
+	}
+
+	updateAnatomyIdSymptomId(diseaseAnimalMedicine,anatomy,symptom){
+		return new Promise((resolve,reject)=>{
+			const deleteQuery="DELETE FROM disease_symptoms WHERE disease_animal_medicine_id=? "
+			this.mysqlConn.query(deleteQuery,diseaseAnimalMedicine,(error,result)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const updateQuery="INSERT INTO disease_symptoms(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?,?,?) "
+				this.mysqlConn.query(updateQuery,[diseaseAnimalMedicine,anatomy,symptom],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(SUCCESS)
+				})
 			})
 		})
 	}
