@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS `disease_animal_medicine`(
     disease_id INT(11),
     animal_id INT(11),
     medicine_array LONGTEXT,
-    FOREIGN KEY (disease_id) REFERENCES disease(id),
-    FOREIGN KEY (animal_id) REFERENCES animal_type(id)
+    FOREIGN KEY (disease_id) REFERENCES disease(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (animal_id) REFERENCES animal_type(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `disease_symptoms`(
@@ -66,9 +66,9 @@ CREATE TABLE IF NOT EXISTS `disease_symptoms`(
     disease_animal_medicine_id INT(11),
     symptom_id INT(11),
     anatomy_id INT(11),
-    FOREIGN KEY (disease_animal_medicine_id) REFERENCES disease_animal_medicine(id),
-    FOREIGN KEY (symptom_id) REFERENCES symptoms(id),
-    FOREIGN KEY (anatomy_id) REFERENCES anatomy(id)
+    FOREIGN KEY (disease_animal_medicine_id) REFERENCES disease_animal_medicine(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (symptom_id) REFERENCES symptoms(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (anatomy_id) REFERENCES anatomy(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `users`(
@@ -260,6 +260,6 @@ CREATE TABLE IF NOT EXISTS `visit_reminder`(
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    	target_send_date DATE,
    	patient_id int,
-   	FOREIGN KEY (booking_type_name) REFERENCES v2_booking_type(booking_type_name),
-   	FOREIGN KEY (patient_id) REFERENCES patients(id)
+   	FOREIGN KEY (booking_type_name) REFERENCES v2_booking_type(booking_type_name) ON DELETE CASCADE ON UPDATE CASCADE,
+   	FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
