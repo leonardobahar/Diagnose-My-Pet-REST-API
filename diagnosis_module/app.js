@@ -1356,7 +1356,8 @@ app.post("/api/diagnosis/bind-disease-animal-medicine-symptoms-anatomy",(req,res
     let symptomAnatomyArray=JSON.parse(req.body.symptom_anatomy_array);
     dao.bindDiseaseAnimalMedicine(new Disease(req.body.disease_id),new AnimalType(req.body.animal_id),medicineArray).then(async bindResult=>{
         for(let i=0;i<symptomAnatomyArray.length;i++){
-            console.log(symptomAnatomyArray[i])
+            symptomAnatomyArray[i].symptom_id = symptomAnatomyArray[i].symptom_id === '' ? null : symptomAnatomyArray[i].symptom_id
+            symptomAnatomyArray[i].anatomy_id = symptomAnatomyArray[i].anatomy_id === '' ? null : symptomAnatomyArray[i].anatomy_id
             await dao.bindDiseaseAnimalMedicineWithSymptomsAnatomy(bindResult,symptomAnatomyArray[i].symptom_id,symptomAnatomyArray[i].anatomy_id).catch(error=>{
                 if(error.code==="ER_NO_REFERENCED_ROW_2"){
                     res.status(204).send({
