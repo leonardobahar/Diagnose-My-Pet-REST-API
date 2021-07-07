@@ -1375,8 +1375,7 @@ app.post("/api/diagnosis/bind-disease-animal-medicine-symptoms-anatomy",(req,res
             })
         }
         res.status(200).send({
-            success:true,
-            result:result
+            success:true
         })
     }).catch(error=>{
         if(error.code==="ER_NO_REFERENCED_ROW_2"){
