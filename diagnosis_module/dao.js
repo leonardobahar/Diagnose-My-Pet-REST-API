@@ -1017,10 +1017,32 @@ export class Dao{
 		})
 	}
 
-	updateMedicineArray(diseaseAnimalMedicine,medicine){
+	updateMedicineArray(disease,animal,medicine){
 		return new Promise((resolve,reject)=>{
-			const query="UPDATE disease_animal_medicine SET medicine_array=? WHERE id=? "
-			this.mysqlConn.query(query,[medicine,diseaseAnimalMedicine],(error,result)=>{
+			const query="UPDATE disease_animal_medicine SET medicine_array=? WHERE disease_id=? AND animal_id=? "
+			this.mysqlConn.query(query,[medicine,disease,animal],(error,updateResult)=>{
+				if(error){
+					reject(error)
+					return
+				}
+
+				const finalQuery="SELECT id FROM disease_animal_medicine WHERE disease_id=? AND animal_id=? AND medicine_array=? "
+				this.mysqlConn.query(finalQuery,[disease,animal,medicine],(error,result)=>{
+					if(error){
+						reject(error)
+						return
+					}
+
+					resolve(result[0].id)
+				})
+			})
+		})
+	}
+
+	updateAnatomyIdSymptomId(diseaseAnimalMedicine,symptom,anatomy){
+		return new Promise((resolve,reject)=>{
+			const updateQuery="INSERT INTO disease_symptoms(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?,?,?) "
+			this.mysqlConn.query(updateQuery,[diseaseAnimalMedicine,symptom,anatomy],(error,result)=>{
 				if(error){
 					reject(error)
 					return
@@ -1031,24 +1053,16 @@ export class Dao{
 		})
 	}
 
-	updateAnatomyIdSymptomId(diseaseAnimalMedicine,symptom,anatomy){
+	deleteAnatomyIdSymptomId(diseaseAnimalMedicine){
 		return new Promise((resolve,reject)=>{
 			const deleteQuery="DELETE FROM disease_symptoms WHERE disease_animal_medicine_id=? "
-			this.mysqlConn.query(deleteQuery,diseaseAnimalMedicine,(error,result)=>{
+			this.mysqlConn.query(deleteQuery,[diseaseAnimalMedicine],(error,result)=>{
 				if(error){
 					reject(error)
 					return
 				}
 
-				const updateQuery="INSERT INTO disease_symptoms(`disease_animal_medicine_id`,`symptom_id`,`anatomy_id`) VALUES(?,?,?) "
-				this.mysqlConn.query(updateQuery,[diseaseAnimalMedicine,symptom,anatomy],(error,result)=>{
-					if(error){
-						reject(error)
-						return
-					}
-
-					resolve(SUCCESS)
-				})
+				resolve(SUCCESS)
 			})
 		})
 	}

@@ -1394,7 +1394,8 @@ app.post("/api/diagnosis/bind-disease-animal-medicine-symptoms-anatomy",(req,res
 })
 
 app.post("/api/diagnosis/update-disease-animal-medicine-symptoms-anatomy",(req,res)=>{
-    if(typeof req.body.disease_animal_medicine_id==='undefined' ||
+    if(typeof req.body.disease_id==='undefined' ||
+        typeof req.body.animal_id==='undefined' ||
         typeof req.body.medicine_array==='undefined' ||
         typeof req.body.symptom_anatomy_array==='undefined'){
         res.status(400).send({
@@ -1407,28 +1408,38 @@ app.post("/api/diagnosis/update-disease-animal-medicine-symptoms-anatomy",(req,r
     const medicineArray=JSON.stringify(JSON.parse(req.body.medicine_array))
     const symptomAnatomyArray=JSON.parse(req.body.symptom_anatomy_array)
 
-    dao.updateMedicineArray(req.body.disease_animal_medicine_id,medicineArray).then(updateResult=>{
-        for(let i=0;i<symptomAnatomyArray.length;i++){
-            dao.updateAnatomyIdSymptomId(req.body.disease_animal_medicine_id,symptomAnatomyArray[i].symptom_id,symptomAnatomyArray[i].anatomy_id).then(result=>{
-                res.status(200).send({
-                    success:true,
-                    result:result
-                })
-            }).catch(error=>{
-                if(error.code==="ER_NO_REFERENCED_ROW_2"){
-                    res.status(204).send({
+    dao.updateMedicineArray(req.body.disease_id,req.body.animal_id,medicineArray).then(updateResult=>{
+        dao.deleteAnatomyIdSymptomId(updateResult).then(async deleteResult=>{
+            for(let i=0;i<symptomAnatomyArray.length;i++){
+                symptomAnatomyArray[i].symptom_id = symptomAnatomyArray[i].symptom_id === '' ? null : symptomAnatomyArray[i].symptom_id
+                symptomAnatomyArray[i].anatomy_id = symptomAnatomyArray[i].anatomy_id === '' ? null : symptomAnatomyArray[i].anatomy_id
+
+                await dao.updateAnatomyIdSymptomId(updateResult,symptomAnatomyArray[i].symptom_id,symptomAnatomyArray[i].anatomy_id).catch(error=>{
+                    if(error.code==="ER_NO_REFERENCED_ROW_2"){
+                        res.status(204).send({
+                            success:false,
+                            error:ERROR_FOREIGN_KEY
+                        })
+                        return
+                    }
+                    console.error(error)
+                    res.status(500).send({
                         success:false,
-                        error:ERROR_FOREIGN_KEY
+                        error:SOMETHING_WENT_WRONG
                     })
                     return
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
                 })
+            }
+            res.status(200).send({
+                success:true
             })
-        }
+        }).catch(error=>{
+            console.error(error)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        })
     }).catch(error=>{
         console.error(error)
         res.status(500).send({
