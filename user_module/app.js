@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import multer from "multer";
+import compressImages from 'compress-images';
 import nodecron from 'node-cron';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
@@ -63,8 +64,13 @@ const UPLOADPATH = process.env.UPLOAD_PATH
 const dao = new Dao(host, user, password, dbname)
 
 const storage=multer.diskStorage({
-    destination: './Uploads/',
+    destination: function(req, file,cb){
+        cb(null,'./Uploads/'+'Uncompressed');
+    },
     filename: function (req,file,cb){
+        const originalFileName=file.originalname
+        let fileExtension=originalFileName.split(".")
+        fileExtension=fileExtension[fileExtension.length-1]
         cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
 })
@@ -77,6 +83,8 @@ const medicalRecordFilter = (req, file, cb)=>{
     }
     cb(null, true);
 }
+
+const upload=multer({storage:storage, fileFilter: medicalRecordFilter})
 
 const authenticateToken = (req, res, next)=>{
     // Gather the jwt access token from the request header
@@ -925,85 +933,90 @@ app.get("/api/user/retrieve-patient-picture",(req,res)=>{
     })
 })
 
-app.post("/api/user/add-patient",async (req,res)=>{
-    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('patient_attachment')
+app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,res)=>{
 
-    upload(req,res, async(error)=>{
-        if (typeof req.body.patient_name === 'undefined' ||
-            typeof req.body.animal_type === 'undefined' ||
-            typeof req.body.age==='undefined' ||
-            typeof req.body.gender==='undefined' ||
-            typeof req.body.pet_owner === 'undefined'){
-            res.status(400).send({
-                success: false,
-                error: WRONG_BODY_FORMAT
+    if (typeof req.body.patient_name === 'undefined' ||
+        typeof req.body.animal_type === 'undefined' ||
+        typeof req.body.age==='undefined' ||
+        typeof req.body.gender==='undefined' ||
+        typeof req.body.pet_owner === 'undefined'){
+        res.status(400).send({
+            success: false,
+            error: WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    if (!req.body.age.toString().includes(".")){
+        req.body.age = `${req.body.age}.0`
+    }
+    const splittedAge = (req.body.age.toString()).split(".") // Array 0 -> year Array 1 -> month
+
+    let birthDate=new Date()
+    birthDate.setFullYear(birthDate.getFullYear()-splittedAge[0])
+    birthDate.setMonth(birthDate.getMonth()-splittedAge[1])
+
+    let patient;
+    if(typeof req.file==='undefined'){
+        patient = new Patient(
+            null,req.body.patient_name.toUpperCase(),
+            req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
+            birthDate,req.body.pet_owner,'No Attachment')
+    }else{
+        const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
+        compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+            false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+            {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+            {svg:{engine:"svgo",command:"--multipass"}},
+            {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+            function(error,completed){
+                    if(completed===true){
+                        fs.unlinkSync(imageInputAbsPath)
+                    }
+                }
+            )
+
+        patient = new Patient(
+            null,req.body.patient_name.toUpperCase(),
+            req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
+            birthDate,req.body.pet_owner,req.file.filename)
+
+    }
+
+    // Check if user id exists
+    dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
+        dao.registerPatient(patient).then(result=>{
+            res.status(200).send({
+                success: true,
+                result: result
+            })
+        }).catch(err=>{
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(500).send({
+                    success: false,
+                    error: 'DUPLICATE-ENTRY'
+                })
+                res.end()
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
+                })
+            }
+        })
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
+                success:false,
+                error:NO_SUCH_CONTENT
             })
             return
         }
-
-        if (!req.body.age.toString().includes(".")){
-            req.body.age = `${req.body.age}.0`
-        }
-        const splittedAge = (req.body.age.toString()).split(".") // Array 0 -> year Array 1 -> month
-
-        let birthDate=new Date()
-        birthDate.setFullYear(birthDate.getFullYear()-splittedAge[0])
-        birthDate.setMonth(birthDate.getMonth()-splittedAge[1])
-
-        let patient;
-        if(typeof req.file==='undefined'){
-            patient = new Patient(
-                null,req.body.patient_name.toUpperCase(),
-                req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-                birthDate,req.body.pet_owner,'No Attachment')
-        }else{
-            if(error instanceof multer.MulterError || error){
-                res.send(error)
-                return
-            }
-
-            patient = new Patient(
-                null,req.body.patient_name.toUpperCase(),
-                req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-                birthDate,req.body.pet_owner,req.file.filename)
-
-        }
-
-        // Check if user id exists
-        dao.retrieveUserId(new User(req.body.pet_owner)).then(result=>{
-            dao.registerPatient(patient).then(result=>{
-                res.status(200).send({
-                    success: true,
-                    result: result
-                })
-            }).catch(err=>{
-                if (err.code === 'ER_DUP_ENTRY') {
-                    res.status(500).send({
-                        success: false,
-                        error: 'DUPLICATE-ENTRY'
-                    })
-                    res.end()
-                }else{
-                    console.error(err)
-                    res.status(500).send({
-                        success: false,
-                        error: SOMETHING_WENT_WRONG
-                    })
-                }
-            })
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
