@@ -1365,10 +1365,6 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
             })
         })
     }else{
-        if(error instanceof multer.MulterError || error){
-            return res.send(error)
-        }
-
         const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
         compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
             false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
