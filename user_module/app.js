@@ -1617,51 +1617,39 @@ app.get("/api/user/retrieve-medical-attachment", (req,res)=>{
     }
 })
 
-app.post("/api/user/attach-medical-records", async(req,res)=>{
-    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
+app.post("/api/user/attach-medical-records",upload.single("mc_attachment"), async(req,res)=>{
 
-    upload(req,res, async(err)=>{
-
-        if(typeof req.query.medical_record_id === 'undefined' ||
-            typeof req.file.filename === 'undefined'){
-            res.status(400).send({
-                success:false,
-                error:WRONG_BODY_FORMAT
-            })
-            return
-        }
-
-        if(err instanceof multer.MulterError){
-            return res.send(err)
-        }
-
-        else if(err){
-            return res.send(err)
-        }
-
-        console.log(req.file.filename)
-
-        const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
-        dao.addMedicalRecordAttachment(attachment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            if (err.code === 'ER_DUP_ENTRY') {
-                res.status(500).send({
-                    success: false,
-                    error: 'DUPLICATE-ENTRY'
-                })
-                res.end()
-            }else{
-                console.error(err)
-                res.status(500).send({
-                    success: false,
-                    error: SOMETHING_WENT_WRONG
-                })
-            }
+    if(typeof req.query.medical_record_id === 'undefined' ||
+        typeof req.file.filename === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
         })
+        return
+    }
+
+    console.log(req.file.filename)
+
+    const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
+    dao.addMedicalRecordAttachment(attachment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if (err.code === 'ER_DUP_ENTRY') {
+            res.status(500).send({
+                success: false,
+                error: 'DUPLICATE-ENTRY'
+            })
+            res.end()
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success: false,
+                error: SOMETHING_WENT_WRONG
+            })
+        }
     })
 })
 
