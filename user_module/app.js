@@ -1426,10 +1426,6 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
             if(typeof req.file==='undefined'){
                 medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
             }else{
-                if(error instanceof multer.MulterError || error){
-                    return res.send(error)
-                }
-
                 medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
             }
 
