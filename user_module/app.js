@@ -1409,97 +1409,104 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
     }
 })
 
-app.post("/api/user/update-medical-record",(req,res)=>{
-    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('mc_attachment')
+app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,res)=>{
 
-    upload(req,res,async(error)=>{
-        if( typeof req.body.id === 'undefined' ||
-            typeof req.body.appointment_id === 'undefined'){
-            res.status(400).send({
+    if( typeof req.body.id === 'undefined' ||
+        typeof req.body.appointment_id === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
+
+    dao.retrieveOneMedicalRecord(new MedicalRecords(req.body.id)).then(medResult=>{
+        if(medResult[0].file_attachment===null || medResult[0].file_attachment==='No Attachment'){
+            let medic;
+            if(typeof req.file==='undefined'){
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
+            }else{
+                if(error instanceof multer.MulterError || error){
+                    return res.send(error)
+                }
+
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+            }
+
+            dao.updateMedicalRecord(medic).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                if(err.code==='ER_DUP_ENTRY'){
+                    res.status(500).send({
+                        success:false,
+                        error:ERROR_DUPLICATE_ENTRY
+                    })
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                }
+            })
+        }else{
+            let medic;
+            if(typeof req.file==='undefined'){
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
+            }else{
+
+                const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
+                compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+                    false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+                    {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+                    {svg:{engine:"svgo",command:"--multipass"}},
+                    {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+                    function(error,completed){
+                        if(completed===true){
+                            fs.unlinkSync(imageInputAbsPath)
+                        }
+                    }
+                )
+
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+                fs.unlinkSync('./Uploads/'+medResult[0].file_attachment)
+            }
+
+            dao.updateMedicalRecord(medic).then(result=>{
+                res.status(200).send({
+                    success:true,
+                    result:result
+                })
+            }).catch(err=>{
+                if(err.code==='ER_DUP_ENTRY'){
+                    res.status(500).send({
+                        success:false,
+                        error:ERROR_DUPLICATE_ENTRY
+                    })
+                }else{
+                    console.error(err)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
+                }
+            })
+        }
+    }).catch(error=>{
+        if(error===NO_SUCH_CONTENT){
+            res.status(204).send({
                 success:false,
-                error:WRONG_BODY_FORMAT
+                error:NO_SUCH_CONTENT
             })
             return
         }
-
-        dao.retrieveOneMedicalRecord(new MedicalRecords(req.body.id)).then(medResult=>{
-            if(medResult[0].file_attachment===null || medResult[0].file_attachment==='No Attachment'){
-                let medic;
-                if(typeof req.file==='undefined'){
-                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
-                }else{
-                    if(error instanceof multer.MulterError || error){
-                        return res.send(error)
-                    }
-
-                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
-                }
-
-                dao.updateMedicalRecord(medic).then(result=>{
-                    res.status(200).send({
-                        success:true,
-                        result:result
-                    })
-                }).catch(err=>{
-                    if(err.code==='ER_DUP_ENTRY'){
-                        res.status(500).send({
-                            success:false,
-                            error:ERROR_DUPLICATE_ENTRY
-                        })
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success:false,
-                            error:SOMETHING_WENT_WRONG
-                        })
-                    }
-                })
-            }else{
-                let medic;
-                if(typeof req.file==='undefined'){
-                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
-                }else{
-                    if(error instanceof multer.MulterError || error){
-                        return res.send(error)
-                    }
-
-                    medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
-                    fs.unlinkSync('./Uploads/'+medResult[0].file_attachment)
-                }
-
-                dao.updateMedicalRecord(medic).then(result=>{
-                    res.status(200).send({
-                        success:true,
-                        result:result
-                    })
-                }).catch(err=>{
-                    if(err.code==='ER_DUP_ENTRY'){
-                        res.status(500).send({
-                            success:false,
-                            error:ERROR_DUPLICATE_ENTRY
-                        })
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success:false,
-                            error:SOMETHING_WENT_WRONG
-                        })
-                    }
-                })
-            }
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
-                })
-                return
-            }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
+        console.error(error)
+        res.status(500).send({
+            success:false,
+            error:SOMETHING_WENT_WRONG
         })
     })
 })
@@ -2914,7 +2921,6 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
 })
 
 app.post("/api/user/update-appointment-slot",upload.single("payment_attachment"),(req,res)=>{
-    const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
     if(typeof req.body.appointment_id==='undefined' ||
         typeof req.body.patient_id==='undefined' ||
