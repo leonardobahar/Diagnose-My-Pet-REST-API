@@ -1628,7 +1628,18 @@ app.post("/api/user/attach-medical-records",upload.single("mc_attachment"), asyn
         return
     }
 
-    console.log(req.file.filename)
+    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        {svg:{engine:"svgo",command:"--multipass"}},
+        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        function(error,completed){
+            if(completed===true){
+                fs.unlinkSync(imageInputAbsPath)
+            }
+        }
+    )
 
     const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
     dao.addMedicalRecordAttachment(attachment).then(result=>{
@@ -2904,32 +2915,43 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
     })
 })
 
-app.post("/api/user/update-appointment-slot",(req,res)=>{
+app.post("/api/user/update-appointment-slot",upload.single("payment_attachment"),(req,res)=>{
     const upload=multer({storage:storage, fileFilter: medicalRecordFilter}).single('payment_attachment')
 
-    upload(req,res,async(error)=>{
-        if(typeof req.body.appointment_id==='undefined' ||
-            typeof req.body.patient_id==='undefined' ||
-            typeof req.body.description==='undefined' ||
-            typeof req.body.additional_storage==='undefined'){
-            res.status(400).send({
-                success:false,
-                error:WRONG_BODY_FORMAT
-            })
-            return
-        }
+    if(typeof req.body.appointment_id==='undefined' ||
+        typeof req.body.patient_id==='undefined' ||
+        typeof req.body.description==='undefined' ||
+        typeof req.body.additional_storage==='undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
+        })
+        return
+    }
 
-        dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
-            res.status(200).send({
-                success: true,
-                result: result
-            })
-        }).catch(error => {
-            console.error(error)
-            res.status(500).send({
-                success: false,
-                error: SOMETHING_WENT_WRONG
-            })
+    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        {svg:{engine:"svgo",command:"--multipass"}},
+        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        function(error,completed){
+            if(completed===true){
+                fs.unlinkSync(imageInputAbsPath)
+            }
+        }
+    )
+
+    dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
+        res.status(200).send({
+            success: true,
+            result: result
+        })
+    }).catch(error => {
+        console.error(error)
+        res.status(500).send({
+            success: false,
+            error: SOMETHING_WENT_WRONG
         })
     })
 })
