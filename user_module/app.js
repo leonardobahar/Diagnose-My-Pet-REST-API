@@ -1664,52 +1664,50 @@ app.post("/api/user/attach-medical-records",upload.single("mc_attachment"), asyn
     })
 })
 
-app.post("/api/user/update-medical-attachment",async(req,res)=>{
-    const upload=multer({storage:storage, fileFilter:medicalRecordFilter}).single('mc_attachment')
+app.post("/api/user/update-medical-attachment",upload.single('mc_attachment'),async(req,res)=>{
 
-    upload(req,res, async(err)=>{
-
-        console.log(req.query.medical_record_id)
-        console.log(req.file.filename)
-
-        if(typeof req.query.medical_record_id === 'undefined' ||
-            typeof req.file.filename === 'undefined'){
-            res.status(400).send({
-                success:false,
-                error:WRONG_BODY_FORMAT
-            })
-            return
-        }
-
-        if(err instanceof multer.MulterError){
-            return res.send(err)
-        } else if(err){
-            return res.send(err)
-        }
-
-        console.log(req.file.filename)
-
-        const attachment=new MedicalRecordAttachment(req.query.id,req.query.medical_record_id,req.file.filename)
-        dao.updateMedicalRecordAttachment(attachment).then(result=>{
-            res.status(200).send({
-                success:true,
-                result:result
-            })
-        }).catch(err=>{
-            if(err.code==='ER_DUP_ENTRY'){
-                res.status(500).send({
-                    success:false,
-                    error:ERROR_DUPLICATE_ENTRY
-                })
-                res.end()
-            }else{
-                console.error(err)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
-                })
-            }
+    if(typeof req.query.medical_record_id === 'undefined' ||
+        typeof req.file.filename === 'undefined'){
+        res.status(400).send({
+            success:false,
+            error:WRONG_BODY_FORMAT
         })
+        return
+    }
+
+    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        {svg:{engine:"svgo",command:"--multipass"}},
+        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        function(error,completed){
+            if(completed===true){
+                fs.unlinkSync(imageInputAbsPath)
+            }
+        }
+    )
+
+    const attachment=new MedicalRecordAttachment(req.query.id,req.query.medical_record_id,req.file.filename)
+    dao.updateMedicalRecordAttachment(attachment).then(result=>{
+        res.status(200).send({
+            success:true,
+            result:result
+        })
+    }).catch(err=>{
+        if(err.code==='ER_DUP_ENTRY'){
+            res.status(500).send({
+                success:false,
+                error:ERROR_DUPLICATE_ENTRY
+            })
+            res.end()
+        }else{
+            console.error(err)
+            res.status(500).send({
+                success:false,
+                error:SOMETHING_WENT_WRONG
+            })
+        }
     })
 })
 
