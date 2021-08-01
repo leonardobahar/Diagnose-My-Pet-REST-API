@@ -3065,7 +3065,7 @@ export class Dao{
 				if (res.length > 0){
 					reject("APPOINTMENT SLOT NOT AVAILABLE")
 				}else {
-					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `co_doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?)"
+					query = "INSERT INTO `v2_appointment_schedule`(`start_time`, `end_time`, `description`, `additional_storage`, `status`, `doctor_id`, `co_doctor_id`, `booking_type_name`) VALUES (?,?,?,?,?,?,?,?)"
 					this.mysqlConn.query(query, [start_time, end_time, description, additional_storage, status, doctor_id, co_doctor_id, booking_type_name], (err, res) => {
 						if (!err) {
 							resolve(res.insertId)
