@@ -2952,7 +2952,7 @@ export class Dao{
 				return
 			}
 			const query="SELECT a.id, a.start_time, a.end_time, a.proof_of_payment, a.description, a.additional_storage, a.status, a.doctor_id, d.doctor_name, a.co_doctor_id, cd.doctor_name AS co_doctor_name, a.patient_id, p.patient_name, p.birthdate, p.breed, p.pet_owner_id, u.user_name, u.mobile, a.booking_type_name, bt.duration " +
-				"FROM v2_appointment_schedule a INNER JOIN doctor d ON a.doctor_id=d.id INNER JOIN doctor cd ON a.co_doctor_id = cd.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
+				"FROM v2_appointment_schedule a LEFT OUTER JOIN doctor d ON a.doctor_id=d.id LEFT OUTER JOIN doctor cd ON a.co_doctor_id = cd.id LEFT OUTER JOIN patients p ON a.patient_id=p.id LEFT OUTER JOIN v2_booking_type bt ON bt.booking_type_name=a.booking_type_name " +
 				"LEFT OUTER JOIN users u ON u.id=p.pet_owner_id " +
 				"WHERE a.patient_id IS NOT NULL AND a.start_time >= ? AND a.end_time <= ? AND a.doctor_id=? "+
 				"ORDER BY a.start_time ASC "
