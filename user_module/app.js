@@ -2639,7 +2639,7 @@ app.post("/api/user/add-appointment-slot", (req, res)=>{
         return
     }
 
-    let coDoctorId = typeof req.body.co_doctor_id === 'undefined' ? null : req.body.co_doctor_id
+    let coDoctorId = typeof req.body.co_doctor === 'undefined' ? null : req.body.co_doctor
 
     dao.addAppointmentSlot(req.body.start_time, req.body.end_time, req.body.description, req.body.additional_storage, req.body.status.toUpperCase(), req.body.doctor_id, coDoctorId, req.body.booking_type_name.toUpperCase()).then(appointmentResult=>{
         res.status(200).send({
