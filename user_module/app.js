@@ -2676,144 +2676,77 @@ app.post("/api/user/use-appointment-slot",(req, res)=>{
                 })
                 return
             }
-            dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
-                if(bookingResult[0].payment_proof_required ===1){
-                    // if(typeof req.file==='undefined'){
-                    //     res.status(400).send({
-                    //         success:false,
-                    //         error:'Proof of payment is required for this booking type'
-                    //     })
-                    //     return
-                    // }
-                    if(error instanceof multer.MulterError){
-                        return res.send(error)
-                    } else if(error){
-                        return res.send(error)
-                    }
-                    let filename;
-                    if  (typeof req.file === 'undefined'){
-                        filename = null
-                    }else{
-                        filename = req.file.filename
-                    }
-                    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, filename, req.body.description, req.body.additional_question).then(result=>{
-                        if (result.affectedRows === 0){
-                            res.status(404).send({
-                                success: false,
-                                message: ERROR_FOREIGN_KEY
-                            })
-                        }else{
-                            dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
-                                res.status(200).send({
-                                    success: true
-                                })
-                            }).catch(error=>{
-                                console.error(error)
-                                res.status(500).send({
-                                    success:false,
-                                    error:SOMETHING_WENT_WRONG
-                                })
-                            })
-                        }
-                    }).catch(err=>{
-                        if (err.code==="ER_NO_REFERENCED_ROW_2"){
-                            res.status(404).send({
-                                success: false,
-                                message: ERROR_FOREIGN_KEY
-                            })
-                        }else{
-                            console.error(err)
-                            res.status(500).send({
-                                success: false,
-                                error: SOMETHING_WENT_WRONG
-                            })
-                        }
-                    })
-                }else{
-                    if(typeof req.file==='undefined'){
-                        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null, req.body.description, req.body.additional_question).then(result=>{
-                            if (result.affectedRows === 0){
-                                res.status(404).send({
-                                    success: false,
-                                    message: ERROR_FOREIGN_KEY
-                                })
-                            }else{
-                                dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
-                                    res.status(200).send({
-                                        success: true
-                                    })
-                                }).catch(error=>{
-                                    console.error(error)
-                                    res.status(500).send({
-                                        success:false,
-                                        error:SOMETHING_WENT_WRONG
-                                    })
-                                })
-                            }
-                        }).catch(err=>{
-                            if (err.code==="ER_NO_REFERENCED_ROW_2"){
-                                res.status(404).send({
-                                    success: false,
-                                    message: ERROR_FOREIGN_KEY
-                                })
-                            }else{
-                                console.error(err)
-                                res.status(500).send({
-                                    success: false,
-                                    error: SOMETHING_WENT_WRONG
-                                })
-                            }
-                        })
-                        return
-                    }
 
-                    dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result=>{
-                        if (result.affectedRows === 0){
-                            res.status(404).send({
-                                success: false,
-                                message: ERROR_FOREIGN_KEY
+            if(typeof req.file==='undefined'){
+                dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null, req.body.description, req.body.additional_question).then(result=>{
+                    if (result.affectedRows === 0){
+                        res.status(404).send({
+                            success: false,
+                            message: ERROR_FOREIGN_KEY
+                        })
+                    }else{
+                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
+                            res.status(200).send({
+                                success: true
                             })
-                        }else{
-                            dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
-                                res.status(200).send({
-                                    success: true
-                                })
-                            }).catch(error=>{
-                                console.error(error)
-                                res.status(500).send({
-                                    success:false,
-                                    error:SOMETHING_WENT_WRONG
-                                })
+                        }).catch(error=>{
+                            console.error(error)
+                            res.status(500).send({
+                                success:false,
+                                error:SOMETHING_WENT_WRONG
                             })
-                        }
-                    }).catch(err=>{
-                        if (err.code==="ER_NO_REFERENCED_ROW_2"){
-                            res.status(404).send({
-                                success: false,
-                                message: ERROR_FOREIGN_KEY
+                        })
+                    }
+                }).catch(err=>{
+                    if (err.code==="ER_NO_REFERENCED_ROW_2"){
+                        res.status(404).send({
+                            success: false,
+                            message: ERROR_FOREIGN_KEY
+                        })
+                    }else{
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    }
+                })
+            }else {
+                // File exist
+                dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result => {
+                    if (result.affectedRows === 0) {
+                        res.status(404).send({
+                            success: false,
+                            message: ERROR_FOREIGN_KEY
+                        })
+                    } else {
+                        dao.addAppointmentLog(req.body.patient_id, appointmentResult[0].booking_type_name, appointmentResult[0].start_time, req.body.notes).then(result => {
+                            res.status(200).send({
+                                success: true
                             })
-                        }else{
-                            console.error(err)
+                        }).catch(error => {
+                            console.error(error)
                             res.status(500).send({
                                 success: false,
                                 error: SOMETHING_WENT_WRONG
                             })
-                        }
-                    })
-                }
-            }).catch(error=>{
-                if(error===NO_SUCH_CONTENT){
-                    res.status(204).send({
-                        success:false,
-                        error:NO_SUCH_CONTENT
-                    })
-                }
-                console.error(error)
-                res.status(500).send({
-                    success:false,
-                    error:SOMETHING_WENT_WRONG
+                        })
+                    }
+                }).catch(err => {
+                    if (err.code === "ER_NO_REFERENCED_ROW_2") {
+                        res.status(404).send({
+                            success: false,
+                            message: ERROR_FOREIGN_KEY
+                        })
+                    } else {
+                        console.error(err)
+                        res.status(500).send({
+                            success: false,
+                            error: SOMETHING_WENT_WRONG
+                        })
+                    }
                 })
-            })
+            }
         }).catch(error=>{
             if(error===NO_SUCH_CONTENT){
                 res.status(204).send({
