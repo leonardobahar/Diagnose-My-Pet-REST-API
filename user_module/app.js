@@ -2823,7 +2823,7 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
 app.post("/api/user/update-appointment-slot",/*upload.single("payment_attachment"),*/(req,res)=>{
 
     if(typeof req.body.appointment_id==='undefined' ||
-        typeof req.body.patient_id==='undefined' ||
+        // typeof req.body.patient_id==='undefined' ||
         typeof req.body.description==='undefined' ||
         typeof req.body.additional_storage==='undefined'){
         res.status(400).send({
