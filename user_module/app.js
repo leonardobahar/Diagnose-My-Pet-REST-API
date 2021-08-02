@@ -2674,129 +2674,58 @@ app.post("/api/user/use-appointment-slot",upload.single('payment_attachment'),(r
             })
             return
         }
-        dao.retrieveBookingTypeByName(appointmentResult[0].booking_type_name).then(bookingResult=>{
-            if(bookingResult[0].payment_proof_required ===1){
-                if(typeof req.file==='undefined'){
-                    res.status(400).send({
-                        success:false,
-                        error:'Proof of payment is required for this booking type'
-                    })
-                    return
+
+        let filename;
+        if  (typeof req.file === 'undefined'){
+            filename = null
+        }else{
+            const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+            compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+                false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+                {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+                {svg:{engine:"svgo",command:"--multipass"}},
+                {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+                function(error,completed){
+                    if(completed===true){
+                        fs.unlinkSync(imageInputAbsPath)
+                    }
                 }
+            )
+            filename = req.file.filename
+        }
 
-                const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`;
-                compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-                    false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-                    {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-                    {svg:{engine:"svgo",command:"--multipass"}},
-                    {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-                    function(error,completed){
-                        if(completed===true){
-                            fs.unlinkSync(imageInputAbsPath)
-                        }
-                    }
-                )
-
-                dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, req.file.filename, req.body.description, req.body.additional_question).then(result=>{
-                    if (result.affectedRows === 0){
-                        res.status(404).send({
-                            success: false,
-                            message: ERROR_FOREIGN_KEY
-                        })
-                    }else{
-                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
-                            res.status(200).send({
-                                success: true
-                            })
-                        }).catch(error=>{
-                            console.error(error)
-                            res.status(500).send({
-                                success:false,
-                                error:SOMETHING_WENT_WRONG
-                            })
-                        })
-                    }
-                }).catch(err=>{
-                    if (err.code==="ER_NO_REFERENCED_ROW_2"){
-                        res.status(404).send({
-                            success: false,
-                            message: ERROR_FOREIGN_KEY
-                        })
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success: false,
-                            error: SOMETHING_WENT_WRONG
-                        })
-                    }
+        dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, filename, req.body.description, req.body.additional_question).then(result=>{
+            if (result.affectedRows === 0){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
                 })
             }else{
-
-                let filename;
-                if  (typeof req.file === 'undefined'){
-                    filename = null
-                }else{
-                    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-                    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-                        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-                        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-                        {svg:{engine:"svgo",command:"--multipass"}},
-                        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-                        function(error,completed){
-                            if(completed===true){
-                                fs.unlinkSync(imageInputAbsPath)
-                            }
-                        }
-                    )
-                    filename = req.file.filename
-                }
-
-                dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, filename, req.body.description, req.body.additional_question).then(result=>{
-                    if (result.affectedRows === 0){
-                        res.status(404).send({
-                            success: false,
-                            message: ERROR_FOREIGN_KEY
-                        })
-                    }else{
-                        dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
-                            res.status(200).send({
-                                success: true
-                            })
-                        }).catch(error=>{
-                            console.error(error)
-                            res.status(500).send({
-                                success:false,
-                                error:SOMETHING_WENT_WRONG
-                            })
-                        })
-                    }
-                }).catch(err=>{
-                    if (err.code==="ER_NO_REFERENCED_ROW_2"){
-                        res.status(404).send({
-                            success: false,
-                            message: ERROR_FOREIGN_KEY
-                        })
-                    }else{
-                        console.error(err)
-                        res.status(500).send({
-                            success: false,
-                            error: SOMETHING_WENT_WRONG
-                        })
-                    }
+                dao.addAppointmentLog(req.body.patient_id,appointmentResult[0].booking_type_name,appointmentResult[0].start_time,req.body.notes).then(result=>{
+                    res.status(200).send({
+                        success: true
+                    })
+                }).catch(error=>{
+                    console.error(error)
+                    res.status(500).send({
+                        success:false,
+                        error:SOMETHING_WENT_WRONG
+                    })
                 })
             }
-        }).catch(error=>{
-            if(error===NO_SUCH_CONTENT){
-                res.status(204).send({
-                    success:false,
-                    error:NO_SUCH_CONTENT
+        }).catch(err=>{
+            if (err.code==="ER_NO_REFERENCED_ROW_2"){
+                res.status(404).send({
+                    success: false,
+                    message: ERROR_FOREIGN_KEY
+                })
+            }else{
+                console.error(err)
+                res.status(500).send({
+                    success: false,
+                    error: SOMETHING_WENT_WRONG
                 })
             }
-            console.error(error)
-            res.status(500).send({
-                success:false,
-                error:SOMETHING_WENT_WRONG
-            })
         })
     }).catch(error=>{
         if(error===NO_SUCH_CONTENT){
