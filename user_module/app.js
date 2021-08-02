@@ -2677,7 +2677,7 @@ app.post("/api/user/use-appointment-slot",(req, res)=>{
                 return
             }
 
-            if(typeof req.file==='undefined'){
+            if(typeof req.file==='undefined' || req.file === null){
                 dao.useAppointmentSlot(req.body.appointment_id, req.body.patient_id, null, req.body.description, req.body.additional_question).then(result=>{
                     if (result.affectedRows === 0){
                         res.status(404).send({
