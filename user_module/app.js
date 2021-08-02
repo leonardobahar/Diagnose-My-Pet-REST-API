@@ -2689,6 +2689,7 @@ app.post("/api/user/use-appointment-slot",upload.single("payment_attachment"),(r
                     return res.send(error)
                 }
                 let filename;
+                console.log(req.file)
                 if  (typeof req.file === 'undefined'){
                     filename = null
                 }else{
