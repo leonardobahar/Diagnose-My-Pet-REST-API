@@ -963,8 +963,8 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
             birthDate,req.body.pet_owner,'No Attachment')
     }else{
-        const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
             false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
             {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
             {svg:{engine:"svgo",command:"--multipass"}},
@@ -1052,8 +1052,8 @@ app.post("/api/user/update-patient",upload.single("patient_attachment"),async (r
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
             birthDate,req.body.pet_owner,'No Attachment')
     }else{
-        const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
             false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
             {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
             {svg:{engine:"svgo",command:"--multipass"}},
@@ -1365,8 +1365,8 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
             })
         })
     }else{
-        const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
             false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
             {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
             {svg:{engine:"svgo",command:"--multipass"}},
@@ -1454,8 +1454,8 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
                 medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
             }else{
 
-                const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-                compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+                const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+                compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
                     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
                     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
                     {svg:{engine:"svgo",command:"--multipass"}},
@@ -1631,8 +1631,8 @@ app.post("/api/user/attach-medical-records",upload.single("mc_attachment"), asyn
         return
     }
 
-    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
         false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
         {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
         {svg:{engine:"svgo",command:"--multipass"}},
@@ -1678,8 +1678,8 @@ app.post("/api/user/update-medical-attachment",upload.single('mc_attachment'),as
         return
     }
 
-    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
         false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
         {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
         {svg:{engine:"svgo",command:"--multipass"}},
@@ -2684,8 +2684,8 @@ app.post("/api/user/use-appointment-slot",upload.single('payment_attachment'),(r
                     return
                 }
 
-                const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-                compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+                const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`;
+                compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
                     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
                     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
                     {svg:{engine:"svgo",command:"--multipass"}},
@@ -2736,8 +2736,8 @@ app.post("/api/user/use-appointment-slot",upload.single('payment_attachment'),(r
                 if  (typeof req.file === 'undefined'){
                     filename = null
                 }else{
-                    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-                    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+                    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+                    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
                         false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
                         {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
                         {svg:{engine:"svgo",command:"--multipass"}},
@@ -2904,8 +2904,8 @@ app.post("/api/user/update-appointment-slot",upload.single("payment_attachment")
         return
     }
 
-    const imageInputAbsPath=`${'./Uploads/'}Uncompressed/${req.file.filename}`
-    compressImages(imageInputAbsPath,`${'./Uploads/'}`,{compress_force:false,statistic:false,autoupdate:true},
+    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
         false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
         {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
         {svg:{engine:"svgo",command:"--multipass"}},
