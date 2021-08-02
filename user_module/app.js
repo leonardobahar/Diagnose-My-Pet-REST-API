@@ -2820,7 +2820,7 @@ app.post("/api/user/switch-appointment-slot", (req,res)=>{
     })
 })
 
-app.post("/api/user/update-appointment-slot",/*upload.single("payment_attachment"),*/(req,res)=>{
+app.post("/api/user/update-appointment-slot",upload.single("payment_attachment"),(req,res)=>{
     console.log(req.body)
     if(typeof req.body.appointment_id==='undefined' ||
         // typeof req.body.patient_id==='undefined' ||
@@ -2833,18 +2833,20 @@ app.post("/api/user/update-appointment-slot",/*upload.single("payment_attachment
         return
     }
 
-    // const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-    // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-    //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-    //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-    //     {svg:{engine:"svgo",command:"--multipass"}},
-    //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-    //     function(error,completed){
-    //         if(completed===true){
-    //             fs.unlinkSync(imageInputAbsPath)
-    //         }
-    //     }
-    // )
+    if (req.file != null || req.file) {
+        const imageInputAbsPath = `./Uploads/Uncompressed/${req.file.filename}`
+        compressImages(imageInputAbsPath, `./Uploads/`, {compress_force: false, statistic: false, autoupdate: true},
+            false, {jpg: {engine: "mozjpeg", command: ["-quality", "60"]}},
+            {png: {engine: "pngquant", command: ["--quality=20-50", "-o"]}},
+            {svg: {engine: "svgo", command: "--multipass"}},
+            {gif: {engine: "gifsicle", command: ["--colors", "64", "--use-col=web"]}},
+            function (error, completed) {
+                if (completed === true) {
+                    fs.unlinkSync(imageInputAbsPath)
+                }
+            }
+        )
+    }
 
     dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
         res.status(200).send({
