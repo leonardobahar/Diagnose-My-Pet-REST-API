@@ -947,6 +947,14 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
         return
     }
 
+    if(typeof req.body.weight==='undefined'){
+        req.body.weight=0
+    }
+
+    if(typeof req.body.is_sterilized==='undefined'){
+        req.body.is_sterilized=false
+    }
+
     if (!req.body.age.toString().includes(".")){
         req.body.age = `${req.body.age}.0`
     }
@@ -961,7 +969,7 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
         patient = new Patient(
             null,req.body.patient_name.toUpperCase(),
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-            birthDate,req.body.pet_owner,'No Attachment')
+            req.body.weight,req.body.is_sterilized,birthDate,req.body.pet_owner,'No Attachment')
     }else{
         const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
         compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
@@ -979,7 +987,7 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
         patient = new Patient(
             null,req.body.patient_name.toUpperCase(),
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-            birthDate,req.body.pet_owner,req.file.filename)
+            req.body.weight,req.body.is_sterilized,birthDate,req.body.pet_owner,req.file.filename)
 
     }
 
