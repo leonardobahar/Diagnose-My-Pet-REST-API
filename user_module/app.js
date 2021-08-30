@@ -969,7 +969,7 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
         patient = new Patient(
             null,req.body.patient_name.toUpperCase(),
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-            req.body.weight,req.body.is_sterilized,birthDate,req.body.pet_owner,'No Attachment')
+            req.body.weight,req.body.is_sterilized,req.body.description,birthDate,req.body.pet_owner,'No Attachment')
     }else{
         const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
         compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
@@ -987,7 +987,7 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
         patient = new Patient(
             null,req.body.patient_name.toUpperCase(),
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
-            req.body.weight,req.body.is_sterilized,birthDate,req.body.pet_owner,req.file.filename)
+            req.body.weight,req.body.is_sterilized,req.body.description,birthDate,req.body.pet_owner,req.file.filename)
 
     }
 
