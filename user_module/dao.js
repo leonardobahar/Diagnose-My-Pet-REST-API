@@ -730,7 +730,7 @@ export class Dao{
 
 	retrievePatientsByOwnerId(owner_id){
 		return new Promise((resolve,reject)=>{
-			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.weight, p.is_sterilized, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
+			const query="SELECT p.id, p.patient_name, p.animal_type_id, at.animal_name, p.breed, p.patient_gender, p.weight, p.is_sterilized, p.description, p.birthdate, p.pet_owner_id, u.user_name, p.patient_picture " +
 				"FROM patients p LEFT OUTER JOIN animal_type at ON p.animal_type_id=at.id "+
 				"LEFT OUTER JOIN users u ON p.pet_owner_id=u.id "+
 				"WHERE p.pet_owner_id=?"
@@ -751,6 +751,7 @@ export class Dao{
 							gender:rowDataPacket.patient_gender,
 							weight:rowDataPacket.weight,
 							is_sterilized:rowDataPacket.is_sterilized,
+							description:rowDataPacket.description,
 							birthdate:rowDataPacket.birthdate,
 							age:ageFormatter.getAgeYear(),
 							age_month:ageFormatter.getAgeMonth(),
