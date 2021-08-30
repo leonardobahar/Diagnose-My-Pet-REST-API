@@ -1336,7 +1336,7 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
 
     let medical;
     if(typeof req.file==='undefined'){
-        medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
+        medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,'No Attachment')
         dao.addMedicalRecord(medical).then(result=>{
             dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
                 res.status(200).send({
@@ -1394,7 +1394,7 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
             }
         )
 
-        medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+        medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,req.file.filename)
         dao.addMedicalRecord(medical).then(result=>{
             dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
                 res.status(200).send({
