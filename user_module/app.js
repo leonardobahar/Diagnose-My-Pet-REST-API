@@ -1440,9 +1440,9 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
         if(medResult[0].file_attachment===null || medResult[0].file_attachment==='No Attachment'){
             let medic;
             if(typeof req.file==='undefined'){
-                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,'No Attachment')
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,'No Attachment')
             }else{
-                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,req.file.filename)
             }
 
             dao.updateMedicalRecord(medic).then(result=>{
@@ -1467,7 +1467,7 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
         }else{
             let medic;
             if(typeof req.file==='undefined'){
-                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id, 'No Attachment')
             }else{
 
                 const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
@@ -1483,7 +1483,7 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
                     }
                 )
 
-                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
+                medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,req.file.filename)
                 fs.unlinkSync('./Uploads/'+medResult[0].file_attachment)
             }
 
