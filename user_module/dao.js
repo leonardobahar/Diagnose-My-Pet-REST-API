@@ -801,8 +801,8 @@ export class Dao{
 							reject(ERROR_DUPLICATE_ENTRY)
 							return
 						}else{
-							query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`patient_gender`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?,?)"
-							this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
+							query="INSERT INTO `patients`(`patient_name`,`animal_type_id`,`breed`,`weight`,`is_sterilized`,`patient_gender`,`birthdate`,`pet_owner_id`,`patient_picture`) VALUES(?,?,?,?,?,?,?,?,?)"
+							this.mysqlConn.query(query,[patient.patient_name,patient.animal_type,patient.breed, patient.weight, patient.is_sterilized,patient.gender,patient.birthdate,patient.pet_owner,patient.picture],(err,res)=>{
 								if(err){
 									reject(err)
 									return
