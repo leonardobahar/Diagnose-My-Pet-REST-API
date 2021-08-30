@@ -827,8 +827,8 @@ export class Dao{
 				return
 			} else{
 				if(patient.picture==='No Attachment'){
-					const query="UPDATE patients SET patient_name=?,animal_type_id=?,breed=?,patient_gender=?,birthdate=?,pet_owner_id=? WHERE id=?"
-					this.mysqlConn.query(query, [patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.id], (err, res)=>{
+					const query="UPDATE patients SET patient_name=?,animal_type_id=?,breed=?,weight=?,is_sterilized=?,patient_gender=?,birthdate=?,pet_owner_id=? WHERE id=?"
+					this.mysqlConn.query(query, [patient.patient_name,patient.animal_type,patient.breed,patient.weight,patient.is_sterilized,patient.gender,patient.birthdate,patient.pet_owner,patient.id], (err, res)=>{
 						if(err){
 							reject(err)
 							return
@@ -839,8 +839,8 @@ export class Dao{
 					return
 				}
 
-				const query="UPDATE patients SET patient_name=?,animal_type_id=?,breed=?,patient_gender=?,birthdate=?,pet_owner_id=?,patient_picture=? WHERE id=?"
-				this.mysqlConn.query(query, [patient.patient_name,patient.animal_type,patient.breed,patient.gender,patient.birthdate,patient.pet_owner,patient.picture,patient.id], (err, res)=>{
+				const query="UPDATE patients SET patient_name=?,animal_type_id=?,breed=?,weight=?,is_sterilized=?,patient_gender=?,birthdate=?,pet_owner_id=?,patient_picture=? WHERE id=?"
+				this.mysqlConn.query(query, [patient.patient_name,patient.animal_type,patient.breed,patient.weight,patient.is_sterilized,patient.gender,patient.birthdate,patient.pet_owner,patient.picture,patient.id], (err, res)=>{
 					if(err){
 						reject(err)
 						return
