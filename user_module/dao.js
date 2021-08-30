@@ -792,7 +792,7 @@ export class Dao{
 		return new Promise((resolve,reject)=>{
 			if(patient instanceof Patient){
 				let query = "SELECT 'x' FROM patients WHERE patient_name = ? AND breed = ? AND animal_type_id = ? AND pet_owner_id = ?"
-				this.mysqlConn.query(query, [patient.patient_name, patient.breed, patient.weight, patient.is_sterilized, patient.animal_type, patient.pet_owner], (err, res)=>{
+				this.mysqlConn.query(query, [patient.patient_name, patient.breed, patient.animal_type, patient.pet_owner], (err, res)=>{
 					if	(err){
 						reject(err)
 						return
