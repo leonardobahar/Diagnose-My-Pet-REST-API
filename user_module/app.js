@@ -84,7 +84,7 @@ const medicalRecordFilter = (req, file, cb)=>{
     cb(null, true);
 }
 
-const upload=({storage:storage, fileFilter: medicalRecordFilter})
+const upload=multer({storage:storage, fileFilter: medicalRecordFilter})
 
 const authenticateToken = (req, res, next)=>{
     // Gather the jwt access token from the request header
