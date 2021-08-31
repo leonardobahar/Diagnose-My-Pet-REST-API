@@ -65,7 +65,7 @@ const dao = new Dao(host, user, password, dbname)
 
 const storage=multer.diskStorage({
     destination: function(req, file,cb){
-        cb(null,'./Uploads/'+'Uncompressed');
+        cb(null,'./Uploads/');
     },
     filename: function (req,file,cb){
         const originalFileName=file.originalname
@@ -84,7 +84,7 @@ const medicalRecordFilter = (req, file, cb)=>{
     cb(null, true);
 }
 
-const upload=multer({storage:storage, fileFilter: medicalRecordFilter})
+const upload=({storage:storage, fileFilter: medicalRecordFilter})
 
 const authenticateToken = (req, res, next)=>{
     // Gather the jwt access token from the request header
@@ -963,24 +963,23 @@ app.post("/api/user/add-patient",upload.single("patient_attachment"),async (req,
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
             birthDate,req.body.pet_owner,'No Attachment')
     }else{
-        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-            false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-            {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-            {svg:{engine:"svgo",command:"--multipass"}},
-            {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-            function(error,completed){
-                    if(completed===true){
-                        fs.unlinkSync(imageInputAbsPath)
-                    }
-                }
-            )
+        const imageInputAbsPath=`./Uploads/${req.file.filename}`
+        // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+        //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        //     {svg:{engine:"svgo",command:"--multipass"}},
+        //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        //     function(error,completed){
+        //             if(completed===true){
+        //                 fs.unlinkSync(imageInputAbsPath)
+        //             }
+        //         }
+        //     )
 
         patient = new Patient(
             null,req.body.patient_name.toUpperCase(),
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
             birthDate,req.body.pet_owner,req.file.filename)
-
     }
 
     // Check if user id exists
@@ -1052,18 +1051,18 @@ app.post("/api/user/update-patient",upload.single("patient_attachment"),async (r
             req.body.animal_type,req.body.breed.toUpperCase(),req.body.gender.toUpperCase(),
             birthDate,req.body.pet_owner,'No Attachment')
     }else{
-        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-            false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-            {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-            {svg:{engine:"svgo",command:"--multipass"}},
-            {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-            function(error,completed){
-                if(completed===true){
-                    fs.unlinkSync(imageInputAbsPath)
-                }
-            }
-        )
+        const imageInputAbsPath=`./Uploads/${req.file.filename}`
+        // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+        //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        //     {svg:{engine:"svgo",command:"--multipass"}},
+        //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        //     function(error,completed){
+        //         if(completed===true){
+        //             fs.unlinkSync(imageInputAbsPath)
+        //         }
+        //     }
+        // )
 
         patient = new Patient(
             req.body.id,req.body.patient_name.toUpperCase(),
@@ -1365,18 +1364,18 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
             })
         })
     }else{
-        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-            false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-            {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-            {svg:{engine:"svgo",command:"--multipass"}},
-            {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-            function(error,completed){
-                if(completed===true){
-                    fs.unlinkSync(imageInputAbsPath)
-                }
-            }
-        )
+        const imageInputAbsPath=`./Uploads/${req.file.filename}`
+        // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+        //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+        //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+        //     {svg:{engine:"svgo",command:"--multipass"}},
+        //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+        //     function(error,completed){
+        //         if(completed===true){
+        //             fs.unlinkSync(imageInputAbsPath)
+        //         }
+        //     }
+        // )
 
         medical=new MedicalRecords(null,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
         dao.addMedicalRecord(medical).then(result=>{
@@ -1454,18 +1453,18 @@ app.post("/api/user/update-medical-record",upload.single('mc_attachment'),(req,r
                 medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id, 'No Attachment')
             }else{
 
-                const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-                compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-                    false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-                    {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-                    {svg:{engine:"svgo",command:"--multipass"}},
-                    {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-                    function(error,completed){
-                        if(completed===true){
-                            fs.unlinkSync(imageInputAbsPath)
-                        }
-                    }
-                )
+                // const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+                // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+                //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+                //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+                //     {svg:{engine:"svgo",command:"--multipass"}},
+                //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+                //     function(error,completed){
+                //         if(completed===true){
+                //             fs.unlinkSync(imageInputAbsPath)
+                //         }
+                //     }
+                // )
 
                 medic=new MedicalRecords(req.body.id,req.body.description,req.body.medication,'NOW()', req.body.appointment_id,req.file.filename)
                 fs.unlinkSync('./Uploads/'+medResult[0].file_attachment)
@@ -1631,18 +1630,18 @@ app.post("/api/user/attach-medical-records",upload.single("mc_attachment"), asyn
         return
     }
 
-    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-        {svg:{engine:"svgo",command:"--multipass"}},
-        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-        function(error,completed){
-            if(completed===true){
-                fs.unlinkSync(imageInputAbsPath)
-            }
-        }
-    )
+    // const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+    // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+    //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+    //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+    //     {svg:{engine:"svgo",command:"--multipass"}},
+    //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+    //     function(error,completed){
+    //         if(completed===true){
+    //             fs.unlinkSync(imageInputAbsPath)
+    //         }
+    //     }
+    // )
 
     const attachment = new MedicalRecordAttachment(null,req.query.medical_record_id, req.file.filename)
     dao.addMedicalRecordAttachment(attachment).then(result=>{
@@ -1678,18 +1677,18 @@ app.post("/api/user/update-medical-attachment",upload.single('mc_attachment'),as
         return
     }
 
-    const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-    compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-        false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-        {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-        {svg:{engine:"svgo",command:"--multipass"}},
-        {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-        function(error,completed){
-            if(completed===true){
-                fs.unlinkSync(imageInputAbsPath)
-            }
-        }
-    )
+    // const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+    // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+    //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+    //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+    //     {svg:{engine:"svgo",command:"--multipass"}},
+    //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+    //     function(error,completed){
+    //         if(completed===true){
+    //             fs.unlinkSync(imageInputAbsPath)
+    //         }
+    //     }
+    // )
 
     const attachment=new MedicalRecordAttachment(req.query.id,req.query.medical_record_id,req.file.filename)
     dao.updateMedicalRecordAttachment(attachment).then(result=>{
@@ -2679,18 +2678,18 @@ app.post("/api/user/use-appointment-slot",upload.single('payment_attachment'),(r
         if  (typeof req.file === 'undefined'){
             filename = null
         }else{
-            const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-            compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-                false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-                {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-                {svg:{engine:"svgo",command:"--multipass"}},
-                {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-                function(error,completed){
-                    if(completed===true){
-                        fs.unlinkSync(imageInputAbsPath)
-                    }
-                }
-            )
+            // const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
+            // compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+            //     false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+            //     {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+            //     {svg:{engine:"svgo",command:"--multipass"}},
+            //     {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+            //     function(error,completed){
+            //         if(completed===true){
+            //             fs.unlinkSync(imageInputAbsPath)
+            //         }
+            //     }
+            // )
             filename = req.file.filename
         }
 
@@ -2833,18 +2832,18 @@ app.post("/api/user/update-appointment-slot",upload.single("payment_attachment")
     }
 
     if (req.file != null || req.file) {
-        const imageInputAbsPath = `./Uploads/Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath, `./Uploads/`, {compress_force: false, statistic: false, autoupdate: true},
-            false, {jpg: {engine: "mozjpeg", command: ["-quality", "60"]}},
-            {png: {engine: "pngquant", command: ["--quality=20-50", "-o"]}},
-            {svg: {engine: "svgo", command: "--multipass"}},
-            {gif: {engine: "gifsicle", command: ["--colors", "64", "--use-col=web"]}},
-            function (error, completed) {
-                if (completed === true) {
-                    fs.unlinkSync(imageInputAbsPath)
-                }
-            }
-        )
+        // const imageInputAbsPath = `./Uploads/Uncompressed/${req.file.filename}`
+        // compressImages(imageInputAbsPath, `./Uploads/`, {compress_force: false, statistic: false, autoupdate: true},
+        //     false, {jpg: {engine: "mozjpeg", command: ["-quality", "60"]}},
+        //     {png: {engine: "pngquant", command: ["--quality=20-50", "-o"]}},
+        //     {svg: {engine: "svgo", command: "--multipass"}},
+        //     {gif: {engine: "gifsicle", command: ["--colors", "64", "--use-col=web"]}},
+        //     function (error, completed) {
+        //         if (completed === true) {
+        //             fs.unlinkSync(imageInputAbsPath)
+        //         }
+        //     }
+        // )
     }
 
     dao.updateAppointmentSlot(req.body.appointment_id, req.body.description, req.body.additional_storage).then(result => {
