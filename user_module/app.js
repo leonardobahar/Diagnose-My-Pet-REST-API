@@ -1324,7 +1324,7 @@ app.get("/api/user/retrieve-medical-record",(req,res)=>{
     }
 })
 
-app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res)=>{
+app.post("/api/user/add-medical-record",upload.array("mc_attachment"), (req,res)=>{
 
     if(typeof req.body.appointment_id ==='undefined'){
         res.status(400).send({
@@ -1335,7 +1335,7 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
     }
 
     let medical;
-    if(typeof req.file==='undefined'){
+    if(typeof req.files==='undefined'){
         medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,'No Attachment')
         dao.addMedicalRecord(medical).then(result=>{
             dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
@@ -1381,20 +1381,29 @@ app.post("/api/user/add-medical-record",upload.single("mc_attachment"), (req,res
             })
         })
     }else{
-        const imageInputAbsPath=`./Uploads/Uncompressed/${req.file.filename}`
-        compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
-            false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
-            {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
-            {svg:{engine:"svgo",command:"--multipass"}},
-            {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
-            function(error,completed){
-                if(completed===true){
-                    fs.unlinkSync(imageInputAbsPath)
-                }
-            }
-        )
+        let uploadedPictures=[]
 
-        medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,req.file.filename)
+        const pictures=JSON.parse(JSON.stringify(req.files))
+        for(let i=0; i<pictures.length;i++){
+            uploadedPictures.push(pictures[i].filename)
+        }
+
+        for(let i=0; i<uploadedPictures.length;i++){
+            const imageInputAbsPath=`./Uploads/Uncompressed/${uploadedPictures[i]}`
+            compressImages(imageInputAbsPath,`./Uploads/`,{compress_force:false,statistic:false,autoupdate:true},
+                false,{jpg:{engine:"mozjpeg",command:["-quality","60"]}},
+                {png:{engine:"pngquant",command:["--quality=20-50","-o"]}},
+                {svg:{engine:"svgo",command:"--multipass"}},
+                {gif:{engine:"gifsicle",command:["--colors","64","--use-col=web"]}},
+                function(error,completed){
+                    if(completed===true){
+                        fs.unlinkSync(imageInputAbsPath)
+                    }
+                }
+            )
+        }
+
+        medical=new MedicalRecords(null,req.body.description,req.body.medication,req.body.recorded_temperature,'NOW()', req.body.appointment_id,uploadedPictures.toString())
         dao.addMedicalRecord(medical).then(result=>{
             dao.finishAppointmentSchedule(req.body.appointment_id).then(result=>{
                 res.status(200).send({
